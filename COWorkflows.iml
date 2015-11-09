@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="bash" name="BashSupport">
+      <configuration>
+        <operationMode type="IgnoreAll" />
+      </configuration>
+    </facet>
+    <facet type="Python" name="Python">
+      <configuration sdkName="" />
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$USER_HOME$/.roddy">
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-xml/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-console/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-templates/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/config/codenarc" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-console/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/examples/osgi/hello-groovy-bundle" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-servlet/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-groovydoc/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-testng/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-ant/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-test/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-jmx/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/buildSrc/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-servlet/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-servlet/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-nio/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-groovysh/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-ant/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/benchmark" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/tck/src" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/buildSrc/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-test/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-servlet/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-xml/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-sql/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/spec/test-resources/reloading" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/examples" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/examples/swing" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-nio/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-nio/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/examples/osgi/hello-groovy-bundle" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-xml/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-groovydoc/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-test/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-jmx/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-sql/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-bsf/src/test/resources" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/benchmark/bench" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-jmx/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-test/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-groovydoc/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-groovysh/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-swing/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-sql/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-json/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/examples" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-testng/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-jmx/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-swing/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/test-resources" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-ant/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-jsr223/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-jsr223/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-swing/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-json/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-templates/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-templates/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-test/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/test-resources" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-bsf/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-console/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-ant/src/test-resources" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-jsr223/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/spec/test-resources/reloading" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/tck/src" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/examples/groovyShell" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-groovysh/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-bsf/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-jsr223/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/tck/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-servlet/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/examples/webapps/groovlet-examples" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-jmx/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-json/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-console/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-templates/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-bsf/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/examples/osgi/hello-groovy-test-harness" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/buildSrc/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-groovydoc/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-templates/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-ant/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-ant/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/test-resources/groovy/transform/sc" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-bsf/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/benchmark" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-jsr223/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-bsf/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-swing/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-docgenerator/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-jmx/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-groovysh/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-xml/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-jmx/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-test/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-jmx/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-jsr223/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-sql/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-templates/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/benchmark/bench" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-xml/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-json/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/buildSrc/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/tck/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-jsr223/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-json/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-docgenerator/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-bsf/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/main" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-bsf/src/test/resources" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-jsr223/src/test/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-ant/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-json/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-console/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-groovydoc/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-swing/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-nio/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-servlet/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/examples/groovyShell" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-ant/src/test-resources" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/test-resources/groovy/transform/stc" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/test-resources/groovy/transform/sc" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-jmx/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-groovydoc/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-console/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-xml/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/main" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/examples/swing" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/subprojects/groovy-templates/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/examples/webapps/groovlet-examples" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-templates/src/main/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/examples/osgi/hello-groovy-test-harness" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-swing/src/test/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/subprojects/groovy-jmx/src/spec/test" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/src/examples/searchEngine" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy/src/config/codenarc" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/examples/searchEngine" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.roddy/runtimeDevel/groovy-2.3.6/src/src/test-resources/groovy/transform/stc" isTestSource="false" />
+      <excludeFolder url="file://$USER_HOME$/.roddy/PanCanConf" />
+      <excludeFolder url="file://$USER_HOME$/.roddy/caches" />
+      <excludeFolder url="file://$USER_HOME$/.roddy/compressedAnalysisTools" />
+      <excludeFolder url="file://$USER_HOME$/.roddy/pancancer" />
+      <excludeFolder url="file://$USER_HOME$/.roddy/plugins" />
+      <excludeFolder url="file://$USER_HOME$/.roddy/roddyPipelines" />
+      <excludeFolder url="file://$USER_HOME$/.roddy/runtimeDevel" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../COProjectConfigurations">
+      <sourceFolder url="file://$MODULE_DIR$/../../COProjectConfigurations" type="java-resource" />
+    </content>
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="groovy-2.3.6" level="application" />
+    <orderEntry type="library" name="Roddy" level="project" />
+  </component>
+</module>
