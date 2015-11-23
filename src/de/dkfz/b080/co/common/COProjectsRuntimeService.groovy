@@ -327,9 +327,21 @@ public class COProjectsRuntimeService extends RuntimeService {
         } else {
             // Default case
 
-            File sampleDirectory = getSampleDirectory(context, sample, library);
+            File sampleDirectory = getSampleDirectory(context, sample);
 
-            loadFastqFilesFromDirectory(sampleDirectory, context, sample, library, laneFiles)
+            logger.postAlwaysInfo("Searching for lane files in directory ${sampleDirectory}")
+            List<File> runsForSample = FileSystemInfoProvider.getInstance().listDirectoriesInDirectory(sampleDirectory);
+            for (File run : runsForSample) {
+                File sequenceDirectory = getSequenceDirectory(context, sample, run.getName());
+                if(!FileSystemInfoProvider.getInstance().checkDirectory(sequenceDirectory, context, false)) // Skip directories which do not exist
+                    continue;
+                List<File> files = FileSystemInfoProvider.getInstance().listFilesInDirectory(sequenceDirectory);
+                if (files.size() == 0)
+                    logger.postAlwaysInfo("\t There were no lane files in directory ${sequenceDirectory}")
+                //Find file bundles
+                List<LaneFileGroup> bundleFiles = QCPipelineScriptFileServiceHelper.bundleFiles(context, sample, run.getName(), files);
+                laneFiles.addAll(bundleFiles);
+            }
         }
         if (laneFiles.size() == 0) {
             context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("There were no lane files available for sample ${sample.getName()}"));
@@ -349,7 +361,7 @@ public class COProjectsRuntimeService extends RuntimeService {
         List<File> runsForSample = FileSystemInfoProvider.getInstance().listDirectoriesInDirectory(sampleDirectory);
         for (File run : runsForSample) {
             File runFilePath = getSequenceDirectory(context, sample, run.getName(), library);
-            if(!FileSystemInfoProvider.getInstance().checkDirectory(sequenceDirectory, context, false)) // Skip directories which do not exist
+            if(!FileSystemInfoProvider.getInstance().checkDirectory(runFilePath, context, false)) // Skip directories which do not exist
                 continue;
             List<File> files = FileSystemInfoProvider.getInstance().listFilesInDirectory(runFilePath);
             if (files.size() == 0)
