@@ -349,6 +349,8 @@ public class COProjectsRuntimeService extends RuntimeService {
         List<File> runsForSample = FileSystemInfoProvider.getInstance().listDirectoriesInDirectory(sampleDirectory);
         for (File run : runsForSample) {
             File runFilePath = getSequenceDirectory(context, sample, run.getName(), library);
+            if(!FileSystemInfoProvider.getInstance().checkDirectory(sequenceDirectory, context, false)) // Skip directories which do not exist
+                continue;
             List<File> files = FileSystemInfoProvider.getInstance().listFilesInDirectory(runFilePath);
             if (files.size() == 0)
                 logger.postAlwaysInfo("\t There were no lane files in directory ${runFilePath}")
