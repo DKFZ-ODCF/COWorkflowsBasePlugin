@@ -32,7 +32,7 @@ public class BamFileGroup extends FileGroup<BamFile> {
 
     public BamFile mergeAndRemoveDuplicatesSlim(Sample sample) {
         boolean useBioBamBamMarkDuplicates = executionContext.getConfiguration().getConfigurationValues().getBoolean("useBioBamBamMarkDuplicates", true);
-        if(mergedBam == null) {
+        if (mergedBam == null) {
             mergedBam = (BamFile) GenericMethod.callGenericTool(useBioBamBamMarkDuplicates ? MERGEANDMORMDUP_SLIM_BIOBAMBAM : MERGEANDMORMDUP_SLIM_PICARD, getFilesInGroup().get(0), this, "SAMPLE=${sample.getName()}");
         }
         return mergedBam;
@@ -43,30 +43,30 @@ public class BamFileGroup extends FileGroup<BamFile> {
         boolean useBioBamBamMarkDuplicates = executionContext.getConfiguration().getConfigurationValues().getBoolean("useBioBamBamMarkDuplicates", true);
 
         List<BaseFile> parentFiles = new LinkedList<BaseFile>();
-        getFilesInGroup().each { BamFile it -> parentFiles.add((BaseFile)it);}
+        getFilesInGroup().each { BamFile it -> parentFiles.add((BaseFile) it); }
 
         BamFile bamFile = new BamFile(this);
         bamFile.setFlagstatsFile(new FlagstatsFile(bamFile));
         bamFile.setMetricsFile(new BamMetricsFile(bamFile));
-        if(useBioBamBamMarkDuplicates) bamFile.setIndexFile(new BamIndexFile(bamFile));
+        if (useBioBamBamMarkDuplicates) bamFile.setIndexFile(new BamIndexFile(bamFile));
         String parentFilePaths = parentFiles.collect { BaseFile pf -> pf.path.absolutePath }.join(":");
 
-        Map<String, Object> parameters = run.getDefaultJobParameters( MERGEANDRMDUP);
+        Map<String, Object> parameters = run.getDefaultJobParameters(MERGEANDRMDUP);
         parameters.putAll([
-                "FILENAME":bamFile.absolutePath,
-                "FILENAME_FLAGSTATS":bamFile.getFlagstatsFile().absolutePath,
-                "FILENAME_METRICS":bamFile.getMetricsFile().absolutePath,
-                "INPUT_FILES" : parentFilePaths
+                "FILENAME"          : bamFile.absolutePath,
+                "FILENAME_FLAGSTATS": bamFile.getFlagstatsFile().absolutePath,
+                "FILENAME_METRICS"  : bamFile.getMetricsFile().absolutePath,
+                "INPUT_FILES"       : parentFilePaths
         ]);
 
-        def filesToVerify = (List<BaseFile>) [bamFile, bamFile.flagstatsFile, bamFile.metricsFile]
-        if(bamFile.hasIndex())
+        def filesToVerify = [bamFile, bamFile.flagstatsFile, bamFile.metricsFile] as List<BaseFile>
+        if (bamFile.hasIndex())
             filesToVerify << bamFile.indexFile;
         JobResult jobResult = new Job(run, CommandFactory.getInstance().createJobName(parentFiles[0], MERGEANDRMDUP, true), MERGEANDRMDUP, parameters, parentFiles, filesToVerify).run();
         bamFile.setCreatingJobsResult(jobResult);
         bamFile.getMetricsFile().setCreatingJobsResult(jobResult);
         bamFile.getFlagstatsFile().setCreatingJobsResult(jobResult);
-        if(useBioBamBamMarkDuplicates) bamFile.getIndexFile().setCreatingJobsResult(jobResult);
+        if (useBioBamBamMarkDuplicates) bamFile.getIndexFile().setCreatingJobsResult(jobResult);
         return bamFile;
     }
 }

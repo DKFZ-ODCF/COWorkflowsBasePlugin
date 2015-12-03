@@ -1,7 +1,6 @@
 package de.dkfz.b080.co.common;
 
 import de.dkfz.b080.co.files.BamFile;
-import de.dkfz.b080.co.files.COFileStageSettings;
 import de.dkfz.b080.co.files.Sample;
 import de.dkfz.roddy.core.DataSet;
 import de.dkfz.roddy.core.ExecutionContext;
@@ -29,7 +28,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         context.getConfiguration().getConfigurationValues().put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" + val, "boolean");
 
         COProjectsRuntimeService runtimeService = (COProjectsRuntimeService) context.getRuntimeService();
-        List<Sample> samples = runtimeService.getSamplesForRun(context);
+        List<Sample> samples = runtimeService.getSamplesForContext(context);
         List<BamFile> bamsTumorMerged = new LinkedList<>();
         BamFile bamControlMerged = null;
         DataSet dataSet = context.getDataSet();

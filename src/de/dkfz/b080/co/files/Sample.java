@@ -21,6 +21,11 @@ public class Sample implements Comparable<Sample>, Serializable {
 
     private static final LoggerWrapper logger = LoggerWrapper.getLogger(Sample.class.getName());
 
+    /**
+     * A list of libraries which might be filled (or not)
+     */
+    private List<String> libraries;
+
     @Override
     public int compareTo(Sample o) {
         return ((Integer) sampleType.ordinal()).compareTo(o.sampleType.ordinal());
@@ -86,6 +91,10 @@ public class Sample implements Comparable<Sample>, Serializable {
         return ((COProjectsRuntimeService) project.getRuntimeService()).getLanesForSample(executionContext, this);
     }
 
+    public List<LaneFileGroup> getLanes(String library) {
+        return ((COProjectsRuntimeService) project.getRuntimeService()).getLanesForSampleAndLibrary(executionContext, this, library);
+    }
+
     public String getName() {
         return name;
     }
@@ -100,6 +109,13 @@ public class Sample implements Comparable<Sample>, Serializable {
 
     public SampleType getType() {
         return sampleType;
+    }
+
+    public List<String> getLibraries() {
+        if(libraries == null) {
+            libraries = ((COProjectsRuntimeService)executionContext.getRuntimeService()).getLibrariesForSample(this);
+        }
+        return libraries;
     }
 
     @Override
