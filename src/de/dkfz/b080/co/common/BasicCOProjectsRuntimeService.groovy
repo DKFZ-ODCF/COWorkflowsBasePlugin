@@ -160,7 +160,10 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             List<String> fastqFiles = configurationValues.getString("fastq_list", "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
             def sequenceDirectory = configurationValues.get("sequenceDirectory").toFile(context).getAbsolutePath();
             int indexOfSampleID = sequenceDirectory.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
-            samples += fastqFiles.collect {
+            samples += (List<Sample>)fastqFiles.collect {
+                if (!fileSystemAccessProvider.isReadable(new File(it))) {
+                    logger.severe("File requested by fastq_list is not readable: '${it}'")
+                }
                 it.split(StringConstants.SPLIT_SLASH)[indexOfSampleID]
             }.unique().collect {
                 if (Sample.getSampleType(context, it) != Sample.SampleType.UNKNOWN) {
@@ -173,7 +176,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
                 it != null
             } as List<Sample>;
         } else if (extractSamplesFromOutputFiles) {
-            //TODO etractSamplesFromOutputFiles fails, when no alignment directory is available. Should one fall back to the default method?
+            //TODO extractSamplesFromOutputFiles fails, when no alignment directory is available. Should one fall back to the default method?
 
             File alignmentDirectory = getAlignmentDirectory(context)
             if (!fileSystemAccessProvider.checkDirectory(alignmentDirectory, context, false)) {
