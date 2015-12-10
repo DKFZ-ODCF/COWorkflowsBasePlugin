@@ -155,11 +155,18 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     public List<Sample> extractSamplesFromFastqList(List<File> fastqFiles, ExecutionContext context) {
         COConfig cfg = new COConfig(context);
         int indexOfSampleID = cfg.getSequenceDirectory().split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
+        FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
         return fastqFiles.collect {
+            if (!fileSystemAccessProvider.isReadable(it)) {
+                logger.severe("File requested by fastq_list is not readable: '${it}'")
+            }
             it.name.split(StringConstants.SPLIT_SLASH)[indexOfSampleID]
         }.unique().collect {
             new Sample(context, it)
-        }
+        }.findAll {
+            it != null
+        } as List<Sample>;
+
     }
 
     public static String extractSampleNameFromOutputFile(String filename, boolean enforceAtomicSampleName) {
