@@ -116,7 +116,7 @@ public final class COConstants {
     public static final String CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME = "alignmentInputDirectory";
     public static final String CVALUE_SEQUENCE_DIRECTORY = "sequenceDirectory";
     public static final String CVALUE_ALIGNMENT_DIRECTORY_NAME = "alignmentOutputDirectory";
-
+    public static final String CVALUE_WINDOW_SIZE = "WINDOW_SIZE";
 
     private COConstants() {
     }
