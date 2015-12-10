@@ -174,7 +174,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
                 }
             }.findAll {
                 it != null
-            } as List<Sample>;
+            };
         } else if (extractSamplesFromOutputFiles) {
             //TODO extractSamplesFromOutputFiles fails, when no alignment directory is available. Should one fall back to the default method?
 
