@@ -199,7 +199,6 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         }
     }
 
-
     public List<Sample> extractSamplesFromSampleDirs(ExecutionContext context) {
         FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
 
