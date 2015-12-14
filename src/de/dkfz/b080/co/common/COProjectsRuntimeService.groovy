@@ -10,7 +10,6 @@ import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.core.*
 import de.dkfz.roddy.execution.io.ExecutionResult
 import de.dkfz.roddy.execution.io.ExecutionService
-import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.execution.io.fs.FileSystemInfoProvider
 import de.dkfz.roddy.execution.jobs.CommandFactory
 import de.dkfz.roddy.knowledge.files.BaseFile
@@ -204,7 +203,7 @@ public class COProjectsRuntimeService extends RuntimeService {
         boolean enforceAtomicSampleName = configurationValues.getBoolean(FLAG_ENFORCE_ATOMIC_SAMPLE_NAME, false);
 
 
-        FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
+        FileSystemInfoProvider fileSystemAccessProvider = FileSystemInfoProvider.getInstance()
         if (extractSamplesFromFastqList) {
             List<String> fastqFiles = configurationValues.getString("fastq_list", "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
             def sequenceDirectory = configurationValues.get("sequenceDirectory").toFile(context).getAbsolutePath();
@@ -272,7 +271,7 @@ public class COProjectsRuntimeService extends RuntimeService {
     }
 
     public List<String> getLibrariesForSample(Sample sample) {
-        return FileSystemAccessProvider.getInstance().listDirectoriesInDirectory(sample.path).collect { File f -> f.name } as List<String>;
+        return FileSystemInfoProvider.getInstance().listDirectoriesInDirectory(sample.path).collect { File f -> f.name } as List<String>;
     }
 
     private File getAlignmentDirectory(ExecutionContext run) {
