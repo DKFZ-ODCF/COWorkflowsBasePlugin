@@ -146,6 +146,11 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
 
 
+    public List<Sample> getSamplesForRun(ExecutionContext context) {
+        logger.warning("Deprecated method call on COProjectsRuntimeService.getSamplesForRun(ExecutionContext). Please use COProjectsRuntimeService.getSamplesForContext(ExecutionContext).")
+        return getSamplesForContext(context)
+    }
+
     public List<Sample> getSamplesForContext(ExecutionContext context) {
         List<Sample> samples = new LinkedList<Sample>();
 
