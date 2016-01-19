@@ -1,6 +1,6 @@
 package de.dkfz.b080.co.files;
 
-import de.dkfz.b080.co.common.COProjectsRuntimeService;
+import de.dkfz.b080.co.common.BasicCOProjectsRuntimeService;
 import de.dkfz.roddy.config.Configuration;
 import de.dkfz.roddy.core.Analysis;
 import de.dkfz.roddy.core.ExecutionContext;
@@ -10,7 +10,6 @@ import de.dkfz.roddy.tools.LoggerWrapper;
 import java.io.File;
 import java.io.Serializable;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * A sample is either control or tumor. It has a name and a path and belongs to a project.
@@ -87,13 +86,13 @@ public class Sample implements Comparable<Sample>, Serializable {
         return false;
     }
 
-    public List<LaneFileGroup> getLanes() {
-        return ((COProjectsRuntimeService) project.getRuntimeService()).getLanesForSample(executionContext, this);
-    }
-
-    public List<LaneFileGroup> getLanes(String library) {
-        return ((COProjectsRuntimeService) project.getRuntimeService()).getLanesForSampleAndLibrary(executionContext, this, library);
-    }
+//    public List<LaneFileGroup> getLanes() {
+//        return ((BasicCOProjectsRuntimeService) project.getRuntimeService()).getLanesForSample(executionContext, this);
+//    }
+//
+//    public List<LaneFileGroup> getLanes(String library) {
+//        return ((BasicCOProjectsRuntimeService) project.getRuntimeService()).getLanesForSampleAndLibrary(executionContext, this, library);
+//    }
 
     public String getName() {
         return name;
@@ -113,7 +112,7 @@ public class Sample implements Comparable<Sample>, Serializable {
 
     public List<String> getLibraries() {
         if(libraries == null) {
-            libraries = ((COProjectsRuntimeService)executionContext.getRuntimeService()).getLibrariesForSample(this);
+            libraries = ((BasicCOProjectsRuntimeService)executionContext.getRuntimeService()).getLibrariesForSample(this);
         }
         return libraries;
     }
