@@ -5,6 +5,5 @@ Initial import for the COWorkflows (Computational Oncology Workflows Base Plugin
 - Reverted references to FileSystemAccessProvider back to FileSystemInfoProvider to ensure compatibility of current COWorkflows to older version of Roddy (e.g. 2.2.66 currently used in OTP).
 - Changed COProjectsRuntimeService so, that a library name can be set when getting the sample or sequence directory.
 - Function added to get the read groups of a bam file from the bam header. Small fix in the SQ count
-- A speaking title like this is very nice
 - Add readme file.
 
