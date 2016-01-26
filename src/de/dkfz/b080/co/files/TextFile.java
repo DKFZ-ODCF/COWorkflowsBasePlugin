@@ -10,7 +10,9 @@ public class TextFile extends BaseFile {
         super(parentFile);
     }
 
-    public TextFile(BamFile parentFile) { super(parentFile); }
+    public TextFile(BasicBamFile parentFile) {
+        super(parentFile);
+    }
 
     public TextFile(BaseFile parentFile, String nameSelectionTag, boolean sourceFile) {
         this(parentFile);

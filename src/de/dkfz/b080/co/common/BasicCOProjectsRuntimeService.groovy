@@ -29,9 +29,9 @@ import static de.dkfz.b080.co.files.COConstants.*
  */
 //@PluginImplementation
 @groovy.transform.CompileStatic
-public class COProjectsRuntimeService extends RuntimeService {
+public class BasicCOProjectsRuntimeService extends RuntimeService {
 
-    private static LoggerWrapper logger = LoggerWrapper.getLogger(COProjectsRuntimeService.class.getName());
+    private static LoggerWrapper logger = LoggerWrapper.getLogger(BasicCOProjectsRuntimeService.class.getName());
 
     private static List<File> alreadySearchedMergedBamFolders = [];
 
@@ -144,55 +144,7 @@ public class COProjectsRuntimeService extends RuntimeService {
     }
 
 
-    private static void getFileCompression(ExecutionContext run, List<LaneFile> allLaneFiles) {
-        ExecutionService es = ExecutionService.getInstance();
-        StringBuilder command = new StringBuilder();
-        for (LaneFile lf : allLaneFiles) {
-            if (lf.getDecompressionString() == null) {
-                command << "&& file -bL ${lf.path.absolutePath}";
-//            } else if (lf.getDecompressionString().equals("setgid")) {
-//                command << "&& file -bL ${lf.path.absolutePath} | cut -d' ' -f2 ";
-            } else {
-                command << "&& echo 0 ";
-            }
-        }
 
-        //TODO Throw or post error that no lane files are available
-
-        ExecutionResult er = es.execute(command[2..-1].toString());
-        for (int i = 0; i < er.resultLines.size(); i++) {
-            //Look at Matthias ExomePipeline extension. The code is mainly taken from there.
-            String dCString = null;
-            String dRString = "gzip -c"; //POSSIBLE-ERROR: Not zipper set for 'cat'/ASCII
-            String type = er.resultLines[i];
-            if (type.startsWith("setgid "))
-                type = type[7..-1].trim().split(" ")[0];
-            if (type == "0") continue;
-            if (type == "gzip") {
-                dCString = "gunzip -c";
-                dRString = "gzip -c"
-            } else if (type == "bzip2") {
-                dCString = "bunzip2 -c -k";
-                dRString = "bzip2 -c -k";
-            } else if (type == "ASCII" || type == "ASCII text") {
-                dCString = "cat";
-                dRString = "head -n E";
-            }
-            allLaneFiles[i].setDecompressionString(dCString);
-            allLaneFiles[i].setRecompressionString(dRString);
-        }
-    }
-
-    public static void determineFileDecoder(ExecutionContext context, List<LaneFileGroup> laneFileGroupList) {
-        List<LaneFile> allLaneFiles = [];
-        for (LaneFileGroup lfg : laneFileGroupList) {
-            List<LaneFile> lflist = lfg.getFilesInGroup();
-            for (LaneFile lf : lflist) {
-                allLaneFiles << lf;
-            }
-        }
-        getFileCompression(context, allLaneFiles);
-    }
 
     public List<Sample> getSamplesForContext(ExecutionContext context) {
         List<Sample> samples = new LinkedList<Sample>();
@@ -274,13 +226,13 @@ public class COProjectsRuntimeService extends RuntimeService {
         return FileSystemInfoProvider.getInstance().listDirectoriesInDirectory(sample.path).collect { File f -> f.name } as List<String>;
     }
 
-    private File getAlignmentDirectory(ExecutionContext run) {
+    protected File getAlignmentDirectory(ExecutionContext run) {
         String alignmentFolderName = run.getConfiguration().getConfigurationValues().getString(CVALUE_ALIGNMENT_DIRECTORY_NAME, "alignment");
         File alignmentDirectory = getDirectory(alignmentFolderName, run);
         alignmentDirectory
     }
 
-    private File getInpDirectory(String dir, ExecutionContext process, Sample sample, String library = null) {
+    protected File getInpDirectory(String dir, ExecutionContext process, Sample sample, String library = null) {
         Configuration cfg = process.getConfiguration();
         File path = cfg.getConfigurationValues().get(dir).toFile(process);
         String temp = path.getAbsolutePath();
@@ -294,117 +246,16 @@ public class COProjectsRuntimeService extends RuntimeService {
         return new File(temp);
     }
 
-    private File getSampleDirectory(ExecutionContext process, Sample sample, String library = null) {
+    public File getSampleDirectory(ExecutionContext process, Sample sample, String library = null) {
         File sampleDir = getInpDirectory(COConstants.CVALUE_SAMPLE_DIRECTORY, process, sample, library);
         return sampleDir
     }
 
-    private File getSequenceDirectory(ExecutionContext process, Sample sample, String run, String library = null) {
+    public File getSequenceDirectory(ExecutionContext process, Sample sample, String run, String library = null) {
         return new File(getInpDirectory(COConstants.CVALUE_SEQUENCE_DIRECTORY, process, sample, library).getAbsolutePath().replace('${run}', run));
     }
 
-    public List<LaneFileGroup> getLanesForSample(ExecutionContext context, Sample sample, String library = null) {
-        ProcessingFlag flag = context.setProcessingFlag(ProcessingFlag.STORE_FILES);
-        List<LaneFileGroup> laneFiles = new LinkedList<LaneFileGroup>();
-
-        def configurationValues = context.getConfiguration().getConfigurationValues()
-        boolean getLanesFromFastqList = configurationValues.getString("fastq_list", "");
-        if (getLanesFromFastqList) {
-            // If fastq_list was set via command line or via config file.
-            List<File> fastqFiles = configurationValues.getString("fastq_list").split(StringConstants.SPLIT_SEMICOLON).collect { String it -> new File(it); };
-            def sequenceDirectory = configurationValues.get(COConstants.CVALUE_SEQUENCE_DIRECTORY).toFile(context).getAbsolutePath();
-            int indexOfSampleID = sequenceDirectory.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
-            int indexOfRunID = sequenceDirectory.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${run}' }
-
-            List<File> listOfFastqFilesForSample = fastqFiles.findAll { it.absolutePath.split(StringConstants.SPLIT_SLASH)[indexOfSampleID] == sample.getName() } as List<File>
-            List<String> listOfRunIDs = listOfFastqFilesForSample.collect { it.absolutePath.split(StringConstants.SPLIT_SLASH)[indexOfRunID] }.unique() as List<String>
-            listOfRunIDs.each { String runID ->
-                List<File> fastqFilesForRun = listOfFastqFilesForSample.findAll { it.absolutePath.split(StringConstants.SPLIT_SLASH)[indexOfRunID] == runID } as List<File>
-                List<LaneFileGroup> bundleFiles = QCPipelineScriptFileServiceHelper.bundleFiles(context, sample, runID, fastqFilesForRun);
-                laneFiles.addAll(bundleFiles);
-            }
-
-        } else {
-            // Default case
-
-            File sampleDirectory = getSampleDirectory(context, sample);
-
-            logger.postAlwaysInfo("Searching for lane files in directory ${sampleDirectory}")
-            List<File> runsForSample = FileSystemInfoProvider.getInstance().listDirectoriesInDirectory(sampleDirectory);
-            for (File run : runsForSample) {
-                File sequenceDirectory = getSequenceDirectory(context, sample, run.getName());
-                if(!FileSystemInfoProvider.getInstance().checkDirectory(sequenceDirectory, context, false)) // Skip directories which do not exist
-                    continue;
-                List<File> files = FileSystemInfoProvider.getInstance().listFilesInDirectory(sequenceDirectory);
-                if (files.size() == 0)
-                    logger.postAlwaysInfo("\t There were no lane files in directory ${sequenceDirectory}")
-                //Find file bundles
-                List<LaneFileGroup> bundleFiles = QCPipelineScriptFileServiceHelper.bundleFiles(context, sample, run.getName(), files);
-                laneFiles.addAll(bundleFiles);
-            }
-        }
-        if (laneFiles.size() == 0) {
-            context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("There were no lane files available for sample ${sample.getName()}"));
-        } else {
-            determineFileDecoder(context, laneFiles);
-        }
-        context.setProcessingFlag(flag);
-        return laneFiles;
-    }
-
-    public List<LaneFileGroup> getLanesForSampleAndLibrary(ExecutionContext context, Sample sample, String library) {
-        return getLanesForSample(context, sample, library);
-    }
-
-    private void loadFastqFilesFromDirectory(File sampleDirectory, ExecutionContext context, Sample sample, String library = null, LinkedList<LaneFileGroup> laneFiles) {
-        logger.postAlwaysInfo("Searching for lane files in directory ${sampleDirectory}")
-        List<File> runsForSample = FileSystemInfoProvider.getInstance().listDirectoriesInDirectory(sampleDirectory);
-        for (File run : runsForSample) {
-            File runFilePath = getSequenceDirectory(context, sample, run.getName(), library);
-            if(!FileSystemInfoProvider.getInstance().checkDirectory(runFilePath, context, false)) // Skip directories which do not exist
-                continue;
-            List<File> files = FileSystemInfoProvider.getInstance().listFilesInDirectory(runFilePath);
-            if (files.size() == 0)
-                logger.postAlwaysInfo("\t There were no lane files in directory ${runFilePath}")
-            //Find file bundles
-            List<LaneFileGroup> bundleFiles = QCPipelineScriptFileServiceHelper.bundleFiles(context, sample, run.getName(), files);
-            laneFiles.addAll(bundleFiles);
-        }
-    }
-
-    public BamFileGroup getPairedBamFilesForDataSet(ExecutionContext context, Sample sample) {
-        File alignmentDirectory = getAlignmentDirectory(context);
-        final String pairedBamSuffix = context.getConfiguration().getConfigurationValues().get("pairedBamSuffix", "paired.bam.sorted.bam")
-        //TODO Create constants
-        List<String> filters = ["${sample.getName()}*${pairedBamSuffix}".toString()]
-        List<File> pairedBamPaths = FileSystemInfoProvider.getInstance().listFilesInDirectory(alignmentDirectory, filters);
-
-        int laneID = 0;
-        List<BamFile> bamFiles = pairedBamPaths.collect({
-            File f ->
-                laneID++;
-                String name = f.getName();
-                String[] split = name.split(StringConstants.SPLIT_UNDERSCORE);
-                String sampleName = split[0];
-                int runIndex = 1;
-                if (split[1].isInteger()) {
-                    runIndex = 2;
-                    sampleName = split[0..1].join(StringConstants.UNDERSCORE);
-                }
-                String run = split[runIndex..-2].join(StringConstants.UNDERSCORE);
-                String lane = String.format("L%03d", laneID);
-
-
-                BamFile bamFile = new BamFile(f, context, new COFileStageSettings(lane, run, sample, context.getDataSet()))
-                bamFile.setAsSourceFile();
-                return bamFile;
-        })
-        BamFileGroup bamFileGroup = new BamFileGroup(bamFiles);
-        logger.info("Found ${bamFileGroup.getFilesInGroup().size()} paired bam files for sample ${sample.getName()}");
-        return bamFileGroup;
-    }
-
-    public BamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, Sample sample) {
+    public BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, Sample sample) {
         //TODO Create constants
 
         def configurationValues = context.getConfiguration().getConfigurationValues()
@@ -443,7 +294,7 @@ public class COProjectsRuntimeService extends RuntimeService {
 
         mergedBamPaths = FileSystemInfoProvider.getInstance().listFilesInDirectory(searchDirectory, filters);
 
-        List<BamFile> bamFiles = mergedBamPaths.collect({
+        List<BasicBamFile> bamFiles = mergedBamPaths.collect({
             File f ->
                 String name = f.getName();
                 String[] split = name.split(StringConstants.SPLIT_UNDERSCORE);
@@ -454,7 +305,7 @@ public class COProjectsRuntimeService extends RuntimeService {
                 String run = split[runIndex..-2].join(StringConstants.UNDERSCORE);
 
 
-                BamFile bamFile = new BamFile(f, context, new COFileStageSettings(run, sample, context.getDataSet()))
+                BasicBamFile bamFile = new BasicBamFile(f, context, null, null, new COFileStageSettings(run, sample, context.getDataSet()))
                 bamFile.setAsSourceFile();
                 return bamFile;
         })
@@ -464,7 +315,7 @@ public class COProjectsRuntimeService extends RuntimeService {
         if (bamFiles.size() > 1) {
             StringBuilder info = new StringBuilder();
             info << "Found more ${bamFiles.size()} merged bam files for sample ${sample.getName()}.\nConsider using option searchMergedBamFilesWithPID=true in your configuration.";
-            bamFiles.each { BamFile bamFile -> info << "\t" << bamFile.getAbsolutePath() << "\n"; }
+            bamFiles.each { BasicBamFile bamFile -> info << "\t" << bamFile.getAbsolutePath() << "\n"; }
 
             logger.postAlwaysInfo(info.toString());
             return null;
@@ -477,38 +328,6 @@ public class COProjectsRuntimeService extends RuntimeService {
         return bamFiles[0];
     }
 
-    public BamFileGroup getMergedBamFilesForDataSet(ExecutionContext context) {
 
-        ProcessingFlag flag = context.setProcessingFlag(ProcessingFlag.STORE_NOTHING);
-
-//        File outputFolderForDataSetAndAnalysis = getOutputFolderForDataSetAndAnalysis(context.getDataSet(), context.getAnalysis());
-        BamFileGroup mergedBamFiles = new BamFileGroup();
-        Map<Sample.SampleType, CoverageTextFileGroup> coverageTextFilesBySample = new LinkedHashMap<>();
-
-        //Set level to test, set back later.
-        ExecutionContextLevel executionContextLevel = context.getExecutionContextLevel();
-        ExecutionContextSubLevel detailedExecutionContextLevel = context.getDetailedExecutionContextLevel();
-        context.setExecutionContextLevel(ExecutionContextLevel.QUERY_STATUS);
-//        context.setExecutionContextLevel(ExecutionContextLevel.QUERY_STATUS);
-        getSamplesForContext(context).parallelStream().forEach(new Consumer<Sample>() {
-            @Override
-            void accept(Sample sample) {
-                List<LaneFileGroup> rawSequenceGroups = sample.getLanes();
-                BamFileGroup sortedBamFiles = new BamFileGroup();
-
-                for (LaneFileGroup rawSequenceGroup : rawSequenceGroups) {
-                    rawSequenceGroup.alignAll();
-                    BamFile bamFile = rawSequenceGroup.getAllAlignedFiles().pairAndSort();
-                    sortedBamFiles.addFile(bamFile);
-                }
-                context.setProcessingFlag(ProcessingFlag.STORE_FILES);
-                mergedBamFiles.addFile(sortedBamFiles.mergeAndRemoveDuplicates());
-                context.setProcessingFlag(ProcessingFlag.STORE_NOTHING);
-            }
-        });
-        context.setExecutionContextLevel(executionContextLevel);
-        context.setProcessingFlag(flag);
-        return mergedBamFiles;
-    }
 
 }

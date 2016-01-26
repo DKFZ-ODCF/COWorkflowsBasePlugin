@@ -1,6 +1,6 @@
 package de.dkfz.b080.co.common;
 
-import de.dkfz.b080.co.files.BamFile;
+import de.dkfz.b080.co.files.BasicBamFile;
 import de.dkfz.b080.co.files.Sample;
 import de.dkfz.roddy.core.DataSet;
 import de.dkfz.roddy.core.ExecutionContext;
@@ -20,26 +20,26 @@ import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT
  */
 public abstract class WorkflowUsingMergedBams extends Workflow {
 
-    private Map<DataSet, BamFile[]> foundInputFiles = new LinkedHashMap<>();
+    private Map<DataSet, BasicBamFile[]> foundInputFiles = new LinkedHashMap<>();
 
-    public BamFile[] getInitialBamFiles(ExecutionContext context) {
+    public BasicBamFile[] getInitialBamFiles(ExecutionContext context) {
         //Enable extract samples by default.
         boolean val = context.getConfiguration().getConfigurationValues().getBoolean(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, true);
         context.getConfiguration().getConfigurationValues().put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" + val, "boolean");
 
-        COProjectsRuntimeService runtimeService = (COProjectsRuntimeService) context.getRuntimeService();
+        BasicCOProjectsRuntimeService runtimeService = (BasicCOProjectsRuntimeService) context.getRuntimeService();
         List<Sample> samples = runtimeService.getSamplesForContext(context);
-        List<BamFile> bamsTumorMerged = new LinkedList<>();
-        BamFile bamControlMerged = null;
+        List<BasicBamFile> bamsTumorMerged = new LinkedList<>();
+        BasicBamFile bamControlMerged = null;
         DataSet dataSet = context.getDataSet();
 
-        BamFile[] found = null;
+        BasicBamFile[] found = null;
 
         synchronized (foundInputFiles) {
             if (!foundInputFiles.containsKey(dataSet)) {
-                List<BamFile> allFound = new LinkedList<>();
+                List<BasicBamFile> allFound = new LinkedList<>();
                 for (Sample sample : samples) {
-                    BamFile tempBam = ((COProjectsRuntimeService) context.getRuntimeService()).getMergedBamFileForDataSetAndSample(context, sample);
+                    BasicBamFile tempBam = ((BasicCOProjectsRuntimeService) context.getRuntimeService()).getMergedBamFileForDataSetAndSample(context, sample);
                     if (sample.getType() == Sample.SampleType.CONTROL)
                         bamControlMerged = tempBam;
                     else if (sample.getType() == Sample.SampleType.TUMOR)
@@ -47,14 +47,14 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
                 }
                 allFound.add(bamControlMerged);
                 allFound.addAll(bamsTumorMerged);
-                foundInputFiles.put(dataSet, allFound.toArray(new BamFile[0]));
+                foundInputFiles.put(dataSet, allFound.toArray(new BasicBamFile[0]));
             }
             found = foundInputFiles.get(dataSet);
             if (found != null && found[0] != null && found[0].getExecutionContext() != context) {
-                BamFile[] copy = new BamFile[found.length];
+                BasicBamFile[] copy = new BasicBamFile[found.length];
                 for (int i = 0; i < found.length; i++) {
                     if (found[i] == null) continue;
-                    copy[i] = new BamFile(found[i].getPath(), context, found[i].getFileStage().copy());
+                    copy[i] = new BasicBamFile(found[i].getPath(), context, null, null, found[i].getFileStage().copy());
                     copy[i].setAsSourceFile();
                 }
                 found = copy;
@@ -63,9 +63,9 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         return found;
     }
 
-    public boolean checkInitialFiles(ExecutionContext context, BamFile[] initialBamFiles) {
-        BamFile bamControlMerged = initialBamFiles[0];
-        BamFile bamTumorMerged = initialBamFiles[1];
+    public boolean checkInitialFiles(ExecutionContext context, BasicBamFile[] initialBamFiles) {
+        BasicBamFile bamControlMerged = initialBamFiles[0];
+        BasicBamFile bamTumorMerged = initialBamFiles[1];
         if (bamControlMerged == null || bamTumorMerged == null) {
             if (bamControlMerged == null)
                 context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control bam is missing"));
@@ -79,7 +79,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
 
     @Override
     public boolean execute(ExecutionContext context) {
-        BamFile[] initialBamFiles = getInitialBamFiles(context);
+        BasicBamFile[] initialBamFiles = getInitialBamFiles(context);
         if (!checkInitialFiles(context, initialBamFiles))
             return false;
 
@@ -90,12 +90,12 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         return execute(context, initialBamFiles[0], initialBamFiles[1]);
     }
 
-    protected abstract boolean execute(ExecutionContext context, BamFile bamControlMerged, BamFile bamTumorMerged);
+    protected abstract boolean execute(ExecutionContext context, BasicBamFile bamControlMerged, BasicBamFile bamTumorMerged);
 
-    private boolean executeMulti(ExecutionContext context, BamFile[] initialBamFiles) {
+    private boolean executeMulti(ExecutionContext context, BasicBamFile[] initialBamFiles) {
 
         boolean result = true;
-        BamFile bamControlMerged = initialBamFiles[0];
+        BasicBamFile bamControlMerged = initialBamFiles[0];
         for (int i = 1; i < initialBamFiles.length; i++) {
             result &= execute(context, bamControlMerged, initialBamFiles[i]);
         }
@@ -104,7 +104,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
 
     @Override
     public boolean checkExecutability(ExecutionContext context) {
-        BamFile[] initialBamFiles = getInitialBamFiles(context);
+        BasicBamFile[] initialBamFiles = getInitialBamFiles(context);
         if (initialBamFiles == null) return false;
         return checkInitialFiles(context, initialBamFiles);
     }
