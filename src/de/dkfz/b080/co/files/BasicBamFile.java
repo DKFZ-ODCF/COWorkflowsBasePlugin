@@ -14,28 +14,11 @@ import java.util.List;
  * Created by heinold on 14.01.16.
  */
 public class BasicBamFile extends COBaseFile {
-
-    public BasicBamFile(FileGroup parentFileGroup, FileStageSettings settings, JobResult jobResult) {
-        super(parentFileGroup, settings, jobResult);
+    public BasicBamFile(ConstructionHelperForBaseFiles helper) {
+        super(helper);
     }
 
-    public BasicBamFile(FileGroup parentFileGroup, FileStageSettings settings) {
-        super(parentFileGroup, settings);
-    }
-
-    public BasicBamFile(BaseFile parentFile, FileStageSettings fileStage, JobResult jobResult) {
-        super(parentFile, fileStage, jobResult);
-    }
-
-    public BasicBamFile(BaseFile parentFile) {
-        super(parentFile);
-    }
-
-    public BasicBamFile(BaseFile parentFile, FileStageSettings settings) {
-        super(parentFile, settings);
-    }
-
-    public BasicBamFile(File path, ExecutionContext executionContext, JobResult jobResult, List parentFiles, FileStageSettings settings) {
-        super(path, executionContext, jobResult, parentFiles, settings);
+    public BasicBamFile(BaseFile parent) {
+        super(parent);
     }
 }

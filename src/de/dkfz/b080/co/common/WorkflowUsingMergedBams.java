@@ -6,6 +6,7 @@ import de.dkfz.roddy.core.DataSet;
 import de.dkfz.roddy.core.ExecutionContext;
 import de.dkfz.roddy.core.ExecutionContextError;
 import de.dkfz.roddy.core.Workflow;
+import de.dkfz.roddy.knowledge.files.BaseFile;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -54,7 +55,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
                 BasicBamFile[] copy = new BasicBamFile[found.length];
                 for (int i = 0; i < found.length; i++) {
                     if (found[i] == null) continue;
-                    copy[i] = new BasicBamFile(found[i].getPath(), context, null, null, found[i].getFileStage().copy());
+                    copy[i] = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(found[i].getPath(), context, found[i].getFileStage().copy(), null));
                     copy[i].setAsSourceFile();
                 }
                 found = copy;

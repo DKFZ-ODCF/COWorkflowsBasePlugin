@@ -6,18 +6,7 @@ import de.dkfz.roddy.knowledge.files.BaseFile;
  * Just a simple text file for various purposes
  */
 public class TextFile extends BaseFile {
-    public TextFile(BaseFile parentFile) {
-        super(parentFile);
-    }
-
-    public TextFile(BasicBamFile parentFile) {
-        super(parentFile);
-    }
-
-    public TextFile(BaseFile parentFile, String nameSelectionTag, boolean sourceFile) {
-        this(parentFile);
-        this.overrideFilenameUsingSelectionTag(nameSelectionTag);
-        if(sourceFile)
-            setAsSourceFile();
+    public TextFile(ConstructionHelperForBaseFiles helper) {
+        super(helper);
     }
 }

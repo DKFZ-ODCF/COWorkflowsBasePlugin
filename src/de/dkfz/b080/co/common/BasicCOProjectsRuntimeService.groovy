@@ -304,9 +304,8 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
                 }
                 String run = split[runIndex..-2].join(StringConstants.UNDERSCORE);
 
-
-                BasicBamFile bamFile = new BasicBamFile(f, context, null, null, new COFileStageSettings(run, sample, context.getDataSet()))
-                bamFile.setAsSourceFile();
+//                                    BaseFile.ConstructionHelperForSourceFiles.construct(BasicBamFile, f, context, new COFileStageSettings(run, sample, context.getDataSet()));
+                BasicBamFile bamFile = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(f, context, new COFileStageSettings(run, sample, context.getDataSet()), null));
                 return bamFile;
         })
 
