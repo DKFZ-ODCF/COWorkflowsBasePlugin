@@ -10,7 +10,7 @@ import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.core.*
 import de.dkfz.roddy.execution.io.ExecutionResult
 import de.dkfz.roddy.execution.io.ExecutionService
-import de.dkfz.roddy.execution.io.fs.FileSystemInfoProvider
+import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.execution.jobs.CommandFactory
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
@@ -160,7 +160,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         boolean enforceAtomicSampleName = configurationValues.getBoolean(FLAG_ENFORCE_ATOMIC_SAMPLE_NAME, false);
 
 
-        FileSystemInfoProvider fileSystemAccessProvider = FileSystemInfoProvider.getInstance()
+        FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
         if (extractSamplesFromFastqList) {
             List<String> fastqFiles = configurationValues.getString("fastq_list", "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
             def sequenceDirectory = configurationValues.get("sequenceDirectory").toFile(context).getAbsolutePath();
@@ -231,7 +231,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     }
 
     public List<String> getLibrariesForSample(Sample sample) {
-        return FileSystemInfoProvider.getInstance().listDirectoriesInDirectory(sample.path).collect { File f -> f.name } as List<String>;
+        return FileSystemAccessProvider.getInstance().listDirectoriesInDirectory(sample.path).collect { File f -> f.name } as List<String>;
     }
 
     protected File getAlignmentDirectory(ExecutionContext run) {
@@ -300,7 +300,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             }
         }
 
-        mergedBamPaths = FileSystemInfoProvider.getInstance().listFilesInDirectory(searchDirectory, filters);
+        mergedBamPaths = FileSystemAccessProvider.getInstance().listFilesInDirectory(searchDirectory, filters);
 
         List<BasicBamFile> bamFiles = mergedBamPaths.collect({
             File f ->
