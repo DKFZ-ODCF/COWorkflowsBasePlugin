@@ -8,8 +8,11 @@
       <sourceFolder url="file://$MODULE_DIR$/resources/analysisTools" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Roddy" level="project" />
+    <orderEntry type="library" name="PluginBase" level="project" />
+    <orderEntry type="library" name="roddy" level="project" />
+    <orderEntry type="library" name="roddyBundledLibraries" level="project" />
+    <orderEntry type="library" name="groovy-2.4.5" level="application" />
   </component>
 </module>
