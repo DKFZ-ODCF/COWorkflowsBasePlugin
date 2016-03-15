@@ -1,5 +1,11 @@
 Initial import for the COWorkflows (Computational Oncology Workflows Base Plugin for Roddy) repo into Phabricator.
 
+* Version update to 1.1.39
+
+- JDK Version 1.8
+- Groovy Version 2.4
+- Roddy API Version 2.3
+
 * Version update to 1.1.20
 
 - Reverted references to FileSystemAccessProvider back to FileSystemInfoProvider to ensure compatibility of current COWorkflows to older version of Roddy (e.g. 2.2.66 currently used in OTP).
