@@ -7,15 +7,12 @@ package de.dkfz.b080.co.common
 import de.dkfz.b080.co.files.*
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
+import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
 import de.dkfz.roddy.core.*
-import de.dkfz.roddy.execution.io.ExecutionResult
-import de.dkfz.roddy.execution.io.ExecutionService
 import de.dkfz.roddy.execution.io.fs.FileSystemInfoProvider
 import de.dkfz.roddy.execution.jobs.CommandFactory
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
-
-import java.util.function.Consumer
 
 import static de.dkfz.b080.co.files.COConstants.*
 
@@ -151,27 +148,16 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
         def configurationValues = context.getConfiguration().getConfigurationValues()
         boolean extractSamplesFromFastqList = configurationValues.getString("fastq_list", ""); //Evaluates to false automatically.
+        boolean extractSamplesFromBamfileList = configurationValues.hasValue("bamfile_list"); //Evaluates to false automatically.
         boolean extractSamplesFromOutputFiles = configurationValues.getBoolean(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, false);
-        boolean enforceAtomicSampleName = configurationValues.getBoolean(FLAG_ENFORCE_ATOMIC_SAMPLE_NAME, false);
-
 
         FileSystemInfoProvider fileSystemAccessProvider = FileSystemInfoProvider.getInstance()
         if (extractSamplesFromFastqList) {
             List<String> fastqFiles = configurationValues.getString("fastq_list", "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
-            def sequenceDirectory = configurationValues.get("sequenceDirectory").toFile(context).getAbsolutePath();
-            int indexOfSampleID = sequenceDirectory.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
-            samples += fastqFiles.collect {
-                it.split(StringConstants.SPLIT_SLASH)[indexOfSampleID]
-            }.unique().collect {
-                if (Sample.getSampleType(context, it) != Sample.SampleType.UNKNOWN) {
-                    return new Sample(context, it)
-                } else {
-                    logger.warning("Unknown sample type '${it}'")
-                    return (List<Sample>) null
-                }
-            }.findAll {
-                it != null
-            } as List<Sample>;
+            samples = extractSamplesFromSequenceDirectory(configurationValues, context, fastqFiles)
+        } else if (extractSamplesFromBamfileList) {
+            List<File> bamFiles = configurationValues.getString("bamfile_list", "").split(StringConstants.SPLIT_SEMICOLON).collect { String f -> new File(f); };
+            samples = extractSamplesFromFilenames(bamFiles, context)
         } else if (extractSamplesFromOutputFiles) {
             //TODO etractSamplesFromOutputFiles fails, when no alignment directory is available. Should one fall back to the default method?
 
@@ -182,32 +168,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             }
             List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort();
 
-            List<Sample.SampleType> availableTypes = [];
-            for (File f : filesInDirectory) {
-                String name = f.getName();
-                String sampleName = null;
-                try {
-                    String[] split = name.split(StringConstants.SPLIT_UNDERSCORE);
-                    sampleName = split[0];
-                    if (!enforceAtomicSampleName && split[1].isInteger() && split[1].length() <= 2)
-                        sampleName = split[0..1].join(StringConstants.UNDERSCORE);
-
-                    Sample.SampleType type = Sample.getSampleType(context, sampleName)
-                    if (type == Sample.SampleType.UNKNOWN)
-                        throw new Exception();
-                    if (!availableTypes.contains(type)) {
-                        availableTypes << type;
-                    }
-                } catch (Exception ex) {
-                    logger.warning("The sample for file ${f.getAbsolutePath()} could not be determined.");
-                }
-
-                if (!samples.find { sample -> sample.name == sampleName })
-                    samples << new Sample(context, sampleName);
-            }
-            if (samples.size() == 0) {
-                logger.warning("There were no samples available for dataset ${context.getDataSet().getId()}, extractSamplesFromOutputFiles is set to true, should this value be false?")
-            }
+            samples = extractSamplesFromFilenames(filesInDirectory, context)
         } else {
             List<File> sampleDirs = fileSystemAccessProvider.listDirectoriesInDirectory(context.getInputDirectory());
             for (File sd : sampleDirs) {
@@ -220,6 +181,64 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             }
         }
         return samples;
+    }
+
+    public static List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
+        def configurationValues = context.getConfiguration().getConfigurationValues()
+        boolean enforceAtomicSampleName = configurationValues.getBoolean(FLAG_ENFORCE_ATOMIC_SAMPLE_NAME, false);
+        LinkedList<Sample> samples = [];
+        List<Sample.SampleType> availableTypes = [];
+        for (File f : filesInDirectory) {
+            String name = f.getName();
+            String sampleName = null;
+            try {
+                String[] split = name.split(StringConstants.SPLIT_UNDERSCORE);
+                sampleName = split[0];
+                if (!enforceAtomicSampleName && split[1].isInteger() && split[1].length() <= 2)
+                    sampleName = split[0..1].join(StringConstants.UNDERSCORE);
+
+                Sample.SampleType type = Sample.getSampleType(context, sampleName)
+                if (type == Sample.SampleType.UNKNOWN)
+                    throw new Exception();
+                if (!availableTypes.contains(type)) {
+                    availableTypes << type;
+                }
+            } catch (Exception ex) {
+                logger.warning("The sample for file ${f.getAbsolutePath()} could not be determined.");
+            }
+
+            if (!samples.find { sample -> sample.name == sampleName })
+                samples << new Sample(context, sampleName);
+        }
+        if (samples.size() == 0) {
+            logger.warning("There were no samples available for dataset ${context.getDataSet().getId()}, extractSamplesFromOutputFiles is set to true, should this value be false?")
+        }
+        return samples;
+    }
+
+    /**
+     * Try to extract samples from the filename suffixes.
+     * @param configurationValues
+     * @param context
+     * @param fastqFiles
+     * @return
+     */
+    public static List<Sample> extractSamplesFromSequenceDirectory(RecursiveOverridableMapContainerForConfigurationValues configurationValues, ExecutionContext context, List<String> fastqFiles) {
+        def sequenceDirectory = configurationValues.get("sequenceDirectory").toFile(context).getAbsolutePath();
+        int indexOfSampleID = sequenceDirectory.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
+        List<Sample> samples = fastqFiles.collect {
+            it.split(StringConstants.SPLIT_SLASH)[indexOfSampleID]
+        }.unique().collect {
+            if (Sample.getSampleType(context, it) != Sample.SampleType.UNKNOWN) {
+                return new Sample(context, it)
+            } else {
+                logger.warning("Unknown sample type '${it}'")
+                return (List<Sample>) null
+            }
+        }.findAll {
+            it != null
+        } as List<Sample>;
+        return samples
     }
 
     public List<String> getLibrariesForSample(Sample sample) {

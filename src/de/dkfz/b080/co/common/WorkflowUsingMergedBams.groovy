@@ -1,17 +1,17 @@
 package de.dkfz.b080.co.common;
 
-import de.dkfz.b080.co.files.BasicBamFile;
+import de.dkfz.b080.co.files.BasicBamFile
+import de.dkfz.b080.co.files.COFileStageSettings;
 import de.dkfz.b080.co.files.Sample;
+import de.dkfz.roddy.StringConstants;
+import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues;
 import de.dkfz.roddy.core.DataSet;
 import de.dkfz.roddy.core.ExecutionContext;
 import de.dkfz.roddy.core.ExecutionContextError;
 import de.dkfz.roddy.core.Workflow;
-import de.dkfz.roddy.knowledge.files.BaseFile;
+import de.dkfz.roddy.knowledge.files.BaseFile
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES;
 
@@ -19,14 +19,18 @@ import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT
  * A basic workflow which uses merged bam files as an input and offers some check routines for those files.
  * Created by michael on 05.05.14.
  */
+
 public abstract class WorkflowUsingMergedBams extends Workflow {
 
     private Map<DataSet, BasicBamFile[]> foundInputFiles = new LinkedHashMap<>();
 
     public BasicBamFile[] getInitialBamFiles(ExecutionContext context) {
         //Enable extract samples by default.
-        boolean val = context.getConfiguration().getConfigurationValues().getBoolean(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, true);
-        context.getConfiguration().getConfigurationValues().put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" + val, "boolean");
+        RecursiveOverridableMapContainerForConfigurationValues configurationValues = context.getConfiguration().getConfigurationValues();
+        boolean extractSamplesFromOutputFiles = configurationValues.getBoolean(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, true);
+        configurationValues.put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" + extractSamplesFromOutputFiles, "boolean");
+
+        boolean bamfileListIsSet = configurationValues.hasValue("bamfile_list");
 
         BasicCOProjectsRuntimeService runtimeService = (BasicCOProjectsRuntimeService) context.getRuntimeService();
         List<Sample> samples = runtimeService.getSamplesForContext(context);
@@ -39,12 +43,26 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         synchronized (foundInputFiles) {
             if (!foundInputFiles.containsKey(dataSet)) {
                 List<BasicBamFile> allFound = new LinkedList<>();
-                for (Sample sample : samples) {
-                    BasicBamFile tempBam = ((BasicCOProjectsRuntimeService) context.getRuntimeService()).getMergedBamFileForDataSetAndSample(context, sample);
-                    if (sample.getType() == Sample.SampleType.CONTROL)
-                        bamControlMerged = tempBam;
-                    else if (sample.getType() == Sample.SampleType.TUMOR)
-                        bamsTumorMerged.add(tempBam);
+                if (bamfileListIsSet) {
+
+                    List<String> bamFiles = configurationValues.getString("bamfile_list", "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
+                    for (String bf : bamFiles) {
+                        def path = new File(bf)
+                        Sample sample = BasicCOProjectsRuntimeService.extractSamplesFromFilenames([path], context)[0];
+                        if (sample.getType() == Sample.SampleType.CONTROL)
+                            bamControlMerged = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(path, context, new COFileStageSettings(sample, dataSet), null));
+                        else if (sample.getType() == Sample.SampleType.TUMOR)
+                            bamsTumorMerged.add(new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(path, context, new COFileStageSettings(sample, dataSet), null)));
+                    }
+                } else {
+
+                    for (Sample sample : samples) {
+                        BasicBamFile tempBam = ((BasicCOProjectsRuntimeService) context.getRuntimeService()).getMergedBamFileForDataSetAndSample(context, sample);
+                        if (sample.getType() == Sample.SampleType.CONTROL)
+                            bamControlMerged = tempBam;
+                        else if (sample.getType() == Sample.SampleType.TUMOR)
+                            bamsTumorMerged.add(tempBam);
+                    }
                 }
                 allFound.add(bamControlMerged);
                 allFound.addAll(bamsTumorMerged);
