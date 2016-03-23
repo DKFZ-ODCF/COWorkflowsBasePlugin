@@ -94,19 +94,19 @@ public class COFileStageSettings extends FileStageSettings<COFileStageSettings> 
 
     @Override
     public String fillStringContent(String temp) {
-        temp = temp.replace("${sample}", getSample().getName());
-        temp = temp.replace("${run}", getRunID());
-        temp = temp.replace("${lane}", getLaneId());
-        temp = temp.replace("${laneindex}", getIndex());
+        if (sample != null) temp = temp.replace("${sample}", getSample().getName());
+        if (runID != null) temp = temp.replace("${run}", getRunID());
+        if (laneId != null) temp = temp.replace("${lane}", getLaneId());
+        if (index != null) temp = temp.replace("${laneindex}", getIndex());
         return temp;
     }
 
     @Override
     public String fillStringContentWithArrayValues(int index, String temp) {
-        temp = temp.replace(String.format("${sample[%d]}", index), getSample().getName());
-        temp = temp.replace(String.format("${run[%d]}", index), getRunID());
-        temp = temp.replace(String.format("${lane[%d]}", index), getLaneId());
-        temp = temp.replace(String.format("${laneindex[%d]}", index), getIndex());
+        if (sample != null) temp = temp.replace(String.format("${sample[%d]}", index), getSample().getName());
+        if (runID != null) temp = temp.replace(String.format("${run[%d]}", index), getRunID());
+        if (laneId != null) temp = temp.replace(String.format("${lane[%d]}", index), getLaneId());
+        if (this.index != null) temp = temp.replace(String.format("${laneindex[%d]}", index), getIndex());
         return temp;
     }
 }
