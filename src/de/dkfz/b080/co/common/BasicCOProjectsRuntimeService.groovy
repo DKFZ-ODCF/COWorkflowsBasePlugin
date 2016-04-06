@@ -9,7 +9,7 @@ import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
 import de.dkfz.roddy.core.*
-import de.dkfz.roddy.execution.io.fs.FileSystemInfoProvider
+import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.execution.jobs.CommandFactory
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
@@ -132,16 +132,13 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             result = false;
         }
 
-// If the file is not valid then also temporary parent files should be invalidated! Or at least checked.
+        // TODO If the file is not valid then also temporary parent files should be invalidated! Or at least checked.
         if (!result) {
 
         }
 
         return result;
     }
-
-
-
 
     public List<Sample> getSamplesForContext(ExecutionContext context) {
         List<Sample> samples = new LinkedList<Sample>();
@@ -151,7 +148,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         boolean extractSamplesFromBamfileList = configurationValues.hasValue("bamfile_list"); //Evaluates to false automatically.
         boolean extractSamplesFromOutputFiles = configurationValues.getBoolean(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, false);
 
-        FileSystemInfoProvider fileSystemAccessProvider = FileSystemInfoProvider.getInstance()
+        FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
         if (extractSamplesFromFastqList) {
             List<String> fastqFiles = configurationValues.getString("fastq_list", "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
             samples = extractSamplesFromSequenceDirectory(configurationValues, context, fastqFiles)
@@ -242,7 +239,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     }
 
     public List<String> getLibrariesForSample(Sample sample) {
-        return FileSystemInfoProvider.getInstance().listDirectoriesInDirectory(sample.path).collect { File f -> f.name } as List<String>;
+        return FileSystemAccessProvider.getInstance().listDirectoriesInDirectory(sample.path).collect { File f -> f.name } as List<String>;
     }
 
     protected File getAlignmentDirectory(ExecutionContext run) {
@@ -311,7 +308,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             }
         }
 
-        mergedBamPaths = FileSystemInfoProvider.getInstance().listFilesInDirectory(searchDirectory, filters);
+        mergedBamPaths = FileSystemAccessProvider.getInstance().listFilesInDirectory(searchDirectory, filters);
 
         List<BasicBamFile> bamFiles = mergedBamPaths.collect({
             File f ->
