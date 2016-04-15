@@ -56,6 +56,7 @@ public final class COConstants {
      */
     public static final String FLAG_USE_ACCELERATED_HARDWARE = "useAcceleratedHardware";
     public static final String FLAG_USE_BIOBAMBAM_SORT = "useBioBamBamSort";
+    public static final String FLAG_USE_BIOBAMBAM_MARK_DUPLICATES = "useBioBamBamMarkDuplicates";
     public static final String FLAG_USE_ADAPTOR_TRIMMING = "useAdaptorTrimming";
     public static final String FLAG_USE_EXISTING_PAIRED_BAMS = "useExistingPairedBams";
     public static final String FLAG_USE_EXISTING_MERGED_BAMS = "useExistingMergedBams";
@@ -116,7 +117,7 @@ public final class COConstants {
     public static final String CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME = "alignmentInputDirectory";
     public static final String CVALUE_SEQUENCE_DIRECTORY = "sequenceDirectory";
     public static final String CVALUE_ALIGNMENT_DIRECTORY_NAME = "alignmentOutputDirectory";
-
+    public static final String CVALUE_MARK_DUPLICATES_VARIANT = "markDuplicatesVariant";
 
     private COConstants() {
     }
