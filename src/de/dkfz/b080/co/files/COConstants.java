@@ -3,6 +3,7 @@ package de.dkfz.b080.co.files;
 /**
  * A static class for the storage of computational oncology based constants.
  */
+@groovy.transform.CompileStatic
 public final class COConstants {
     /**
      * Tool entries
@@ -116,7 +117,15 @@ public final class COConstants {
     public static final String CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME = "alignmentInputDirectory";
     public static final String CVALUE_SEQUENCE_DIRECTORY = "sequenceDirectory";
     public static final String CVALUE_ALIGNMENT_DIRECTORY_NAME = "alignmentOutputDirectory";
+    public static final String CVALUE_WINDOW_SIZE = "WINDOW_SIZE";
 
+    /**
+     * Input table column names
+     */
+    public static final String INPUT_TABLE_SAMPLE_NAME = "SampleName";
+    public static final String INPUT_TABLE_LIBRARY = "Library";
+    public static final String INPUT_TABLE_RUN_ID = "RunId";
+    public static final String INPUT_TABLE_READ_NUMBER = "ReadNumber";
 
     private COConstants() {
     }

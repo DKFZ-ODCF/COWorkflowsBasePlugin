@@ -5,6 +5,7 @@
 package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.*
+import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
@@ -13,8 +14,6 @@ import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.execution.jobs.CommandFactory
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
-
-import static de.dkfz.b080.co.files.COConstants.*
 
 //import net.xeoh.plugins.base.annotations.PluginImplementation
 
@@ -32,6 +31,8 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
     private static List<File> alreadySearchedMergedBamFolders = [];
 
+    private static Map<ExecutionContext, MetadataTable> inputTablesByContext = [:]
+
     /**
      * Releases the cache in this provider
      */
@@ -47,15 +48,10 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     @Override
     public void destroy() {
     }
-//
-//    @Override
-//    public Map<String, Object> getDefaultJobParameters(ExecutionContext context, String TOOLID) {
-//    }
 
     public Map<String, Object> getDefaultJobParameters(ExecutionContext context, String toolID) {
         def fs = context.getRuntimeService();
         //File cf = fs..createTemporaryConfigurationFile(executionContext);
-        Configuration cfg = context.getConfiguration();
         String pid = context.getDataSet().toString()
         Map<String, Object> parameters = [
                 pid         : (Object) pid,
@@ -132,14 +128,19 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             result = false;
         }
 
+<<<<<<< HEAD
         // TODO If the file is not valid then also temporary parent files should be invalidated! Or at least checked.
+=======
+        // TODO? If the file is not valid then also temporary parent files should be invalidated! Or at least checked.
+>>>>>>> f7157ff483ef2e11c896cf429c13b9e9f7732b85
         if (!result) {
-
+            // Something is missing here! Michael?
         }
 
         return result;
     }
 
+<<<<<<< HEAD
     public List<Sample> getSamplesForContext(ExecutionContext context) {
         List<Sample> samples = new LinkedList<Sample>();
 
@@ -157,32 +158,86 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             samples = extractSamplesFromFilenames(bamFiles, context)
         } else if (extractSamplesFromOutputFiles) {
             //TODO etractSamplesFromOutputFiles fails, when no alignment directory is available. Should one fall back to the default method?
+=======
+    protected MetadataTable getMetadataTable(ExecutionContext context) {
+        return new MetadataTable(context.getDataSet().getMetadataTable());
+    }
 
-            File alignmentDirectory = getAlignmentDirectory(context)
-            if (!fileSystemAccessProvider.checkDirectory(alignmentDirectory, context, false)) {
-                logger.severe("Cannot retrieve samples from missing directory: " + alignmentDirectory.absolutePath);
-                return (List<Sample>) null;
-            }
-            List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort();
-
-            samples = extractSamplesFromFilenames(filesInDirectory, context)
-        } else {
-            List<File> sampleDirs = fileSystemAccessProvider.listDirectoriesInDirectory(context.getInputDirectory());
-            for (File sd : sampleDirs) {
-                if (Sample.getSampleType(context, sd.getName()) == Sample.SampleType.UNKNOWN) {
-                    logger.warning("Skipping directory ${sd.absolutePath}, name is not a known sample type.")
-                    continue;
-                } else {
-                    samples.add(new Sample(context, sd));
-                }
-            }
+    public List<Sample> extractSamplesFromMetadataTable(ExecutionContext context) {
+        return getMetadataTable(context).listSampleNames().collect {
+            new Sample(context, it)
         }
-        return samples;
+    }
+
+    public List<String> extractLibrariesFromMetadataTable(ExecutionContext context, String sampleName) {
+        MetadataTable resultTable = getMetadataTable(context).subsetBySample(sampleName)
+        assert resultTable.size() > 0
+        return resultTable.listLibraries()
+    }
+
+    public List<Sample> extractSamplesFromFastqList(List<File> fastqFiles, ExecutionContext context) {
+        COConfig cfg = new COConfig(context);
+        int indexOfSampleID = cfg.getSequenceDirectory().split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
+        return fastqFiles.collect {
+            it.name.split(StringConstants.SPLIT_SLASH)[indexOfSampleID]
+        }.unique().collect {
+            new Sample(context, it)
+        }
+    }
+>>>>>>> f7157ff483ef2e11c896cf429c13b9e9f7732b85
+
+    public static String extractSampleNameFromOutputFile(String filename, boolean enforceAtomicSampleName) {
+        String[] split = filename.split(StringConstants.SPLIT_UNDERSCORE);
+        if (split.size() <= 2) {
+            return null
+        }
+        String sampleName = split[0];
+        if (!enforceAtomicSampleName && split[1].isInteger() && split[1].length() <= 2)
+            sampleName = split[0..1].join(StringConstants.UNDERSCORE);
+        return sampleName
+    }
+
+    public List<Sample> extractSamplesFromOutputFiles(ExecutionContext context) {
+        //TODO extractSamplesFromOutputFiles fails, when no alignment directory is available. Should one fall back to the default method?
+        COConfig cfg = new COConfig(context);
+        FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
+
+        File alignmentDirectory = getAlignmentDirectory(context)
+        if (!fileSystemAccessProvider.checkDirectory(alignmentDirectory, context, false)) {
+            logger.severe("Cannot retrieve samples from missing directory: " + alignmentDirectory.absolutePath);
+            return (List<Sample>) null;
+        }
+        List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort();
+
+        return filesInDirectory.collect { File file ->
+            extractSampleNameFromOutputFile(file.name, cfg.enforceAtomicSampleName)
+        }.unique().collect {
+            new Sample(context, it)
+        }
+    }
+
+
+    public List<Sample> extractSamplesFromSampleDirs(ExecutionContext context) {
+        FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
+
+        if (!fileSystemAccessProvider.checkDirectory(context.getInputDirectory(), context, false)) {
+            logger.severe("Cannot retrieve samples from missing directory: " + context.getInputDirectory().getAbsolutePath());
+            return (List<Sample>) null;
+        }
+        List<File> sampleDirs = fileSystemAccessProvider.listFilesInDirectory(context.getInputDirectory()).sort();
+
+        return sampleDirs.collect {
+            new Sample(context, it)
+        }
+    }
+
+
+    public List<String> extractLibrariesFromSampleDirectory(File sampleDirectory) {
+        return FileSystemAccessProvider.getInstance().listDirectoriesInDirectory(sampleDirectory).collect { File f -> f.name } as List<String>;
     }
 
     public static List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
-        def configurationValues = context.getConfiguration().getConfigurationValues()
-        boolean enforceAtomicSampleName = configurationValues.getBoolean(FLAG_ENFORCE_ATOMIC_SAMPLE_NAME, false);
+        COConfig cfg = new COConfig(context)
         LinkedList<Sample> samples = [];
         List<Sample.SampleType> availableTypes = [];
         for (File f : filesInDirectory) {
@@ -191,7 +246,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             try {
                 String[] split = name.split(StringConstants.SPLIT_UNDERSCORE);
                 sampleName = split[0];
-                if (!enforceAtomicSampleName && split[1].isInteger() && split[1].length() <= 2)
+                if (!cfg.getEnforceAtomicSampleName() && split[1].isInteger() && split[1].length() <= 2)
                     sampleName = split[0..1].join(StringConstants.UNDERSCORE);
 
                 Sample.SampleType type = Sample.getSampleType(context, sampleName)
@@ -213,39 +268,50 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return samples;
     }
 
-    /**
-     * Try to extract samples from the filename suffixes.
-     * @param configurationValues
-     * @param context
-     * @param fastqFiles
-     * @return
-     */
-    public static List<Sample> extractSamplesFromSequenceDirectory(RecursiveOverridableMapContainerForConfigurationValues configurationValues, ExecutionContext context, List<String> fastqFiles) {
-        def sequenceDirectory = configurationValues.get("sequenceDirectory").toFile(context).getAbsolutePath();
-        int indexOfSampleID = sequenceDirectory.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
-        List<Sample> samples = fastqFiles.collect {
-            it.split(StringConstants.SPLIT_SLASH)[indexOfSampleID]
-        }.unique().collect {
-            if (Sample.getSampleType(context, it) != Sample.SampleType.UNKNOWN) {
-                return new Sample(context, it)
-            } else {
-                logger.warning("Unknown sample type '${it}'")
-                return (List<Sample>) null
-            }
-        }.findAll {
-            it != null
-        } as List<Sample>;
-        return samples
-    }
 
+<<<<<<< HEAD
     public List<String> getLibrariesForSample(Sample sample) {
         return FileSystemAccessProvider.getInstance().listDirectoriesInDirectory(sample.path).collect { File f -> f.name } as List<String>;
+=======
+    public List<Sample> getSamplesForContext(ExecutionContext context) {
+        // @Michael: I think that COConfig accessors actually belong into the Context itself.
+        COConfig cfg = new COConfig(context);
+        List<Sample> samples
+        String extractedFrom
+        if (Roddy.isMetadataCLOptionSet()) {
+            samples = extractSamplesFromMetadataTable(context)
+            extractedFrom = "input table '${getMetadataTable(context)}'"
+        } else if (cfg.extractSamplesFromFastqFileList) {
+            List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f); }
+            samples = extractSamplesFromFastqList(fastqFiles, context)
+            extractedFrom = "fastq_list configuration value"
+        } else if (cfg.extractSamplesFromOutputFiles) {
+            samples = extractSamplesFromOutputFiles(context)
+            extractedFrom = "output files"
+        } else if (cfg.extractSamplesFromBamList) {
+            List<File> bamFiles = cfg.getBamList().collect { String f -> new File(f); }
+            samples = extractSamplesFromFilenames(bamFiles, context)
+            // @Michael: Should that not better be called "bam_list" in analogy to "fastq_list"?
+            extractedFrom = "bamfile_list configuration value "
+        } else {
+            samples = extractSamplesFromSampleDirs(context)
+            extractedFrom = "subdirectories of input directory '${context.inputDirectory}'"
+        }
+
+        // Remove unknown samples
+        samples.removeAll { Sample sample ->
+            sample.sampleType == Sample.SampleType.UNKNOWN
+        }
+        if (samples.size() == 0) {
+            logger.warning("No valid samples could be extracted from ${extractedFrom} for dataset ${context.getDataSet().getId()}.")
+        }
+        return samples
+>>>>>>> f7157ff483ef2e11c896cf429c13b9e9f7732b85
     }
 
-    protected File getAlignmentDirectory(ExecutionContext run) {
-        String alignmentFolderName = run.getConfiguration().getConfigurationValues().getString(CVALUE_ALIGNMENT_DIRECTORY_NAME, "alignment");
-        File alignmentDirectory = getDirectory(alignmentFolderName, run);
-        alignmentDirectory
+    protected File getAlignmentDirectory(ExecutionContext context) {
+        COConfig cfg = new COConfig(context)
+        return getDirectory(cfg.alignmentFolderName, context);
     }
 
     protected File getInpDirectory(String dir, ExecutionContext process, Sample sample, String library = null) {
@@ -254,7 +320,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         String temp = path.getAbsolutePath();
         temp = temp.replace('${dataSet}', process.getDataSet().toString());
         temp = temp.replace('${sample}', sample.getName());
-        if(library)
+        if (library)
             temp = temp.replace('${library}', library);
         else
             temp = temp.replace('${library}/', "");
@@ -273,16 +339,11 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
     public BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, Sample sample) {
         //TODO Create constants
-
-        def configurationValues = context.getConfiguration().getConfigurationValues()
-        final String[] mergedBamSuffixList = configurationValues.get("mergedBamSuffixList", "merged.bam.dupmarked.bam").toString().split(StringConstants.COMMA);
-        final boolean useMergedBamsFromInputDirectory = configurationValues.getBoolean("useMergedBamsFromInputDirectory", false);
-        final boolean searchMergedBamFilesWithPID = configurationValues.getBoolean("searchMergedBamFilesWithPID", false);
-
+        COConfig cfg = new COConfig(context)
 
         List<String> filters = [];
-        for (String suffix in mergedBamSuffixList) {
-            if (!searchMergedBamFilesWithPID) {
+        for (String suffix in cfg.mergedBamSuffixList) {
+            if (!cfg.searchMergedBamFilesWithPID) {
                 filters += ["${sample.getName()}*${suffix}".toString()
                             , "${sample.getName().toLowerCase()}*${suffix}".toString()
                             , "${sample.getName().toUpperCase()}*${suffix}".toString()]
@@ -298,7 +359,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         List<File> mergedBamPaths;
 
         File searchDirectory = getAlignmentDirectory(context);
-        if (useMergedBamsFromInputDirectory)
+        if (cfg.useMergedBamsFromInputDirectory)
             searchDirectory = getInpDirectory(COConstants.CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME, context, sample);
 
         synchronized (alreadySearchedMergedBamFolders) {
@@ -342,7 +403,6 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
         return bamFiles[0];
     }
-
 
 
 }

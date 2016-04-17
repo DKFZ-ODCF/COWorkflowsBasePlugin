@@ -1,0 +1,9 @@
+PID	SampleName	Library	RunId	ReadNumber	File
+stds_fastq_bisulfite	tumor	lib1	run1	2	/home/heinold/temp/roddyLocalTest/testproject/vbp/stds_fastq_bisulfite/control/lib0/paired/run0/sequence/D2826_GATCAGA_L002_R2_001.fastq.gz
+stds_fastq_bisulfite	tumor	lib1	run2	1	/home/heinold/temp/roddyLocalTest/testproject/vbp/stds_fastq_bisulfite/control/lib0/paired/run0/sequence/D2826_GATCAGA_L002_R1_001.fastq.gz
+stds_fastq_bisulfite	tumor	lib2	run3	2	/home/heinold/temp/roddyLocalTest/testproject/vbp/stds_fastq_bisulfite/control/lib0/paired/run1/sequence/D2826_GATCAGA_L002_R2_001.fastq.gz
+stds_fastq_bisulfite	tumor	lib2	run4	1 /home/heinold/temp/roddyLocalTest/testproject/vbp/stds_fastq_bisulfite/control/lib0/paired/run1/sequence/D2826_GATCAGA_L002_R1_001.fastq.gz
+stds_fastq_bisulfite	control	lib1	run5	1 /home/heinold/temp/roddyLocalTest/testproject/vbp/stds_fastq_bisulfite/tumor/lib0/paired/run150319_D00133_0107_BC5YE7ACXX/sequence/D2826_GATCAGA_L002_R1_001.fastq.gz
+stds_fastq_bisulfite	control	lib1	run6	2 /home/heinold/temp/roddyLocalTest/testproject/vbp/stds_fastq_bisulfite/tumor/lib0/paired/run150326_D00695_0025_BC6B2MACXX/sequence/D2826_GATCAGA_L002_R2_001.fastq.gz
+stds_fastq_bisulfite	control	lib2	run7	1 /home/heinold/temp/roddyLocalTest/testproject/vbp/stds_fastq_bisulfite/tumor/lib0/paired/run150326_D00695_0025_BC6B2MACXX/sequence/D2826_GATCAGA_L002_R1_001.fastq.gz
+stds_fastq_bisulfite	control	lib2	run8	2 /home/heinold/temp/roddyLocalTest/testproject/vbp/stds_fastq_bisulfite/tumor/lib0/paired/run150319_D00133_0107_BC5YE7ACXX/sequence/D2826_GATCAGA_L002_R2_001.fastq.gz
