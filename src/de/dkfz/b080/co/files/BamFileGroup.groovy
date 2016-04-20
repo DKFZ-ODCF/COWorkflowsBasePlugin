@@ -40,27 +40,27 @@ public class BamFileGroup extends FileGroup<BamFile> {
         if (mergedBam == null) {
             RecursiveOverridableMapContainerForConfigurationValues cvalues = executionContext.getConfiguration().getConfigurationValues()
             boolean useBioBamBamMarkDuplicates = cvalues.getBoolean(COConstants.FLAG_USE_BIOBAMBAM_MARK_DUPLICATES, true);
-            boolean markDuplicatesVariant = cvalues.getString(COConstants.CVALUE_MARK_DUPLICATES_VARIANT, null);
-            String jobName
-            if (markDuplicatesVariant == null) {
+            String markDuplicatesVariant = cvalues.getString(COConstants.CVALUE_MARK_DUPLICATES_VARIANT, null);
+            String toolId
+            if (markDuplicatesVariant == null || markDuplicatesVariant == "") {
                 logger.postSometimesInfo("${COConstants.FLAG_USE_BIOBAMBAM_MARK_DUPLICATES} is deprecated. Use ${COConstants.CVALUE_MARK_DUPLICATES_VARIANT}.")
-                jobName = useBioBamBamMarkDuplicates ? MERGEANDMORMDUP_SLIM_BIOBAMBAM : MERGEANDMORMDUP_SLIM_PICARD
+                toolId = useBioBamBamMarkDuplicates ? MERGEANDMORMDUP_SLIM_BIOBAMBAM : MERGEANDMORMDUP_SLIM_PICARD
             } else {
-                switch (markDuplicatesVariant) {
+                switch (markDuplicatesVariant.toLowerCase()) {
                     case "biobambam":
-                        jobName = MERGEANDMORMDUP_SLIM_BIOBAMBAM
+                        toolId = MERGEANDMORMDUP_SLIM_BIOBAMBAM
                         break
                     case "picard":
-                        jobName = MERGEANDMORMDUP_SLIM_PICARD
+                        toolId = MERGEANDMORMDUP_SLIM_PICARD
                         break
                     case "sambamba":
-                        jobName = MERGEANDMORMDUP_SLIM_SAMBAMBA
+                        toolId = MERGEANDMORMDUP_SLIM_SAMBAMBA
                         break
                     default:
                         throw new RuntimeException("markDuplicatesVariant=${markDuplicatesVariant} is not supported")
                 }
             }
-            mergedBam = (BamFile) GenericMethod.callGenericTool(jobName, getFilesInGroup().get(0), this, "SAMPLE=${sample.getName()}");
+            mergedBam = (BamFile) GenericMethod.callGenericTool(toolId, getFilesInGroup().get(0), this, "SAMPLE=${sample.getName()}");
         }
         return mergedBam;
     }
