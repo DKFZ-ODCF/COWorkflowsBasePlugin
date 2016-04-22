@@ -83,6 +83,8 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
     }
 
     public boolean checkInitialFiles(ExecutionContext context, BasicBamFile[] initialBamFiles) {
+        if(!initialBamFiles)  initialBamFiles = new BasicBamFile[2];
+        if(initialBamFiles.size() == 1) initialBamFiles = [ initialBamFiles[0], null] as BasicBamFile[];
         BasicBamFile bamControlMerged = initialBamFiles[0];
         BasicBamFile bamTumorMerged = initialBamFiles[1];
         if (bamControlMerged == null || bamTumorMerged == null) {

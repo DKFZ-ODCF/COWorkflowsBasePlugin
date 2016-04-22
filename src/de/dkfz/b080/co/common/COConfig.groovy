@@ -39,12 +39,19 @@ class COConfig {
         return !getBamList().isEmpty()
     }
 
+    private List<String> checkAndSplitListFromConfig(String listID) {
+        String list = configValues.getString(listID, null);
+        if(list)
+            return list.split(StringConstants.SPLIT_SEMICOLON) as List<String>
+        return [];
+    }
+
     public List<String> getFastqList() {
-        return configValues.getString("fastq_list", "").split(StringConstants.SPLIT_SEMICOLON) as List<String>
+        return checkAndSplitListFromConfig("fastq_list");
     }
 
     public List<String> getBamList() {
-        return configValues.getString("bamfile_list", "").split(StringConstants.SPLIT_SEMICOLON) as List<String>
+        return checkAndSplitListFromConfig("bamfile_list");
     }
 
     public String getSequenceDirectory() {
