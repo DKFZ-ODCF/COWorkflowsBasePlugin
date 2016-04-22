@@ -11,29 +11,10 @@ import static de.dkfz.b080.co.files.COConstants.*
  * getOptionalColumns() methods.
  */
 @CompileStatic
-public class MetadataTable  extends BaseMetadataTable<MetadataTable> {
+public class MetadataTable  extends BaseMetadataTable {
 
-    public MetadataTable(BaseMetadataTable BaseMetadataTable) {
-        this(BaseMetadataTable.headerMap, BaseMetadataTable.records);
-    }
-
-    public MetadataTable(Map<String, Integer> newHeaderMap, List<Map<String, String>> newTable) {
-        super(newHeaderMap, newTable)
-    }
-
-    @Override
-    protected List<String> _getAdditionalMandatoryColumnNames() {
-        return [
-                INPUT_TABLE_SAMPLE_NAME,     // e.g. tumor, control
-                INPUT_TABLE_LIBRARY,         // library identifier
-                INPUT_TABLE_RUN_ID,          // e.g. run150626_ST-E00204_0045_AH5MK5CCXX
-                INPUT_TABLE_READ_NUMBER,     // 1 or 2 representing read 1 or read 2
-        ] as List<String>
-    }
-
-    @Override
-    protected void _assertCustom() {
-        assertUniqueFastq()
+    public MetadataTable(BaseMetadataTable baseMetadataTable) {
+        super(baseMetadataTable);
     }
 
     private void assertUniqueFastq() {
@@ -54,23 +35,23 @@ public class MetadataTable  extends BaseMetadataTable<MetadataTable> {
     }
 
     public MetadataTable subsetBySample(String sampleName) {
-        return (MetadataTable)subsetByColumn(INPUT_TABLE_SAMPLE_NAME, sampleName);
+        return (MetadataTable)subsetByColumn(INPUT_TABLE_MERGECOL_NAME, sampleName);
     }
 
     public MetadataTable subsetByLibrary(String library) {
-        return (MetadataTable)subsetByColumn(INPUT_TABLE_LIBRARY, library);
+        return (MetadataTable)subsetByColumn(INPUT_TABLE_MARKCOL_NAME, library);
     }
 
     public List<String> listSampleNames() {
-        return listColumn(INPUT_TABLE_SAMPLE_NAME).unique()
+        return listColumn(INPUT_TABLE_MERGECOL_NAME).unique()
     }
 
     public List<String> listRunIDs() {
-        return listColumn(INPUT_TABLE_RUN_ID).unique()
+        return listColumn(INPUT_TABLE_RUNCOL_NAME).unique()
     }
 
     public List<String> listLibraries() {
-        return listColumn(INPUT_TABLE_LIBRARY).unique()
+        return listColumn(INPUT_TABLE_MARKCOL_NAME).unique()
     }
 
 }

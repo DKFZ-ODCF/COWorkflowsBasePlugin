@@ -10,6 +10,9 @@ import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.core.RuntimeService
+import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
+import de.dkfz.roddy.core.*
+import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.execution.jobs.CommandFactory
 import de.dkfz.roddy.knowledge.files.BaseFile
@@ -137,7 +140,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     }
 
     protected MetadataTable getMetadataTable(ExecutionContext context) {
-        return new MetadataTable(context.getDataSet().getMetadataTable());
+        return new MetadataTable(MetadataTableFactory.getTable(context.getAnalysis()));
     }
 
     public List<Sample> extractSamplesFromMetadataTable(ExecutionContext context) {
@@ -181,13 +184,13 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         File alignmentDirectory = getAlignmentDirectory(context)
         if (!fileSystemAccessProvider.checkDirectory(alignmentDirectory, context, false)) {
             logger.severe("Cannot retrieve samples from missing directory: " + alignmentDirectory.absolutePath);
-            return (List<Sample>) null;
+            return (List<Sample>) [];
         }
         List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort();
 
         return filesInDirectory.collect { File file ->
             extractSampleNameFromOutputFile(file.name, cfg.enforceAtomicSampleName)
-        }.unique().collect {
+        }.unique().findAll { it != null }.collect {
             new Sample(context, it)
         }
     }
@@ -198,7 +201,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
         if (!fileSystemAccessProvider.checkDirectory(context.getInputDirectory(), context, false)) {
             logger.severe("Cannot retrieve samples from missing directory: " + context.getInputDirectory().getAbsolutePath());
-            return (List<Sample>) null;
+            return (List<Sample>) [];
         }
         List<File> sampleDirs = fileSystemAccessProvider.listFilesInDirectory(context.getInputDirectory()).sort();
 
@@ -243,7 +246,6 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         }
         return samples;
     }
-
 
     public List<Sample> getSamplesForContext(ExecutionContext context) {
         // @Michael: I think that COConfig accessors actually belong into the Context itself.

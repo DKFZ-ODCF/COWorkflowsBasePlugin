@@ -1,4 +1,4 @@
-PID	SampleName	Library	RunId	ReadNumber	File
+PID	Sample	Library	Run	Mate	SequenceFile
 a	tumor	lib1	run1	1	a_tumor_lib1_run1_R1.fastq.gz
 a	tumor	lib1	run2	2	a_tumor_lib1_run2_R2.fastq.gz
 a	tumor	lib2	run3	1	a_tumor_lib2_run3_R1.fastq.gz
