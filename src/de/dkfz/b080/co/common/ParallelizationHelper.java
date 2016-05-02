@@ -1,7 +1,7 @@
 package de.dkfz.b080.co.common;
 
 import de.dkfz.roddy.core.ExecutionContext;
-import de.dkfz.roddy.execution.jobs.CommandFactory;
+import de.dkfz.roddy.execution.jobs.JobManager;
 import de.dkfz.roddy.knowledge.files.BaseFile;
 import de.dkfz.roddy.knowledge.files.FileObject;
 import de.dkfz.roddy.knowledge.files.IndexedFileObjects;
@@ -26,7 +26,7 @@ public class ParallelizationHelper {
         Map<String, FileObject> map = new LinkedHashMap<>();
 
         //First one executes locally or via ssh but without a cluster system.
-        Stream<String> stream = CommandFactory.getInstance().executesWithoutJobSystem() ? indices.parallelStream() : indices.stream();
+        Stream<String> stream = JobManager.getInstance().executesWithoutJobSystem() ? indices.parallelStream() : indices.stream();
         stream.forEach(index -> callWithIndex(toolID, index, indexParameterName, map, firstFile, otherFile));
 
         return new IndexedFileObjects(indices, map, executionContext);
