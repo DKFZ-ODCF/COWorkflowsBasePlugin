@@ -4,23 +4,20 @@
 */
 package de.dkfz.b080.co.common
 
-import de.dkfz.b080.co.files.*
+import de.dkfz.b080.co.files.BasicBamFile
+import de.dkfz.b080.co.files.COConstants
+import de.dkfz.b080.co.files.COFileStageSettings
+import de.dkfz.b080.co.files.Sample
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
-import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
-import de.dkfz.roddy.core.*
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.core.RuntimeService
-import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
-import de.dkfz.roddy.core.*
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
-import de.dkfz.roddy.execution.jobs.CommandFactory
+import de.dkfz.roddy.execution.jobs.JobManager
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
-
-//import net.xeoh.plugins.base.annotations.PluginImplementation
 
 /**
  * This service is mainly for qcpipeline. It might be of use for other projects
@@ -35,8 +32,6 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     private static LoggerWrapper logger = LoggerWrapper.getLogger(BasicCOProjectsRuntimeService.class.getName());
 
     private static List<File> alreadySearchedMergedBamFolders = [];
-
-    private static Map<ExecutionContext, MetadataTable> inputTablesByContext = [:]
 
     /**
      * Releases the cache in this provider
@@ -69,7 +64,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
     @Override
     public String createJobName(ExecutionContext executionContext, BaseFile file, String toolID, boolean reduceLevel) {
-        return CommandFactory.getInstance().createJobName(file, toolID, reduceLevel);
+        return JobManager.getInstance().createJobName(file, toolID, reduceLevel);
     }
 
     /**
