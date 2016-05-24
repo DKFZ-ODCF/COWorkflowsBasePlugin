@@ -119,6 +119,7 @@ public final class COConstants {
     public static final String CVALUE_SEQUENCE_DIRECTORY = "sequenceDirectory";
     public static final String CVALUE_ALIGNMENT_DIRECTORY_NAME = "alignmentOutputDirectory";
     public static final String CVALUE_WINDOW_SIZE = "WINDOW_SIZE";
+    public static final String CVALUE_MARK_DUPLICATES_VARIANT = "markDuplicatesVariant";
 
     /**
      * Input table column names
@@ -126,8 +127,10 @@ public final class COConstants {
     public static final String INPUT_TABLE_MERGECOL_NAME = "mergeCol";
     public static final String INPUT_TABLE_MARKCOL_NAME = "markCol";
     public static final String INPUT_TABLE_RUNCOL_NAME = "runCol";
-    public static final String INPUT_TABLE_READ_NUMBER = "ReadNumber";
-    public static final String CVALUE_MARK_DUPLICATES_VARIANT = "markDuplicatesVariant";
+    public static final String INPUT_TABLE_DATASETCOL_NAME = "datasetCol";
+    public static final String INPUT_TABLE_READLAYOUTCOL_NAME = "readLayoutCol";
+    public static final String INPUT_TABLE_MATECOL_NAME = "mateCol";
+    public static final String INPUT_TABLE_FILECOL_NAME = "fileCol";
 
     private COConstants() {
     }

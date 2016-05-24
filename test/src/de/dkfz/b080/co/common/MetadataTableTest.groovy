@@ -1,6 +1,6 @@
 package de.dkfz.b080.co.common
 
-import de.dkfz.roddy.execution.io.BaseMetadataTable
+import de.dkfz.b080.co.files.COConstants
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.plugins.LibrariesFactory
 import groovy.transform.CompileStatic
@@ -20,33 +20,38 @@ public class MetadataTableTest {
             "readLayoutCol"  : "ReadLayout",
             "runCol"         : "Run",
             "mateCol"        : "Mate",
-            "sequenceFileCol": "SequenceFile"
+            "fileCol"        : "SequenceFile"
     ];
     public static final List<String> mandatoryColumns = [
-            "datasetCol", "sequenceFileCol", "mergeCol", "markCol", "readLayoutCol", "runCol"
+            COConstants.INPUT_TABLE_DATASETCOL_NAME,
+            COConstants.INPUT_TABLE_FILECOL_NAME,
+            COConstants.INPUT_TABLE_MERGECOL_NAME,
+            COConstants.INPUT_TABLE_MARKCOL_NAME,
+            COConstants.INPUT_TABLE_READLAYOUTCOL_NAME,
+            COConstants.INPUT_TABLE_RUNCOL_NAME,
+            COConstants.INPUT_TABLE_MATECOL_NAME
     ];
 
-    private BaseMetadataTable readTable(String table) {
-        String testFileName = LibrariesFactory.groovyClassLoader.getResource(table).file
+    private MetadataTable readTable(String table) {
+        String testFileName = LibrariesFactory.getGroovyClassLoader().getResource(table).file
 
-        BaseMetadataTable baseMetadataTable = MetadataTableFactory.readTable(new File(testFileName), "tsv", columnIDMap, mandatoryColumns)
-        BaseMetadataTable inputTable = new BaseMetadataTable(baseMetadataTable)
+        MetadataTable metadataTable = (MetadataTable) MetadataTableFactory.readTable(new File(testFileName), "tsv", columnIDMap, mandatoryColumns)
+        MetadataTable inputTable = new MetadataTable(metadataTable)
         return inputTable;
     }
 
     @Test
     public void testGetHeader() throws Exception {
-        BaseMetadataTable table = readTable(correctTable)
+        MetadataTable table = readTable(correctTable)
         def keys = table.getHeaderMap().keySet()
         assert keys.size() == 6
         assert keys.containsAll(["PID", "Sample", "Library", "Run", "Mate", "SequenceFile"])
     }
 
-/*
     @Test
     public void testListSampleNames() throws Exception {
-        BaseMetadataTable table = readTable(correctTable)
+        MetadataTable table = readTable(correctTable)
         assert table.listSampleNames().containsAll(["tumor", "control"])
     }
-*/
+
 }

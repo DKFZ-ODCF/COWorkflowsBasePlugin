@@ -20,10 +20,10 @@
         <cvalue name="readLayoutCol" tags="mandatory"   value="ReadLayout"      description="Metadata column defining the read layout. Usually paired, single, or mate_pair. For 'mate_pair' paired-end reads are reverse complemented (by some older workflow variant). Default: ReadLayout. Default if undefined: paired."/>
         <cvalue name="runCol" tags="mandatory"          value="Run"             description="Metadata column defining the name of the run (e.g. run160126_ST-E00350_0017_AHKGFNCCXX). Default: Run"/>
         <cvalue name="mateCol"                          value="Mate"            description="Metadata column mapping FASTQ file to read numbers. Allowed values are 1, 2. If undefined single-end sequencing is assumed, unless readLayout==paired, in which case Roddy will warn you. Default: Mate. Default if undefined: If undefined and paired-end or mate-pair sequencing are set, matching FASTQs are allowed to differ by only a single number (1,2) and automatically identified."/>
-        <cvalue name="sequenceFileCol" tags="mandatory" value="SequenceFile"    description="Metadata column specifying the FASTQ or BAM file to use as input. Default: SequenceFile. Default if undefined: Error."/>
+        <cvalue name="fileCol" tags="mandatory"         value="SequenceFile"    description="Metadata column specifying the FASTQ or BAM file to use as input. Default: SequenceFile. Default if undefined: Error."/>
 
         <!-- List up all values as their own cvalues, so you can describe them. Just put in the varname below -->
-        <cvalue name='metadataTableColumnIDs' value='datasetCol,sequenceFileCol,mergeCol,markCol,readLayoutCol,runCol,mateCol' type="string"/>
+        <cvalue name='metadataTableColumnIDs' value='datasetCol,fileCol,mergeCol,markCol,readLayoutCol,runCol,mateCol' type="string"/>
     </configurationvalues>
     <processingTools>
         <tool name="analyzeBamHeader" value="analyzeBamHeader.sh" basepath="tools"/>
