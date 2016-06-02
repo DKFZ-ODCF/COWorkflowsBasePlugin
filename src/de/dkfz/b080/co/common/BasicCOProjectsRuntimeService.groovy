@@ -221,26 +221,13 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     public static List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
         COConfig cfg = new COConfig(context)
         LinkedList<Sample> samples = [];
-        List<Sample.SampleType> availableTypes = [];
         for (File f : filesInDirectory) {
             String name = f.getName();
             String sampleName = null;
-            try {
-                String[] split = name.split(StringConstants.SPLIT_UNDERSCORE);
-                sampleName = split[0];
-                if (!cfg.getEnforceAtomicSampleName() && split[1].isInteger() && split[1].length() <= 2)
-                    sampleName = split[0..1].join(StringConstants.UNDERSCORE);
-
-                Sample.SampleType type = Sample.getSampleType(context, sampleName)
-                if (type == Sample.SampleType.UNKNOWN)
-                    throw new Exception();
-                if (!availableTypes.contains(type)) {
-                    availableTypes << type;
-                }
-            } catch (Exception ex) {
-                logger.warning("The sample for file ${f.getAbsolutePath()} could not be determined.");
-            }
-
+            String[] split = name.split(StringConstants.SPLIT_UNDERSCORE);
+            sampleName = split[0];
+            if (!cfg.getEnforceAtomicSampleName() && split[1].isInteger() && split[1].length() <= 2)
+                sampleName = split[0..1].join(StringConstants.UNDERSCORE);
             if (!samples.find { sample -> sample.name == sampleName })
                 samples << new Sample(context, sampleName);
         }
