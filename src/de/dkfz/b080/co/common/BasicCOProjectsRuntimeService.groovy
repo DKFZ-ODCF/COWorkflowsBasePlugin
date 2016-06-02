@@ -11,11 +11,10 @@ import de.dkfz.b080.co.files.Sample
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
-import de.dkfz.roddy.core.ExecutionContext
-import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.io.MetadataTableFactory
-import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.execution.jobs.JobManager
+import de.dkfz.roddy.core.*
+import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
 
@@ -159,6 +158,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return fastqFiles.collect {
             if (!fileSystemAccessProvider.isReadable(it)) {
                 logger.severe("File requested by fastq_list is not readable: '${it}'")
+
             }
             it.name.split(StringConstants.SPLIT_SLASH)[indexOfSampleID]
         }.unique().collect {
@@ -318,7 +318,6 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             }
         }
 
-
         List<File> mergedBamPaths;
 
         File searchDirectory = getAlignmentDirectory(context);
@@ -366,6 +365,5 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
         return bamFiles[0];
     }
-
 
 }
