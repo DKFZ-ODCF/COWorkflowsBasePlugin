@@ -1,5 +1,9 @@
 Initial import for the COWorkflows (Computational Oncology Workflows Base Plugin for Roddy) repo into Phabricator.
 
+* Version update to 1.1.58
+
+- Library support for WGBS (FileStage)
+
 * Version update to 1.1.39
 
 - JDK Version 1.8
