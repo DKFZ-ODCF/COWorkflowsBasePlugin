@@ -12,6 +12,7 @@ import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.core.ExecutionContext
+import de.dkfz.roddy.core.ExecutionContextError
 import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
@@ -152,12 +153,21 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return resultTable.listLibraries()
     }
 
-    public List<Sample> extractSamplesFromFastqList(List<File> fastqFiles, ExecutionContext context) {
-        COConfig cfg = new COConfig(context);
-        int indexOfSampleID = cfg.getSequenceDirectory().split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
+    public static List<String> extractSampleNamesFromFastqList(List<File> fastqFiles, String sequenceDirectoryPattern) {
+        int indexOfSampleID = sequenceDirectoryPattern.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
         return fastqFiles.collect {
-            it.name.split(StringConstants.SPLIT_SLASH)[indexOfSampleID]
-        }.unique().collect {
+            String[] pathComponents = it.getPath().split(StringConstants.SPLIT_SLASH)
+            if (pathComponents.size() <= indexOfSampleID) {
+                throw new RuntimeException("Path to fastq_list file '${it.getPath()}' too short to match sample identifier at index ${indexOfSampleID} (${sequenceDirectoryPattern})")
+            } else {
+                return pathComponents[indexOfSampleID]
+            }
+        }.unique()
+    }
+
+    public static List<Sample> extractSamplesFromFastqList(List<File> fastqFiles, ExecutionContext context) {
+        COConfig cfg = new COConfig(context);
+        return extractSampleNamesFromFastqList(fastqFiles, cfg.getSequenceDirectory()).collect {
             new Sample(context, it)
         }
     }
