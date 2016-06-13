@@ -153,21 +153,29 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return resultTable.listLibraries()
     }
 
-    public static List<String> extractSampleNamesFromFastqList(List<File> fastqFiles, String sequenceDirectoryPattern) {
-        int indexOfSampleID = sequenceDirectoryPattern.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == '${sample}' }
-        return fastqFiles.collect {
+    public static int matchPathElement(String pathnamePattern, String element) {
+        int index = pathnamePattern.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == element }
+        if (index < 0) {
+            throw new RuntimeException("Couldn't match '${element}' in '${pathnamePattern}")
+        }
+        return index
+    }
+
+    public static List<String> matchPathElementInFiles(String pathnamePattern, String element, List<File> files) {
+        int indexOfElement = matchPathElement(pathnamePattern, element)
+        return files.collect {
             String[] pathComponents = it.getPath().split(StringConstants.SPLIT_SLASH)
-            if (pathComponents.size() <= indexOfSampleID) {
-                throw new RuntimeException("Path to fastq_list file '${it.getPath()}' too short to match sample identifier at index ${indexOfSampleID} (${sequenceDirectoryPattern})")
+            if (pathComponents.size() <= indexOfElement) {
+                throw new RuntimeException("Path to file '${it.getPath()}' too short to match requested path element '${element}' expected at index ${indexOfElement} (${pathnamePattern})")
             } else {
-                return pathComponents[indexOfSampleID]
+                return pathComponents[indexOfElement]
             }
         }.unique()
     }
 
     public static List<Sample> extractSamplesFromFastqList(List<File> fastqFiles, ExecutionContext context) {
         COConfig cfg = new COConfig(context);
-        return extractSampleNamesFromFastqList(fastqFiles, cfg.getSequenceDirectory()).collect {
+        return matchPathElementInFiles(cfg.getSequenceDirectory(), '${sample}', fastqFiles).collect {
             new Sample(context, it)
         }
     }

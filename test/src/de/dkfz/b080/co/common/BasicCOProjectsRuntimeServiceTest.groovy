@@ -15,18 +15,23 @@ import static org.junit.Assert.*;
  */
 public class BasicCOProjectsRuntimeServiceTest {
 
-    @Test
-    public void testExtractSampleNamesFromFastqList() throws Exception {
-        assert BasicCOProjectsRuntimeService.extractSampleNamesFromFastqList([new File("/a/b/c/sampleName/bla/bla/bla")] as List<String>, "/a/b/c/\${sample}") == ["sampleName"] as List<String>
+    @Test void testMatchPathElement() throws Exception {
+        assert BasicCOProjectsRuntimeService.matchPathElement("/a/b/\${sample}/d", '${sample}') == 3
     }
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    @Test void testMatchPathElementInFiles () throws Exception {
+        assert BasicCOProjectsRuntimeService.matchPathElementInFiles("/a/b/c/\${sample}",
+                '${sample}',
+                [new File("/a/b/c/sampleName1/bla/bla/bla"),
+                 new File("/a/b/c/sampleName2/bla/blub/")] as List<String>) == ["sampleName1", "sampleName2"] as List<String>
+    }
 
     @Test
-    public void testExtractSampleNamesFromFastqList_tooLongFastqPath() throws Exception {
-        thrown.expect(RuntimeException.class)
-        thrown.expectMessage(startsWith("Path to fastq_list file"))
-        BasicCOProjectsRuntimeService.extractSampleNamesFromFastqList([new File("/a/b/c/")] as List<String>, "/a/b/c/\${sample}")
+    public void testMatchPathElementInFiles_tooShortPath() throws Exception {
+        try {
+            BasicCOProjectsRuntimeService.matchPathElementInFiles("/a/b/c/\${sample}", '${sample}', [new File("/a/b/c/")] as List<String>)
+        } catch (RuntimeException e) {
+            assert e.message.startsWith("Path to file")
+        }
     }
 }
