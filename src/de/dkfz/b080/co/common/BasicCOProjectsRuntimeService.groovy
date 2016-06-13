@@ -12,7 +12,6 @@ import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.core.ExecutionContext
-import de.dkfz.roddy.core.ExecutionContextError
 import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
@@ -153,7 +152,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return resultTable.listLibraries()
     }
 
-    public static int matchPathElement(String pathnamePattern, String element) {
+    public static int indexOfPathElement(String pathnamePattern, String element) {
         int index = pathnamePattern.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == element }
         if (index < 0) {
             throw new RuntimeException("Couldn't match '${element}' in '${pathnamePattern}")
@@ -161,8 +160,8 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return index
     }
 
-    public static List<String> matchPathElementInFiles(String pathnamePattern, String element, List<File> files) {
-        int indexOfElement = matchPathElement(pathnamePattern, element)
+    public static List<String> grepPathElementFromFilenames(String pathnamePattern, String element, List<File> files) {
+        int indexOfElement = indexOfPathElement(pathnamePattern, element)
         return files.collect {
             String[] pathComponents = it.getPath().split(StringConstants.SPLIT_SLASH)
             if (pathComponents.size() <= indexOfElement) {
@@ -175,7 +174,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
     public static List<Sample> extractSamplesFromFastqList(List<File> fastqFiles, ExecutionContext context) {
         COConfig cfg = new COConfig(context);
-        return matchPathElementInFiles(cfg.getSequenceDirectory(), '${sample}', fastqFiles).collect {
+        return grepPathElementFromFilenames(cfg.getSequenceDirectory(), '${sample}', fastqFiles).collect {
             new Sample(context, it)
         }
     }
