@@ -22,6 +22,10 @@ import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT
 
 public abstract class WorkflowUsingMergedBams extends Workflow {
 
+    public static final String BAMFILE_LIST = "bamfile_list"
+    public static final String IS_NO_CONTROL_WORKFLOW = "isNoControlWorkflow"
+    public static final String WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES = "workflowSupportsMultiTumorSamples"
+
     private Map<DataSet, BasicBamFile[]> foundInputFiles = new LinkedHashMap<>();
 
     public BasicBamFile[] getInitialBamFiles(ExecutionContext context) {
@@ -30,7 +34,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         boolean extractSamplesFromOutputFiles = configurationValues.getBoolean(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, true);
         configurationValues.put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" + extractSamplesFromOutputFiles, "boolean");
 
-        boolean bamfileListIsSet = configurationValues.hasValue("bamfile_list");
+        boolean bamfileListIsSet = configurationValues.hasValue(BAMFILE_LIST);
 
         BasicCOProjectsRuntimeService runtimeService = (BasicCOProjectsRuntimeService) context.getRuntimeService();
         List<Sample> samples = runtimeService.getSamplesForContext(context);
@@ -45,7 +49,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
                 List<BasicBamFile> allFound = new LinkedList<>();
                 if (bamfileListIsSet) {
 
-                    List<String> bamFiles = configurationValues.getString("bamfile_list", "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
+                    List<String> bamFiles = configurationValues.getString(BAMFILE_LIST, "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
                     for (String bf : bamFiles) {
                         def path = new File(bf)
                         Sample sample = BasicCOProjectsRuntimeService.extractSamplesFromFilenames([path], context)[0];
@@ -87,9 +91,10 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         if(initialBamFiles.size() == 1) initialBamFiles = [ initialBamFiles[0], null] as BasicBamFile[];
         BasicBamFile bamControlMerged = initialBamFiles[0];
         BasicBamFile bamTumorMerged = initialBamFiles[1];
-        if (bamControlMerged == null || bamTumorMerged == null) {
-            if (bamControlMerged == null)
-                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control bam is missing"));
+        boolean isNoControlWorkflow = getflag(context, IS_NO_CONTROL_WORKFLOW, false)
+        if ((!isNoControlWorkflow && bamControlMerged == null) || bamTumorMerged == null) {
+            if (bamControlMerged == null && !isNoControlWorkflow)
+                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control bam is missing and workflow is not set to accept tumor only"));
             if (bamTumorMerged == null)
                 context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Tumor bam is missing"));
             return false;
@@ -105,7 +110,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
             return false;
 
         //TODO Low priority. There were thoughts to have workflows which support multi-tumor samples, this it not supported by any workflow now.
-        if (context.getConfiguration().getConfigurationValues().getBoolean("workflowSupportsMultiTumorSamples", false)) {
+        if (context.getConfiguration().getConfigurationValues().getBoolean(WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES, false)) {
             return executeMulti(context, initialBamFiles);
         }
         return execute(context, initialBamFiles[0], initialBamFiles[1]);
