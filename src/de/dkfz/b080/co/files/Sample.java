@@ -5,6 +5,7 @@ import de.dkfz.b080.co.common.COConfig;
 import de.dkfz.roddy.Roddy;
 import de.dkfz.roddy.core.Analysis;
 import de.dkfz.roddy.core.ExecutionContext;
+import de.dkfz.roddy.core.ExecutionContextError;
 import de.dkfz.roddy.core.Project;
 import de.dkfz.roddy.tools.LoggerWrapper;
 
@@ -72,11 +73,20 @@ public class Sample implements Comparable<Sample>, Serializable {
 
     public static SampleType getSampleType(ExecutionContext context, String sampleName) {
         COConfig cfg = new COConfig(context);
-        SampleType tempSampleType = isInSampleList(cfg.getPossibleControlSampleNamePrefixes(), sampleName) ?
-                    SampleType.CONTROL :
-                    (isInSampleList(cfg.getPossibleTumorSampleNamePrefixes(), sampleName) ?
-                                SampleType.TUMOR :
-                                SampleType.UNKNOWN);
+        SampleType tempSampleType = SampleType.UNKNOWN;
+        if (isInSampleList(cfg.getPossibleControlSampleNamePrefixes(), sampleName)) {
+            if (isInSampleList(cfg.getPossibleTumorSampleNamePrefixes(), sampleName)) {
+                context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.expand(
+                        "Sample name '" + sampleName + "' matches both values of " +
+                            COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES + " and " +
+                            COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES));
+                tempSampleType = SampleType.UNKNOWN;
+            } else {
+                tempSampleType = SampleType.CONTROL;
+            }
+        } else if (isInSampleList(cfg.getPossibleTumorSampleNamePrefixes(), sampleName)) {
+            tempSampleType = SampleType.TUMOR;
+        }
         return tempSampleType;
     }
 
