@@ -38,6 +38,10 @@ public class MetadataTable  extends BaseMetadataTable {
         return (MetadataTable)subsetByColumn(INPUT_TABLE_MERGECOL_NAME, sampleName);
     }
 
+    public MetadataTable subsetByRun(String runId) {
+        return (MetadataTable)subsetByColumn(INPUT_TABLE_RUNCOL_NAME, runId);
+    }
+
     public MetadataTable subsetByLibrary(String library) {
         return (MetadataTable)subsetByColumn(INPUT_TABLE_MARKCOL_NAME, library);
     }

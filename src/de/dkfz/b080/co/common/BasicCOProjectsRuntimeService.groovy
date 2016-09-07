@@ -137,7 +137,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     }
 
     protected MetadataTable getMetadataTable(ExecutionContext context) {
-        return new MetadataTable(MetadataTableFactory.getTable(context.getAnalysis()));
+        return new MetadataTable(MetadataTableFactory.getTable(context.getAnalysis()).subsetByDataset(context.getDataSet().id));
     }
 
     public List<Sample> extractSamplesFromMetadataTable(ExecutionContext context) {
@@ -147,7 +147,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     }
 
     public List<String> extractLibrariesFromMetadataTable(ExecutionContext context, String sampleName) {
-        MetadataTable resultTable = getMetadataTable(context).subsetBySample(sampleName)
+        MetadataTable resultTable = new MetadataTable(getMetadataTable(context).subsetBySample(sampleName))
         assert resultTable.size() > 0
         return resultTable.listLibraries()
     }
