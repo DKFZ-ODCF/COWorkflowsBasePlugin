@@ -1,5 +1,7 @@
 package de.dkfz.b080.co.common
 
+import de.dkfz.b080.co.files.COConstants
+import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
 import de.dkfz.roddy.core.ExecutionContext
@@ -25,6 +27,10 @@ class COConfig {
 
     public boolean getExtractSamplesFromFastqFileList() {
         return !getFastqList().isEmpty()
+    }
+
+    public boolean getExtractSamplesFromMetadataTable() {
+        return Roddy.isMetadataCLOptionSet()
     }
 
     public boolean getExtractSamplesFromOutputFiles() {
@@ -55,7 +61,7 @@ class COConfig {
     }
 
     public String getSequenceDirectory() {
-        return configValues.get("sequenceDirectory").toFile(context).getAbsolutePath()
+        return configValues.get(COConstants.CVALUE_SEQUENCE_DIRECTORY).toFile(context).getAbsolutePath()
     }
 
     public String getAlignmentFolderName() {
@@ -75,11 +81,11 @@ class COConfig {
     }
 
     public List<String> getPossibleControlSampleNamePrefixes() {
-        return configValues.get("possibleControlSampleNamePrefixes").toStringList(" ", ["(", ")"] as String[])
+        return configValues.get(COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES).toStringList(" ", ["(", ")"] as String[])
     }
 
     public List<String> getPossibleTumorSampleNamePrefixes() {
-        return configValues.get("possibleTumorSampleNamePrefixes").toStringList(" ", ["(", ")"] as String[])
+        return configValues.get(COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES).toStringList(" ", ["(", ")"] as String[])
     }
 
 }

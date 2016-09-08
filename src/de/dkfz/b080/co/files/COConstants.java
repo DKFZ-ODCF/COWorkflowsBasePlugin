@@ -29,27 +29,6 @@ public final class COConstants {
     public static final String TOOL_INDEL_DEEP_ANNOTATION = "indelDeepAnnotation";
     public static final String TOOL_PURITY_ESTIMATION = "purityEstimation";
     public static final String TOOL_PURITY_ESTIMATION_THETA = "purityEstimationTheta";
-    public static final String TOOL_CNV_SNP_GENERATION = "cnvSnpGeneration";
-    public static final String TOOL_REPLACE_BAD_CONTROL = "replaceBadControl";
-    public static final String TOOL_MERGE_AND_FILTER_SNP_FILES = "mergeAndFilterSnpFiles";
-    public static final String TOOL_MERGE_AND_FILTER_CNV_FILES = "mergeAndFilterCnvFiles";
-    public static final String TOOL_ANNOTATE_COV_WIN = "annotateCnvFiles";
-    public static final String TOOL_IMPUTE_GENOTYPES = "imputeGenotypes";
-    public static final String TOOL_IMPUTE_GENOTYPEX = "imputeGenotypes_X";
-    public static final String TOOL_ADD_HAPLOTYPES_TO_SNP_FILE = "addHaplotypesToSnpFile";
-    public static final String TOOL_CORRECT_GC_BIAS = "correctGcBias";
-    public static final String TOOL_GET_BREAKPOINTS = "getBreakpoints";
-    public static final String TOOL_MERGE_BREAKPOINTS_AND_SV_DELLY = "mergeBreakpointsAndSvDelly";
-    public static final String TOOL_MERGE_BREAKPOINTS_AND_SV_CREST = "mergeBreakpointsAndSvCrest";
-    public static final String TOOL_GET_SEGMENTS_AND_SNPS = "getSegmentsAndSnps";
-    public static final String TOOL_MARK_HOMOZYGOUS_DELETIONS = "markHomozygousDeletions";
-    public static final String TOOL_SEGMENTS_TO_SNP_DATA_HOMODEL = "segmentsToSnpDataHomodel";
-    public static final String TOOL_CLUSTER_AND_PRUNE_SEGMENTS = "clusterAndPruneSegments";
-    public static final String TOOL_SEGMENTS_TO_SNP_DATA_PRUNED = "segmentsToSnpDataPruned";
-    public static final String TOOL_ESTIMATE_PEAKS_FOR_PURITY = "estimatePeaksForPurity";
-    public static final String TOOL_ESTIMATE_PURITY_AND_PLOIDY = "estimatePurityAndPloidy";
-    public static final String TOOL_GENERATE_RESULTS_AND_PLOTS = "generateResultsAndPlots";
-    public static final String TOOL_GENERATE_VCF_FROM_TAB = "generateVcfFromTab";
     public static final String TARGET_EXTRACTION_AND_COVERAGE_SLIM = "targetExtractCoverageSlim";
 
     /**
@@ -121,6 +100,8 @@ public final class COConstants {
     public static final String CVALUE_ALIGNMENT_DIRECTORY_NAME = "alignmentOutputDirectory";
     public static final String CVALUE_WINDOW_SIZE = "WINDOW_SIZE";
     public static final String CVALUE_MARK_DUPLICATES_VARIANT = "markDuplicatesVariant";
+    public static final String CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES = "possibleControlSampleNamePrefixes";
+    public static final String CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES = "possibleTumorSampleNamePrefixes";
 
     /**
      * Input table column names
