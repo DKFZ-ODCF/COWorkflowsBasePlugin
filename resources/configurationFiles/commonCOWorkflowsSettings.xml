@@ -22,11 +22,12 @@
         <cvalue name="mateCol"                          value="Mate"            description="Metadata column mapping FASTQ file to read numbers. Allowed values are 1, 2. If undefined single-end sequencing is assumed, unless readLayout==paired, in which case Roddy will warn you. Default: Mate. Default if undefined: If undefined and paired-end or mate-pair sequencing are set, matching FASTQs are allowed to differ by only a single number (1,2) and automatically identified."/>
         <cvalue name="fileCol" tags="mandatory"         value="SequenceFile"    description="Metadata column specifying the FASTQ or BAM file to use as input. Default: SequenceFile. Default if undefined: Error."/>
 
-        <cvalue name='metadataTableColumnIDs' value='datasetCol,fileCol,mergeCol,markCol,readLayoutCol,runCol,mateCol' type="string"
+        <cvalue name='metadataTableColumnIDs' value='datasetCol,mergeCol,markCol,runCol,mateCol,fileCol,readLayoutCol' type="string"
                 description="Column names used internally, such as 'datasetCol' or 'fileCol'. The order of mandatory columns in here determines
                              the priority of the column, not the expected column order in the input file (which can be arbitrary). Higher-
-                             priority values may have to have unique values, when lower priority columns are selected to be unique. E.g. when
-                             selecting a value for mergeCol (e.g. a Sample), the datasetCol needs to be unique as well (e.g. the patient ID)."/>
+                             priority values may have to have unique values in the input metadata table, if lower priority columns are selected
+                             to be unique. E.g. when selecting a value for mergeCol (e.g. a Sample), the datasetCol needs to be unique as well
+                             (e.g. the patient ID)."/>
     </configurationvalues>
     <processingTools>
         <tool name="analyzeBamHeader" value="analyzeBamHeader.sh" basepath="tools"/>
