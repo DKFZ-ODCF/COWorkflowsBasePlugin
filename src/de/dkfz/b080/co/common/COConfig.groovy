@@ -85,11 +85,11 @@ class COConfig {
     }
 
     public List<String> getPossibleControlSampleNamePrefixes() {
-        return configValues.get("possibleControlSampleNamePrefixes").toStringList(" ", ["(", ")"] as String[])
+        return configValues.get(COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES).toStringList(" ", ["(", ")"] as String[])
     }
 
     public List<String> getPossibleTumorSampleNamePrefixes() {
-        return configValues.get("possibleTumorSampleNamePrefixes").toStringList(" ", ["(", ")"] as String[])
+        return configValues.get(COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES).toStringList(" ", ["(", ")"] as String[])
     }
 
 }

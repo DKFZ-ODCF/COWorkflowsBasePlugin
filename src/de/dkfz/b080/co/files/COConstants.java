@@ -99,6 +99,8 @@ public final class COConstants {
     public static final String CVALUE_ALIGNMENT_DIRECTORY_NAME = "alignmentOutputDirectory";
     public static final String CVALUE_WINDOW_SIZE = "WINDOW_SIZE";
     public static final String CVALUE_MARK_DUPLICATES_VARIANT = "markDuplicatesVariant";
+    public static final String CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES = "possibleControlSampleNamePrefixes";
+    public static final String CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES = "possibleTumorSampleNamePrefixes";
 
     /**
      * Input table column names
