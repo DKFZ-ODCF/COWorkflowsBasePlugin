@@ -266,9 +266,15 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         COConfig cfg = new COConfig(context);
         List<Sample> samples
         String extractedFrom
+        List<String> samplesPassedInConfig = cfg.getSampleList();
+
         if (Roddy.isMetadataCLOptionSet()) {
             samples = extractSamplesFromMetadataTable(context)
             extractedFrom = "input table '${getMetadataTable(context)}'"
+        } else if (samplesPassedInConfig) {
+            logger.postSometimesInfo("Samples were passed as configuration value: ${samplesPassedInConfig}")
+            samples = samplesPassedInConfig.collect { String it -> new Sample(context, it) }
+            extractedFrom = "samples_list configuration value"
         } else if (cfg.extractSamplesFromFastqFileList) {
             List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f); }
             samples = extractSamplesFromFastqList(fastqFiles, context)

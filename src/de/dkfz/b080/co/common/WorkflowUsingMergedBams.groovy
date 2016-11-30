@@ -35,6 +35,9 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         configurationValues.put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" + extractSamplesFromOutputFiles, "boolean");
 
         boolean bamfileListIsSet = configurationValues.hasValue(BAMFILE_LIST);
+        // There is a method missing in COProjectsRuntimeService. This fix will ONLY work, when sample_list is set!
+        List<String> samplesPassedInConfig = Arrays.asList(configurationValues.getString("sample_list", "").split("[;]"));
+        boolean sampleListIsSet = samplesPassedInConfig != null && samplesPassedInConfig.size() > 0;
 
         BasicCOProjectsRuntimeService runtimeService = (BasicCOProjectsRuntimeService) context.getRuntimeService();
         List<Sample> samples = runtimeService.getSamplesForContext(context);
@@ -48,15 +51,18 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
             if (!foundInputFiles.containsKey(dataSet)) {
                 List<BasicBamFile> allFound = new LinkedList<>();
                 if (bamfileListIsSet) {
-
                     List<String> bamFiles = configurationValues.getString(BAMFILE_LIST, "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
-                    for (String bf : bamFiles) {
-                        def path = new File(bf)
-                        Sample sample = BasicCOProjectsRuntimeService.extractSamplesFromFilenames([path], context)[0];
+                    for (int i = 0; i < bamFiles.size(); i++) {
+                        File path = new File(bamFiles.get(i));
+                        // The bam loading code at this position should maybe be moved to the runtimeservice.
+                        // The get samples method relies on the array index of each bam file! This should work, but might be problematic. let's check it.
+                        // Ok, this code is only called when bamfile_list is set, so in this case it should always work. Order matters!!
+                        Sample sample = ((BasicCOProjectsRuntimeService) context.getRuntimeService()).getSamplesForContext(context).get(i);
+
                         if (sample.getType() == Sample.SampleType.CONTROL)
                             bamControlMerged = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(path, context, new COFileStageSettings(sample, dataSet), null));
                         else if (sample.getType() == Sample.SampleType.TUMOR)
-                            bamsTumorMerged.add(new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(path, context, new COFileStageSettings(sample, dataSet), null)));
+                            bamsTumorMerged << new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(path, context, new COFileStageSettings(sample, dataSet), null));
                     }
                 } else {
 
@@ -87,8 +93,8 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
     }
 
     public boolean checkInitialFiles(ExecutionContext context, BasicBamFile[] initialBamFiles) {
-        if(!initialBamFiles)  initialBamFiles = new BasicBamFile[2];
-        if(initialBamFiles.size() == 1) initialBamFiles = [ initialBamFiles[0], null] as BasicBamFile[];
+        if (!initialBamFiles) initialBamFiles = new BasicBamFile[2];
+        if (initialBamFiles.size() == 1) initialBamFiles = [initialBamFiles[0], null] as BasicBamFile[];
         BasicBamFile bamControlMerged = initialBamFiles[0];
         BasicBamFile bamTumorMerged = initialBamFiles[1];
         boolean isNoControlWorkflow = getflag(context, IS_NO_CONTROL_WORKFLOW, false)

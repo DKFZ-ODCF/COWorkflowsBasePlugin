@@ -60,6 +60,10 @@ class COConfig {
         return checkAndSplitListFromConfig("bamfile_list");
     }
 
+    public List<String> getSampleList() {
+        return checkAndSplitListFromConfig("sample_list");
+    }
+
     public String getSequenceDirectory() {
         return configValues.get(COConstants.CVALUE_SEQUENCE_DIRECTORY).toFile(context).getAbsolutePath()
     }
