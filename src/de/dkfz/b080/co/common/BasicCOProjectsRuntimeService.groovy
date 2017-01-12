@@ -11,6 +11,7 @@ import de.dkfz.b080.co.files.Sample
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
+import de.dkfz.roddy.core.DataSet
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.io.MetadataTableFactory
@@ -33,22 +34,6 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
     private static List<File> alreadySearchedMergedBamFolders = [];
 
-    /**
-     * Releases the cache in this provider
-     */
-    @Override
-    public void releaseCache() {
-
-    }
-
-    @Override
-    public boolean initialize() {
-    }
-
-    @Override
-    public void destroy() {
-    }
-
     public Map<String, Object> getDefaultJobParameters(ExecutionContext context, String toolID) {
         def fs = context.getRuntimeService();
         //File cf = fs..createTemporaryConfigurationFile(executionContext);
@@ -65,75 +50,6 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     @Override
     public String createJobName(ExecutionContext executionContext, BaseFile file, String toolID, boolean reduceLevel) {
         return JobManager.getInstance().createJobName(file, toolID, reduceLevel);
-    }
-
-    /**
-     * Checks if a folder is valid
-     *
-     * A folder is valid if:
-     * <ul>
-     *   <li>its parents are valid</li>
-     *   <li>it was not created recently (within this context)</li>
-     *   <li>it exists</li>
-     *   <li>it can be validated (i.e. by its size or files, but not with a lengthy operation!)</li>
-     * </ul>
-     */
-    @Override
-    public boolean isFileValid(BaseFile baseFile) {
-        //Parents valid?
-        boolean parentsValid = true;
-        for (BaseFile bf in baseFile.parentFiles) {
-            if (bf.isTemporaryFile()) continue; //We do not check the existence of parent files which are temporary.
-            if (bf.isSourceFile()) continue;
-            if (!bf.isFileValid()) {
-                return false;
-            }
-        }
-
-        boolean result = true;
-
-        //Source files should be marked as such and checked in a different way. They are assumed to be valid.
-        if (baseFile.isSourceFile())
-            return true;
-
-        //Temporary files are also considered as valid.
-        if (baseFile.isTemporaryFile())
-            return true;
-
-        try {
-            //Was freshly created?
-            if (baseFile.creatingJobsResult != null && baseFile.creatingJobsResult.wasExecuted) {
-                result = false;
-            }
-        } catch (Exception ex) {
-            result = false;
-        }
-
-        try {
-            //Does it exist and is it readable?
-            if (result && !baseFile.isFileReadable()) {
-                result = false;
-            }
-        } catch (Exception ex) {
-            result = false;
-        }
-
-        try {
-            //Can it be validated?
-            //TODO basefiles are always validated!
-            if (result && !baseFile.checkFileValidity()) {
-                result = false;
-            }
-        } catch (Exception ex) {
-            result = false;
-        }
-
-        // TODO? If the file is not valid then also temporary parent files should be invalidated! Or at least checked.
-        if (!result) {
-            // Something is missing here! Michael?
-        }
-
-        return result;
     }
 
     protected MetadataTable getMetadataTable(ExecutionContext context) {
@@ -331,8 +247,14 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     }
 
     public BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, Sample sample) {
+        return getMergedBamFileForDataSetAndSample(context, null, sample);
+    }
+
+    public BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, DataSet dataSet, Sample sample) {
         //TODO Create constants
         COConfig cfg = new COConfig(context)
+        // If no dataset is set, the one from the context object is taken.
+        if (!dataSet) dataSet = context.getDataSet()
 
         List<String> filters = [];
         for (String suffix in cfg.mergedBamSuffixList) {
@@ -341,7 +263,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
                             , "${sample.getName().toLowerCase()}*${suffix}".toString()
                             , "${sample.getName().toUpperCase()}*${suffix}".toString()]
             } else {
-                def dataSetID = context.getDataSet().getId()
+                def dataSetID = dataSet.getId()
                 filters += ["${sample.getName()}*${dataSetID}*${suffix}".toString()
                             , "${sample.getName().toLowerCase()}*${dataSetID}*${suffix}".toString()
                             , "${sample.getName().toUpperCase()}*${dataSetID}*${suffix}".toString()]
@@ -375,7 +297,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
                 String run = split[runIndex..-2].join(StringConstants.UNDERSCORE);
 
 //                                    BaseFile.ConstructionHelperForSourceFiles.construct(BasicBamFile, f, context, new COFileStageSettings(run, sample, context.getDataSet()));
-                BasicBamFile bamFile = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(f, context, new COFileStageSettings(run, sample, context.getDataSet()), null));
+                BasicBamFile bamFile = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(f, context, new COFileStageSettings(run, sample, dataSet), null));
                 return bamFile;
         })
 
