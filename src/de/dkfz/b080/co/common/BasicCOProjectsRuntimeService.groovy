@@ -17,6 +17,7 @@ import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.execution.jobs.JobManager
+import de.dkfz.roddy.core.*
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
 
@@ -92,7 +93,10 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         COConfig cfg = new COConfig(context);
         return grepPathElementFromFilenames(cfg.getSequenceDirectory(), '${sample}', fastqFiles).collect {
             new Sample(context, it)
-        }
+        }.findAll {
+            it != null
+        } as List<Sample>;
+
     }
 
     public static String extractSampleNameFromOutputFile(String filename, boolean enforceAtomicSampleName) {
@@ -125,7 +129,6 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         }
     }
 
-
     public List<Sample> extractSamplesFromSampleDirs(ExecutionContext context) {
         FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
 
@@ -148,26 +151,13 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     public static List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
         COConfig cfg = new COConfig(context)
         LinkedList<Sample> samples = [];
-        List<Sample.SampleType> availableTypes = [];
         for (File f : filesInDirectory) {
             String name = f.getName();
             String sampleName = null;
-            try {
-                String[] split = name.split(StringConstants.SPLIT_UNDERSCORE);
-                sampleName = split[0];
-                if (!cfg.getEnforceAtomicSampleName() && split[1].isInteger() && split[1].length() <= 2)
-                    sampleName = split[0..1].join(StringConstants.UNDERSCORE);
-
-                Sample.SampleType type = Sample.getSampleType(context, sampleName)
-                if (type == Sample.SampleType.UNKNOWN)
-                    throw new Exception();
-                if (!availableTypes.contains(type)) {
-                    availableTypes << type;
-                }
-            } catch (Exception ex) {
-                logger.warning("The sample for file ${f.getAbsolutePath()} could not be determined.");
-            }
-
+            String[] split = name.split(StringConstants.SPLIT_UNDERSCORE);
+            sampleName = split[0];
+            if (!cfg.getEnforceAtomicSampleName() && split[1].isInteger() && split[1].length() <= 2)
+                sampleName = split[0..1].join(StringConstants.UNDERSCORE);
             if (!samples.find { sample -> sample.name == sampleName })
                 samples << new Sample(context, sampleName);
         }
@@ -270,7 +260,6 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             }
         }
 
-
         List<File> mergedBamPaths;
 
         File searchDirectory = getAlignmentDirectory(context);
@@ -318,6 +307,5 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
         return bamFiles[0];
     }
-
 
 }

@@ -28,7 +28,7 @@ public class SampleTest {
     @Test
     public void testGetSampleType_MatchInBothPrefixSets() throws Exception {
         ExecutionContext context = getExecutionContext("tumor1", "tumor1a")
-        Sample.SampleType sampleType = Sample.getSampleType(context, "tumor1a")
+        Sample.SampleType sampleType = Sample.determineSampleType(context, "tumor1a")
         assert sampleType == Sample.SampleType.UNKNOWN
         assert context.getErrors().size() == 1
         assert context.getErrors().getAt(0).toString().contains("Sample name")
@@ -38,19 +38,19 @@ public class SampleTest {
     @Test
     public void testGetSampleType_MatchControlPrefix() throws Exception {
         ExecutionContext context = getExecutionContext("control", "tumor")
-        assert Sample.getSampleType(context, "control") == Sample.SampleType.CONTROL
+        assert Sample.determineSampleType(context, "control") == Sample.SampleType.CONTROL
     }
 
     @Test
     public void testGetSampleType_MatchTumorPrefix() throws Exception {
         ExecutionContext context = getExecutionContext("blood", "metastasis")
-        assert Sample.getSampleType(context, "metastasis") == Sample.SampleType.TUMOR
+        assert Sample.determineSampleType(context, "metastasis") == Sample.SampleType.TUMOR
     }
 
     @Test
     public void testGetSampleType_MatchNeitherPrefix() throws Exception {
         ExecutionContext context = getExecutionContext("blood", "tumor")
-        assert Sample.getSampleType(context, "metastasis") == Sample.SampleType.UNKNOWN
+        assert Sample.determineSampleType(context, "metastasis") == Sample.SampleType.UNKNOWN
     }
 
 

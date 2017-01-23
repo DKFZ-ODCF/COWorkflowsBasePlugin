@@ -51,6 +51,7 @@ public final class COConstants {
 
     public static final String FLAG_ALIGNMENT_PROCESSING_OPTIONS = "alignmentProcessingOptions";
     public static final String FLAG_RUN_COVERAGE_PLOTS = "runCoveragePlots";
+    public static final String FLAG_RUN_COVERAGE_PLOTS_ONLY = "runCoveragePlotsOnly";
     public static final String FLAG_RUN_EXOME_ANALYSIS = "runExomeAnalysis";
     public static final String FLAG_RUN_SNP_COMPARISON = "runSNPComparison";
     public static final String FLAG_RUN_COLLECT_BAMFILE_METRICS = "runCollectBamFileMetrics";
