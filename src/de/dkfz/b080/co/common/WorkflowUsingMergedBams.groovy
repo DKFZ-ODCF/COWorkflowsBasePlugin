@@ -45,13 +45,13 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         BasicBamFile bamControlMerged = null;
         DataSet dataSet = context.getDataSet();
 
-        BasicBamFile[] found = null;
+        BasicBamFile[] found;
 
         synchronized (foundInputFiles) {
             if (!foundInputFiles.containsKey(dataSet)) {
                 List<BasicBamFile> allFound = new LinkedList<>();
                 if (bamfileListIsSet) {
-                    List<String> bamFiles = configurationValues.getString(BAMFILE_LIST, "").split(StringConstants.SPLIT_SEMICOLON) as List<String>;
+                    List<String> bamFiles = new COConfig(context.getConfiguration()).getBamList();
                     for (int i = 0; i < bamFiles.size(); i++) {
                         File path = new File(bamFiles.get(i));
                         // The bam loading code at this position should maybe be moved to the runtimeservice.

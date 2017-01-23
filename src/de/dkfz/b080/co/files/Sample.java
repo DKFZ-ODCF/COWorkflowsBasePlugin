@@ -65,13 +65,13 @@ public class Sample implements Comparable<Sample>, Serializable {
         this.analysis = context.getAnalysis();
         this.project = context.getProject();
 
-        SampleType tempSampleType = getSampleType(context, name);
+        SampleType tempSampleType = determineSampleType(context, name);
         if (tempSampleType == SampleType.UNKNOWN)
             logger.severe("Sample type is not known for name " + name);
         sampleType = tempSampleType;
     }
 
-    public static SampleType getSampleType(ExecutionContext context, String sampleName) {
+    public static SampleType determineSampleType(ExecutionContext context, String sampleName) {
         COConfig cfg = new COConfig(context);
         SampleType tempSampleType = SampleType.UNKNOWN;
         if (isInSampleList(cfg.getPossibleControlSampleNamePrefixes(), sampleName)) {
