@@ -12,20 +12,24 @@
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../COProjectConfigurations">
-      <sourceFolder url="file://$MODULE_DIR$/../../COProjectConfigurations" type="java-resource" />
-    </content>
-    <content url="file://$MODULE_DIR$/../../dist/resources" />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/resources/analysisTools" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/resources/configurationFiles" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/test/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/test/src" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <content url="file://$MODULE_DIR$/../../dist/resources" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="PluginBase" level="application" />
     <orderEntry type="library" name="roddyBundledLibraries" level="project" />
-    <orderEntry type="library" name="roddy" level="project" />
-    <orderEntry type="library" name="roddyBundledLibraries" level="project" />
+    <orderEntry type="module" module-name="PluginBase" />
+    <orderEntry type="module" module-name="roddy" />
+  </component>
+  <component name="PackageRequirementsSettings">
+    <option name="requirementsPath" value="" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
   </component>
 </module>
-
