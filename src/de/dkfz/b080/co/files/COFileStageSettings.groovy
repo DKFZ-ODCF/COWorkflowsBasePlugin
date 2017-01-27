@@ -12,12 +12,12 @@ import groovy.transform.CompileStatic;
 @CompileStatic
 public class COFileStageSettings extends FileStageSettings<COFileStageSettings> {
 
-    private final LaneID laneId;
-    private final IndexID index;
-    private final int numericIndex;
-    private final RunID runID;
-    private final Sample sample;
-    private final LibraryID libraryID;
+    final LaneID laneId;
+    final IndexID index;
+    final int numericIndex;
+    final RunID runID;
+    final Sample sample;
+    final LibraryID libraryID;
 
     // Convenience constructor
     public COFileStageSettings(String laneId, String index, int numericIndex, String runID, String libraryID, Sample sample, DataSet dataSet, FileStage stage) {
@@ -60,28 +60,6 @@ public class COFileStageSettings extends FileStageSettings<COFileStageSettings> 
     public COFileStageSettings(DataSet dataSet) {
         this(null, null, -1, null, (LibraryID) null, null, dataSet, COFileStage.PID);
     }
-
-    public LaneID getLaneId() {
-        return laneId;
-    }
-
-    public IndexID getIndex() {
-        return index;
-    }
-
-    public int getNumericIndex() {
-        return numericIndex;
-    }
-
-    public RunID getRunID() {
-        return runID;
-    }
-
-    public Sample getSample() {
-        return sample;
-    }
-
-    public String getLibraryID() { return libraryID; }
 
     @Override
     public COFileStageSettings copy() {
