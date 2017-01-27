@@ -283,10 +283,8 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
                 if (split[1].isInteger()) {
                     runIndex = 2;
                 }
-                String run = split[runIndex..-2].join(StringConstants.UNDERSCORE);
-
-//                                    BaseFile.ConstructionHelperForSourceFiles.construct(BasicBamFile, f, context, new COFileStageSettings(run, sample, context.getDataSet()));
-                BasicBamFile bamFile = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(f, context, new COFileStageSettings(run, sample, dataSet), null));
+                RunID run = new RunID(split[runIndex..-2].join(StringConstants.UNDERSCORE));
+                BasicBamFile bamFile = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(f, context, new COFileStageSettings(run, null, sample, dataSet), null));
                 return bamFile;
         })
 
