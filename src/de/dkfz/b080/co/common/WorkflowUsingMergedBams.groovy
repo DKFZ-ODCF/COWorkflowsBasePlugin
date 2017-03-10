@@ -10,6 +10,7 @@ import de.dkfz.roddy.core.ExecutionContext;
 import de.dkfz.roddy.core.ExecutionContextError;
 import de.dkfz.roddy.core.Workflow;
 import de.dkfz.roddy.knowledge.files.BaseFile
+import groovy.transform.CompileStatic
 
 import java.util.*;
 
@@ -19,7 +20,7 @@ import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT
  * A basic workflow which uses merged bam files as an input and offers some check routines for those files.
  * Created by michael on 05.05.14.
  */
-
+@CompileStatic
 public abstract class WorkflowUsingMergedBams extends Workflow {
 
     public static final String BAMFILE_LIST = "bamfile_list"
@@ -36,7 +37,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
 
         boolean bamfileListIsSet = configurationValues.hasValue(BAMFILE_LIST);
         // There is a method missing in COProjectsRuntimeService. This fix will ONLY work, when sample_list is set!
-        List<String> samplesPassedInConfig = Arrays.asList(configurationValues.getString("sample_list", "").split("[;]"));
+        List<String> samplesPassedInConfig = Arrays.asList(configurationValues.getString("sample_list", "").split("[;]")) as List<String>;
         boolean sampleListIsSet = samplesPassedInConfig != null && samplesPassedInConfig.size() > 0;
 
         BasicCOProjectsRuntimeService runtimeService = (BasicCOProjectsRuntimeService) context.getRuntimeService();
@@ -48,10 +49,10 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         BasicBamFile[] found;
 
         synchronized (foundInputFiles) {
-            if (!foundInputFiles.containsKey(dataSet)) {
+            if (!foundInputFiles.containsKey(dataSet as Object)) {
                 List<BasicBamFile> allFound = new LinkedList<>();
                 if (bamfileListIsSet) {
-                    List<String> bamFiles = new COConfig(context.getConfiguration()).getBamList();
+                    List<String> bamFiles = new COConfig(context).getBamList();
                     for (int i = 0; i < bamFiles.size(); i++) {
                         File path = new File(bamFiles.get(i));
                         // The bam loading code at this position should maybe be moved to the runtimeservice.
@@ -76,9 +77,9 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
                 }
                 allFound.add(bamControlMerged);
                 allFound.addAll(bamsTumorMerged);
-                foundInputFiles.put(dataSet, allFound.toArray(new BasicBamFile[0]));
+                foundInputFiles.put(dataSet, allFound as BasicBamFile[]);
             }
-            found = foundInputFiles.get(dataSet);
+            found = foundInputFiles[dataSet];
             if (found != null && found[0] != null && found[0].getExecutionContext() != context) {
                 BasicBamFile[] copy = new BasicBamFile[found.length];
                 for (int i = 0; i < found.length; i++) {

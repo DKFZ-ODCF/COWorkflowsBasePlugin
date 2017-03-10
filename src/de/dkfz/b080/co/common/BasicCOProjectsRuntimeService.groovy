@@ -48,6 +48,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return parameters;
     }
 
+    @Deprecated
     @Override
     public String createJobName(ExecutionContext executionContext, BaseFile file, String toolID, boolean reduceLevel) {
         return JobManager.getInstance().createJobName(file, toolID, reduceLevel);
