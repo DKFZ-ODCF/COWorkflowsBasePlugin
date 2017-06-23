@@ -42,8 +42,8 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         Map<String, Object> parameters = [
                 pid         : (Object) pid,
                 PID         : pid,
-                CONFIG_FILE : fs.getNameOfConfigurationFile(context).getAbsolutePath(),
-                ANALYSIS_DIR: context.getOutputDirectory().getParentFile().getParent()
+                (COConstants.PRM_CONFIG_FILE) : fs.getNameOfConfigurationFile(context).getAbsolutePath(),
+                (COConstants.PRM_ANALYSIS_DIR): context.getOutputDirectory().getParentFile().getParent()
         ]
         return parameters;
     }
