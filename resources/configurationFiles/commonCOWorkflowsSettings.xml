@@ -40,7 +40,5 @@
         <tool name="processAnnovar" value="processAnnovarOutput.pl" basepath="tools"/>
         <tool name="seqContextAnnotator" value="seqContext_annotator.pl" basepath="tools"/>
         <tool name="vcfToAnnovar" value="vcf_to_annovar.pl" basepath="tools"/>
-
-        <tool name='memoryStreamer' value='MemoryStreamer.jar' basepath='roddyToolsDirectory'/>
     </processingTools>
 </configuration>
