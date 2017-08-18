@@ -6,8 +6,6 @@
 #PBS -l mem=120g
 #PBS -m a
 
-source ${CONFIG_FILE}
-
 set -o pipefail
 # use scratch dir for temp files: samtools sort uses the current working directory for them
 cd $PBS_SCRATCH_DIR/$PBS_JOBID

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source ${CONFIG_FILE}
-
 set -x
 set -o pipefail
 
