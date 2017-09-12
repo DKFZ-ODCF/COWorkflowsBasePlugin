@@ -40,7 +40,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         RecursiveOverridableMapContainerForConfigurationValues configurationValues = context.getConfiguration().getConfigurationValues();
         boolean extractSamplesFromOutputFiles = configurationValues.getBoolean(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, true);
         configurationValues.put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" + extractSamplesFromOutputFiles, "boolean");
-
+        boolean isNoControlWorkflow = getflag(context, IS_NO_CONTROL_WORKFLOW, false)
         boolean bamfileListIsSet = configurationValues.hasValue(BAMFILE_LIST);
         // There is a method missing in COProjectsRuntimeService. This fix will ONLY work, when sample_list is set!
         List<String> samplesPassedInConfig = Arrays.asList(configurationValues.getString("sample_list", "").split("[;]")) as List<String>;
@@ -81,7 +81,7 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
                             bamsTumorMerged.add(tempBam);
                     }
                 }
-                allFound.add(bamControlMerged);
+                if (!isNoControlWorkflow && bamControlMerged) allFound.add(bamControlMerged);
                 allFound.addAll(bamsTumorMerged);
                 foundInputFiles.put(dataSet, allFound as BasicBamFile[]);
             }
@@ -100,17 +100,37 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
     }
 
     public boolean checkInitialFiles(ExecutionContext context, BasicBamFile[] initialBamFiles) {
-        if (!initialBamFiles) initialBamFiles = new BasicBamFile[2];
-        if (initialBamFiles.size() == 1) initialBamFiles = [initialBamFiles[0], null] as BasicBamFile[];
-        BasicBamFile bamControlMerged = initialBamFiles[0];
-        BasicBamFile bamTumorMerged = initialBamFiles[1];
         boolean isNoControlWorkflow = getflag(context, IS_NO_CONTROL_WORKFLOW, false)
-        if ((!isNoControlWorkflow && bamControlMerged == null) || bamTumorMerged == null) {
-            if (bamControlMerged == null && !isNoControlWorkflow)
-                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control bam is missing and workflow is not set to accept tumor only"));
-            if (bamTumorMerged == null)
-                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Tumor bam is missing"));
-            return false;
+        if (!initialBamFiles) {
+            context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Did not find any bam files."));
+            return false
+        }
+        if (isNoControlWorkflow) {
+            boolean foundAll = true
+            initialBamFiles.each { BasicBamFile it -> foundAll &= it && ((COFileStageSettings) it.getFileStage()).sample.sampleType == Sample.SampleType.TUMOR }
+
+            if (!foundAll) {
+                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Not all found files are tumor bam files."));
+                return false
+            }
+
+        } else {
+            boolean foundAll = true
+        BasicBamFile bamControlMerged = initialBamFiles[0];
+
+            for (int i = 1; i < initialBamFiles.size(); i++) {
+                if (initialBamFiles[i] == null || !((COFileStageSettings) initialBamFiles[i].getFileStage()).sample.sampleType == Sample.SampleType.TUMOR) {
+                    context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Tumor bam is missing."));
+                    foundAll = false
+                }
+            }
+
+            if (bamControlMerged == null || ((COFileStageSettings) bamControlMerged.getFileStage()).sample.sampleType == Sample.SampleType.TUMOR) {
+                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control bam is missing and workflow is not set to accept tumor only."));
+                foundAll = false
+            }
+
+            if (!foundAll) return false
         }
         return true;
     }
@@ -126,6 +146,10 @@ public abstract class WorkflowUsingMergedBams extends Workflow {
         if (context.getConfiguration().getConfigurationValues().getBoolean(WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES, false)) {
             return executeMulti(context, initialBamFiles);
         }
+        boolean isNoControlWorkflow = getflag(context, IS_NO_CONTROL_WORKFLOW, false)
+        if (isNoControlWorkflow)
+            return execute(context, null, initialBamFiles[0]);
+        else
         return execute(context, initialBamFiles[0], initialBamFiles[1]);
     }
 
