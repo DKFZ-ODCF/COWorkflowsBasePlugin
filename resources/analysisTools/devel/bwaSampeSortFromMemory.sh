@@ -8,23 +8,23 @@
 
 set -o pipefail
 # use scratch dir for temp files: samtools sort uses the current working directory for them
-cd $PBS_SCRATCH_DIR/$PBS_JOBID
+cd $RODDY_SCRATCH
 
-SHM_FILE0=/dev/shm/${PBS_JOBID}_rawSequence0
-SHM_FILE1=/dev/shm/${PBS_JOBID}_rawSequence1
-SHM_TMP_SORT=/dev/shm/${PBS_JOBID}_tempSort.bam
+SHM_FILE0=/dev/shm/${RODDY_JOBID}_rawSequence0
+SHM_FILE1=/dev/shm/${RODDY_JOBID}_rawSequence1
+SHM_TMP_SORT=/dev/shm/${RODDY_JOBID}_tempSort.bam
 
-FNPIPE1=$PBS_SCRATCH_DIR/$PBS_JOBID/NAMED_PIPE1
-FNPIPE2=$PBS_SCRATCH_DIR/$PBS_JOBID/NAMED_PIPE2
-NP_SEQUENCE_0=$PBS_SCRATCH_DIR/$PBS_JOBID/NP_SEQUENCE_0
-NP_SEQUENCE_1=$PBS_SCRATCH_DIR/$PBS_JOBID/NP_SEQUENCE_1
-NP_SEQUENCE_2=$PBS_SCRATCH_DIR/$PBS_JOBID/NP_SEQUENCE_2
-NP_SEQUENCE_3=$PBS_SCRATCH_DIR/$PBS_JOBID/NP_SEQUENCE_3
+FNPIPE1=$RODDY_SCRATCH/NAMED_PIPE1
+FNPIPE2=$RODDY_SCRATCH/NAMED_PIPE2
+NP_SEQUENCE_0=$RODDY_SCRATCH/NP_SEQUENCE_0
+NP_SEQUENCE_1=$RODDY_SCRATCH/NP_SEQUENCE_1
+NP_SEQUENCE_2=$RODDY_SCRATCH/NP_SEQUENCE_2
+NP_SEQUENCE_3=$RODDY_SCRATCH/NP_SEQUENCE_3
 #MEM_FILE_0=/dev/shm/${PBS_JOBID}.memorybackedfile.0
 #MEM_FILE_1=/dev/shm/${PBS_JOBID}.memorybackedfile.1
-#NP_FLAGSTATS=$PBS_SCRATCH_DIR/$PBS_JOBID/NAMED_PIPE_FLAGSTATS
-#NP_INDEX=$PBS_SCRATCH_DIR/$PBS_JOBID/NAMED_PIPE_FLAGSTATS
-#NP_ISIZES=$PBS_SCRATCH_DIR/$PBS_JOBID/NAMED_PIPE_ISIZES
+#NP_FLAGSTATS=$RODDY_SCRATCH/NAMED_PIPE_FLAGSTATS
+#NP_INDEX=$RODDY_SCRATCH/NAMED_PIPE_FLAGSTATS
+#NP_ISIZES=$RODDY_SCRATCH/NAMED_PIPE_ISIZES
 
 MBUFFER_2="mbuffer -q -m 16G -l /dev/null"
 
@@ -43,8 +43,8 @@ echo created pipes
 #TMP_FILE_INDEX=${FILENAME_SORTED_BAM}.bai
 TMP_FILE_SAMPESORT=${FILENAME_SORTED_BAM}_tmp
 TMP_FILE=${TMP_FILE_SAMPESORT}
-TMP_FILE_SORT=/dev/shm/${PBS_JOBID}_sampeSort_sorted.temporary
-#TMP_FILE_SORT=${PBS_SCRATCH_DIR}/${PBS_JOBID}/sorted.temporary
+TMP_FILE_SORT=/dev/shm/${RODDY_JOBID}_sampeSort_sorted.temporary
+#TMP_FILE_SORT=${PBS_SCRATCH_DIR}/${RODDY_JOBID}/sorted.temporary
 FLAGSTAT_TMP=${FILENAME_FLAGSTAT}_tmp
 # error tracking!
 BWA_LOG=${FILENAME_SORTED_BAM}_errlog_sampesort
@@ -62,12 +62,12 @@ lockfile ${LOCKFILE}
 if [[ ${useMBufferStreaming} ]]
 then
     lockfile ${DIR_TEMP}/~streamingBufferPortFinder.lock
-    startPort=$((0x`echo ${PBS_JOBID} | md5sum | cut -b 1-8` % 16000 + 49152))
+    startPort=$((0x`echo ${RODDY_JOBID} | md5sum | cut -b 1-8` % 16000 + 49152))
     # Get two free ports for listening for raw data
     hostAndPort0=`cat ${STREAM_BUFFER_PORTEXCHANGE_0}`
     hostAndPort1=`cat ${STREAM_BUFFER_PORTEXCHANGE_1}`
-    java7 -jar ${TOOL_MEMORY_STREAMER} pull $hostAndPort0 - $DIR_TEMP/${PBS_JOBID}_memStreamer_0_pull | mbuffer -m 10G > $NP_SEQUENCE_0 &
-    java7 -jar ${TOOL_MEMORY_STREAMER} pull $hostAndPort1 - $DIR_TEMP/${PBS_JOBID}_memStreamer_1_pull | mbuffer -m 10G > $NP_SEQUENCE_1 &
+    java7 -jar ${TOOL_MEMORY_STREAMER} pull $hostAndPort0 - $DIR_TEMP/${RODDY_JOBID}_memStreamer_0_pull | mbuffer -m 10G > $NP_SEQUENCE_0 &
+    java7 -jar ${TOOL_MEMORY_STREAMER} pull $hostAndPort1 - $DIR_TEMP/${RODDY_JOBID}_memStreamer_1_pull | mbuffer -m 10G > $NP_SEQUENCE_1 &
 #    portSAIFile0=`${TOOLSDIR}/../roddy/findOpenPort.sh $startPort`
 #    netcat -vv -l -p $portSAIFile0 | mbuffer -m 10G  > $NP_SEQUENCE_0 &
 #    cat $NP_SEQUENCE_0 > $NP_SEQUENCE_2

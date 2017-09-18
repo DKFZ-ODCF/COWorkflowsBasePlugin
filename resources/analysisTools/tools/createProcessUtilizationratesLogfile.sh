@@ -2,16 +2,16 @@
 
 mkdir -p ${DIR_TEMP}
 
-topLog=$DIR_EXECUTION/cpu_timings_$PBS_JOBID.log
+topLog=$DIR_EXECUTION/cpu_timings_$RODDY_JOBID.log
 session=`ps | grep bash | cut -d " " -f 1`
 [[ -z "$session" ]] && session=`ps | grep bash | cut -d " " -f 2`
 [[ -z "$session" ]] && session=`ps | grep bash | cut -d " " -f 3`
 [[ -z "$session" ]] && session=`ps | grep bash | cut -d " " -f 4`
 [[ -z "$session" ]] && ps && exit -20
 
-topLog=$DIR_EXECUTION/cpu_timings_$PBS_JOBID.log
-FILE_BENCHMARK_TMP=$DIR_TEMP/$PBS_JOBID.benchmark.tmp
-FILE_BENCHMARK_STAYALIVE=$DIR_TEMP/$PBS_JOBID.benchmark.stayalive
+topLog=$DIR_EXECUTION/cpu_timings_$RODDY_JOBID.log
+FILE_BENCHMARK_TMP=$DIR_TEMP/$RODDY_JOBID.benchmark.tmp
+FILE_BENCHMARK_STAYALIVE=$DIR_TEMP/$RODDY_JOBID.benchmark.stayalive
 touch $FILE_BENCHMARK_STAYALIVE
 
 setX=false

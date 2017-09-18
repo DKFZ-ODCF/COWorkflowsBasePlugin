@@ -49,7 +49,7 @@ then
 
 #    hostIP=`ping $host | head -n 1 | cut -d "(" -f 2 | cut -d ")" -f 1`
 #    mbufferCommand="mbuffer -O ${host}:${port}"
-    mbufferCommand="java7 -jar ${TOOL_MEMORY_STREAMER} push $host $port $DIR_TEMP/${PBS_JOBID}_memStreamer_push" # Mbuffer does not really work... Dunno why, so don't use it to have a pre buffer
+    mbufferCommand="java7 -jar ${TOOL_MEMORY_STREAMER} push $host $port $DIR_TEMP/${RODDY_JOBID}_memStreamer_push" # Mbuffer does not really work... Dunno why, so don't use it to have a pre buffer
 #    mbufferCommand="mbuffer -m 10G | java7 -jar ${TOOL_MEMORY_STREAMER} push $host $port push"
 #    mbufferCommand="mbuffer -m 10G | netcat -vv $host $port"
     targetCall="| ${mbufferCommand}"

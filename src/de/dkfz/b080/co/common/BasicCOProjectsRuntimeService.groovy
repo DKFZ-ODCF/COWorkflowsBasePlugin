@@ -8,6 +8,7 @@ import de.dkfz.b080.co.files.BasicBamFile
 import de.dkfz.b080.co.files.COConstants
 import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
+import de.dkfz.roddy.Constants
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
@@ -40,10 +41,10 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         //File cf = fs..createTemporaryConfigurationFile(executionContext);
         String pid = context.getDataSet().toString()
         Map<String, Object> parameters = [
-                pid         : (Object) pid,
-                PID         : pid,
-                (COConstants.PRM_CONFIG_FILE) : fs.getNameOfConfigurationFile(context).getAbsolutePath(),
-                (COConstants.PRM_ANALYSIS_DIR): context.getOutputDirectory().getParentFile().getParent()
+                (COConstants.PRM_PID)            : (Object) pid,
+                (COConstants.PRM_PID_CAP)        : pid,
+                (COConstants.PRM_CONFIG_FILE)    : fs.getNameOfConfigurationFile(context).getAbsolutePath(),
+                (COConstants.PRM_ANALYSIS_DIR)   : context.getOutputDirectory().getParentFile().getParent()
         ]
         return parameters;
     }

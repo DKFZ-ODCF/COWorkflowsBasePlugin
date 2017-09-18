@@ -4,6 +4,7 @@
 # The script is supposed to run in roddy environments and needs a proper configuration set.
 
 function getRefGenomeAndChrPrefixFromHeader {
+    local bamFile="${1:?No BAM file given}"
     if [[ ${disableAutoBAMHeaderAnalysis-false} == false ]]
     then
         CHROMOSOME_LENGTH_FILE="${chromosomeLengthFile_hg19}"
@@ -11,7 +12,7 @@ function getRefGenomeAndChrPrefixFromHeader {
 
     #        <cvalue name='chromosomeSizesFile_mm10_GRC' value='${chromosomeSizesBaseDirectory_mm10}/GRCm38mm10.fa.chrLenOnlyACGT_realChromosomes.tab' type="path"/>
     #        <cvalue name='chromosomeSizesFile_mm10' value='${chromosomeSizesBaseDirectory_mm10}/mm10_1-19_X_Y_M.fa.chrLenOnlyACGT_realChromosomes.tab' type="path"/>
-        countCHRPrefixes=`${SAMTOOLS_BINARY} view -H ${1} | grep "^@SQ" | grep "SN:chr" | wc -l`
+        countCHRPrefixes=`${SAMTOOLS_BINARY} view -H "$bamFile" | grep "^@SQ" | grep "SN:chr" | wc -l`
         if [[ $countCHRPrefixes -gt 0 ]]
         then
             CHR_PREFIX="chr"
@@ -29,5 +30,6 @@ function getRefGenomeAndChrPrefixFromHeader {
 }
 
 function getReadGroupsFromHeader {
-	BAM_READ_GROUPS=(`${SAMTOOLS_BINARY} view -H ${1} | grep "^@RG" | ${PERL_BINARY} -e 'use strict; use warnings; open(BAM, "<$ARGV[0]") or die "Could not open the bam header\n"; my @RGnames; while(<BAM>){chomp; my @line = split("\t", $_); foreach(@line){next if($_ !~ /^ID:/); if($_ =~ /^ID:/){my $RGname = $_; $RGname =~ s/^ID://; push(@RGnames, $RGname);}}} print join(" ", @RGnames);' -`)
+    local bamFile="${1:?No BAM file given}"
+	BAM_READ_GROUPS=(`${SAMTOOLS_BINARY} view -H "$bamFile" | grep "^@RG" | ${PERL_BINARY} -e 'use strict; use warnings; open(BAM, "<$ARGV[0]") or die "Could not open the bam header\n"; my @RGnames; while(<BAM>){chomp; my @line = split("\t", $_); foreach(@line){next if($_ !~ /^ID:/); if($_ =~ /^ID:/){my $RGname = $_; $RGname =~ s/^ID://; push(@RGnames, $RGname);}}} print join(" ", @RGnames);' -`)
 }
