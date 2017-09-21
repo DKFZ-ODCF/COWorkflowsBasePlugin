@@ -31,7 +31,6 @@
     <orderEntry type="module" module-name="RoddyToolLib_main" />
     <orderEntry type="module" module-name="BatchEuphoria_main" />
     <orderEntry type="module" module-name="RoddyCore" />
-    <orderEntry type="module" module-name="RoddyToolLib" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />
