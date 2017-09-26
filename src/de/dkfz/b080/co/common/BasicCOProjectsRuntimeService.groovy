@@ -4,16 +4,13 @@
  * Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
  */
 
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
-*/
 package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.BasicBamFile
 import de.dkfz.b080.co.files.COConstants
 import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
+import de.dkfz.roddy.Constants
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
@@ -46,10 +43,10 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         //File cf = fs..createTemporaryConfigurationFile(executionContext);
         String pid = context.getDataSet().toString()
         Map<String, Object> parameters = [
-                pid         : (Object) pid,
-                PID         : pid,
-                CONFIG_FILE : fs.getNameOfConfigurationFile(context).getAbsolutePath(),
-                ANALYSIS_DIR: context.getOutputDirectory().getParentFile().getParent()
+                (COConstants.PRM_PID)            : (Object) pid,
+                (COConstants.PRM_PID_CAP)        : pid,
+                (COConstants.PRM_CONFIG_FILE)    : fs.getNameOfConfigurationFile(context).getAbsolutePath(),
+                (COConstants.PRM_ANALYSIS_DIR)   : context.getOutputDirectory().getParentFile().getParent()
         ]
         return parameters;
     }
@@ -290,10 +287,8 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
                 if (split[1].isInteger()) {
                     runIndex = 2;
                 }
-                String run = split[runIndex..-2].join(StringConstants.UNDERSCORE);
-
-//                                    BaseFile.ConstructionHelperForSourceFiles.construct(BasicBamFile, f, context, new COFileStageSettings(run, sample, context.getDataSet()));
-                BasicBamFile bamFile = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(f, context, new COFileStageSettings(run, sample, dataSet), null));
+                RunID run = new RunID(split[runIndex..-2].join(StringConstants.UNDERSCORE));
+                BasicBamFile bamFile = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(f, context, new COFileStageSettings(run, null, sample, dataSet), null));
                 return bamFile;
         })
 
