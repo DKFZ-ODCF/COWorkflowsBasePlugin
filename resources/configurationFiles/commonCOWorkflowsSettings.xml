@@ -1,4 +1,10 @@
-<configuration name='commonCOWorkflowsSettings' description='A configuration file with settings for all COWorkflows configuration files.'>
+<!--
+  ~ Copyright (c) 2017 eilslabs.
+  ~
+  ~ Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
+  -->
+
+<configuration name='commonCOWorkflowsSettings' description='A basic configuration file with settings for bam file analyses.'>
     <configurationvalues>
         <cvalue name='BASE_QUALITY_CUTOFF' value='0' type='integer'/>
 
@@ -30,16 +36,6 @@
                              (e.g. the patient ID)."/>
     </configurationvalues>
     <processingTools>
-        <tool name="analyzeBamHeader" value="analyzeBamHeader.sh" basepath="tools"/>
-        <tool name='checkBwaAndIndexVersions' value='checkBWAAndIndexVersions.sh' basepath='tools'/>
-        <tool name="annotateVcfFile" value="annotate_vcf.pl" basepath="tools"/>
-        <tool name="convertNewcolsToVcf" value="newCols2vcf.pl" basepath="tools"/>
-        <tool name="createpipes" value="createpipes.pl" basepath="tools"/>
-        <tool name="headeredFileConcatenator" value="headeredFileConcatenator.pl" basepath="tools"/>
-        <tool name="newColsToVcf" value="newCols2vcf.pl" basepath="tools"/>
-        <tool name="processAnnovar" value="processAnnovarOutput.pl" basepath="tools"/>
-        <tool name="seqContextAnnotator" value="seqContext_annotator.pl" basepath="tools"/>
-        <tool name="vcfToAnnovar" value="vcf_to_annovar.pl" basepath="tools"/>
-        <tool name="bamIsComplete" value="bamIsComplete.sh" basepath="tools"/>
+        <tool name="analyzeBamHeader" value="analyzeBamHeader.sh" basepath="cobasetools"/>
     </processingTools>
 </configuration>
