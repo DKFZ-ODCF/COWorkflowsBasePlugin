@@ -1,7 +1,16 @@
 #!/bin/bash
 
+###
+# Copyright (c) 2017 eilslabs.
+#
+# Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
+###
+
+# Michael Heinold
+
 # This script offers several functions to get data out of a bam file header.
-# The script is supposed to run in roddy environments and needs a proper configuration set.
+# The script is supposed to run in Roddy environments and needs a proper configuration set!
+# It also relies on specific variables.
 
 function getRefGenomeAndChrPrefixFromHeader {
     local bamFile="${1:?No BAM file given}"
