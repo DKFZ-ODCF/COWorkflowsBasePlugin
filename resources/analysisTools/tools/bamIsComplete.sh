@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
+
+##
+# Copyright (c) 2017 eilslabs.
+#
+# Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
+##
+
 # Philip R. Kensche
+
 # Loosely based on a Groovy script written by Manuel Prinz.
 
 # Report FAIL or OK to standard output and details to standard error.

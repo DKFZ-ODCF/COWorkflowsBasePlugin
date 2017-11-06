@@ -1,5 +1,11 @@
 #!/usr/bin/env perl
 
+##
+# Copyright (c) 2017 eilslabs.
+#
+# Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
+##
+
 # small filter which reads a sorted vcf file from stdin, merges duplicate lines (lines where chrom and pos are identical), and prints duplicate-free file to stdout
 # it detects which column(s) differ in the duplicates and joins the entries with an '&'
 use strict;
