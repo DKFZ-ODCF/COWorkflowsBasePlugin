@@ -42,13 +42,13 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         def fs = context.getRuntimeService();
         //File cf = fs..createTemporaryConfigurationFile(executionContext);
         String pid = context.getDataSet().toString()
-        Map<Object, Object> parameters = [
+        Map<String, Object> parameters = [
                 (COConstants.PRM_PID)         : (Object) pid,
                 (COConstants.PRM_PID_CAP)     : pid,
                 (COConstants.PRM_CONFIG_FILE) : fs.getNameOfConfigurationFile(context).getAbsolutePath(),
                 (COConstants.PRM_ANALYSIS_DIR): context.getOutputDirectory().getParentFile().getParent()
         ]
-        return parameters as Map<String, String>;
+        return parameters
     }
 
     @Deprecated

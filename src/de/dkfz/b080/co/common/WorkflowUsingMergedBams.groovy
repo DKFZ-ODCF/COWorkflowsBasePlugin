@@ -130,7 +130,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      * @return
      */
     boolean checkInitialFiles(ExecutionContext context, BasicBamFile[] initialBamFiles) {
-        def errors = []
+        List<ExecutionContextError> errors = []
 
         initialBamFiles = initialBamFiles.findAll() // Clean up list, only accept non null entries.
 
@@ -145,7 +145,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
                     errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control bam is missing and workflow is not set to accept tumor only.")
                 possibleTumorBamFiles = initialBamFiles[1..-1] // There is a control bam, change the list so, that it should only contain tumor files.
             } else {
-                possibleTumorBamFiles = initialBamFiles
+                possibleTumorBamFiles = initialBamFiles as List<BasicBamFile>
             }
 
             if (possibleTumorBamFiles.any { BasicBamFile bf -> bf.sample.sampleType != Sample.SampleType.TUMOR })
