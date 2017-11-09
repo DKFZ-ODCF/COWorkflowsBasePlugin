@@ -18,83 +18,83 @@ class COConfig {
 
     public ExecutionContext context
 
-    public COConfig(ExecutionContext context) {
+    COConfig(ExecutionContext context) {
         this.context = context
     }
 
     // This is used so often, it should maybe be part of ExecutionContext.
-    public RecursiveOverridableMapContainerForConfigurationValues getConfigValues() {
+    RecursiveOverridableMapContainerForConfigurationValues getConfigValues() {
         return context.getConfiguration().getConfigurationValues()
     }
 
-    public setConfig(String flagName, String value, String typeName) {
+    def setConfig(String flagName, String value, String typeName) {
         configValues.put(flagName, value, typeName)
     }
 
-    public boolean getExtractSamplesFromFastqFileList() {
+    boolean getExtractSamplesFromFastqFileList() {
         return !getFastqList().isEmpty()
     }
 
-    public boolean getExtractSamplesFromMetadataTable() {
+    boolean getExtractSamplesFromMetadataTable() {
         return Roddy.isMetadataCLOptionSet()
     }
 
-    public boolean getExtractSamplesFromOutputFiles() {
-        return configValues.getBoolean(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, false)
+    boolean getExtractSamplesFromOutputFiles(boolean defaultValue = false) {
+        return configValues.getBoolean(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, defaultValue)
     }
 
-    public boolean getEnforceAtomicSampleName() {
+    boolean getEnforceAtomicSampleName() {
         return configValues.getBoolean(FLAG_ENFORCE_ATOMIC_SAMPLE_NAME, false)
     }
 
-    public boolean getExtractSamplesFromBamList() {
+    boolean getExtractSamplesFromBamList() {
         return !getBamList().isEmpty()
     }
 
     private List<String> checkAndSplitListFromConfig(String listID) {
-        String list = configValues.getString(listID, null);
+        String list = configValues.getString(listID, null)
         if(list)
             return list.split(StringConstants.SPLIT_SEMICOLON) as List<String>
-        return [];
+        return []
     }
 
-    public List<String> getFastqList() {
-        return checkAndSplitListFromConfig("fastq_list");
+    List<String> getFastqList() {
+        return checkAndSplitListFromConfig("fastq_list")
     }
 
-    public List<String> getBamList() {
-        return checkAndSplitListFromConfig("bamfile_list");
+    List<String> getBamList() {
+        return checkAndSplitListFromConfig("bamfile_list")
     }
 
-    public List<String> getSampleList() {
-        return checkAndSplitListFromConfig("sample_list");
+    List<String> getSampleList() {
+        return checkAndSplitListFromConfig("sample_list")
     }
 
-    public String getSequenceDirectory() {
+    String getSequenceDirectory() {
         return configValues.get(COConstants.CVALUE_SEQUENCE_DIRECTORY).toFile(context).getAbsolutePath()
     }
 
-    public String getAlignmentFolderName() {
+    String getAlignmentFolderName() {
         return configValues.getString(CVALUE_ALIGNMENT_DIRECTORY_NAME, "alignment")
     }
 
-    public String[] getMergedBamSuffixList() {
+    String[] getMergedBamSuffixList() {
         return configValues.get("mergedBamSuffixList", "merged.bam.dupmarked.bam").toString().split(StringConstants.COMMA)
     }
 
-    public boolean getUseMergedBamsFromInputDirectory() {
+    boolean getUseMergedBamsFromInputDirectory() {
         return configValues.getBoolean("useMergedBamsFromInputDirectory", false)
     }
 
-    public boolean getSearchMergedBamFilesWithPID() {
+    boolean getSearchMergedBamFilesWithPID() {
         return configValues.getBoolean("searchMergedBamFilesWithPID", false)
     }
 
-    public List<String> getPossibleControlSampleNamePrefixes() {
+    List<String> getPossibleControlSampleNamePrefixes() {
         return configValues.get(COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES).toStringList(" ", ["(", ")"] as String[])
     }
 
-    public List<String> getPossibleTumorSampleNamePrefixes() {
+    List<String> getPossibleTumorSampleNamePrefixes() {
         return configValues.get(COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES).toStringList(" ", ["(", ")"] as String[])
     }
 
