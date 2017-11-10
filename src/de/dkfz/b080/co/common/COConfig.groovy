@@ -27,7 +27,7 @@ class COConfig {
         return context.getConfiguration().getConfigurationValues()
     }
 
-    def setConfig(String flagName, String value, String typeName) {
+    void setConfig(String flagName, String value, String typeName) {
         configValues.put(flagName, value, typeName)
     }
 
