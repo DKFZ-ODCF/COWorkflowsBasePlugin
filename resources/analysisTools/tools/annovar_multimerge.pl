@@ -1,5 +1,12 @@
 #!/usr/bin/env perl
 
+##
+# Copyright (c) 2017 eilslabs.
+#
+# Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
+##
+
+
 # This script takes an snv file and a number of annovar result files as input.
 # Annofiles should be passed as ANNOCOLUMN=ANNOFILE(column[1-based]).
 # It adds for each annovar file one column (header ANNOCOLUMN) to the snv file.
