@@ -1,7 +1,9 @@
 /*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
+ * Copyright (c) 2017 eilslabs.
+ *
+ * Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
 */
+
 package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.BasicBamFile
@@ -41,12 +43,12 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         //File cf = fs..createTemporaryConfigurationFile(executionContext);
         String pid = context.getDataSet().toString()
         Map<String, Object> parameters = [
-                (COConstants.PRM_PID)            : (Object) pid,
-                (COConstants.PRM_PID_CAP)        : pid,
-                (COConstants.PRM_CONFIG_FILE)    : fs.getNameOfConfigurationFile(context).getAbsolutePath(),
-                (COConstants.PRM_ANALYSIS_DIR)   : context.getOutputDirectory().getParentFile().getParent()
+                (COConstants.PRM_PID)         : (Object) pid,
+                (COConstants.PRM_PID_CAP)     : pid,
+                (COConstants.PRM_CONFIG_FILE) : fs.getNameOfConfigurationFile(context).getAbsolutePath(),
+                (COConstants.PRM_ANALYSIS_DIR): context.getOutputDirectory().getParentFile().getParent()
         ]
-        return parameters;
+        return parameters
     }
 
     @Deprecated

@@ -1,5 +1,11 @@
 #!/bin/sh
 
+##
+# Copyright (c) 2017 eilslabs.
+#
+# Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
+##
+
 # This script tries to lookup the bwa version and to determine the used index version.
 # If both fits everything is fine. In any other case it throws an error.
 

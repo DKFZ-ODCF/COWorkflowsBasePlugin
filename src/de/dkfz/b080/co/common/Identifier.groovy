@@ -6,8 +6,10 @@
 
 package de.dkfz.b080.co.common
 
+import groovy.transform.CompileStatic
 import groovy.transform.InheritConstructors
 
+@CompileStatic
 class Identifier {
 
     private String value
@@ -27,14 +29,34 @@ class Identifier {
 
 }
 
+@CompileStatic
 @InheritConstructors
-class LibraryID extends Identifier {}
+class LibraryID extends Identifier {
+    LibraryID(String value) {
+        super(value)
+    }
+}
 
+@CompileStatic
 @InheritConstructors
-class RunID extends Identifier {}
+class RunID extends Identifier {
+    RunID(String value) {
+        super(value)
+    }
+}
 
+@CompileStatic
 @InheritConstructors
-class LaneID extends Identifier {}
+class LaneID extends Identifier {
+    LaneID(String value) {
+        super(value)
+    }
+}
 
+@CompileStatic
 @InheritConstructors
-class IndexID extends Identifier {}
+class IndexID extends Identifier {
+    IndexID(String value) {
+        super(value)
+    }
+}
