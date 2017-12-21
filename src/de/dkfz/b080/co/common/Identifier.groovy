@@ -23,7 +23,7 @@ class Identifier {
         return value
     }
 
-    public int hashCode() {
+    int hashCode() {
         return value.hashCode()
     }
 

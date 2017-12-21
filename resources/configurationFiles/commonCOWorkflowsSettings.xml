@@ -1,5 +1,7 @@
 <configuration name='commonCOWorkflowsSettings' description='A configuration file with settings for all COWorkflows configuration files.'>
     <configurationvalues>
+        <cvalue name="JAVA_BINARY" value="java"/>
+
         <cvalue name='BASE_QUALITY_CUTOFF' value='0' type='integer'/>
 
         <cvalue name='CHROMOSOME_INDICES' value='( {1..22} X Y )' type='bashArray'/>

@@ -28,14 +28,14 @@ declare -a observedBytes=( $(tail --bytes 28 "$fileToCheck" | od -A none -t x1) 
 
 if [[ ${#observedBytes[@]} -ne ${#expectedBytes[@]} ]]; then
     echo "FAIL"
-    echo "Could not read ${#expectedBytes[@]} bytes from input file '$fileToCheck'." > /dev/stderr
+    echo "Could not read ${#expectedBytes[@]} bytes from input file '$fileToCheck'." >> /dev/stderr
     exit 2
 fi
 
 for i in $( seq 0 $( expr ${#expectedBytes[@]} - 1 ) ); do
     if [[ "0x${observedBytes[$i]}" != "${expectedBytes[$i]}" ]]; then
         echo "FAIL"
-        echo "Byte mismatch in ${#expectedBytes[@]} byte trailer of '$fileToCheck' with expected byte sequence for BAMs." > /dev/stderr
+        echo "Byte mismatch in ${#expectedBytes[@]} byte trailer of '$fileToCheck' with expected byte sequence for BAMs." >> /dev/stderr
         exit 1
     fi
 done

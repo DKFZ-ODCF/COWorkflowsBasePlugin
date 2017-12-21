@@ -52,7 +52,7 @@ while (<FL>)
 	chomp;
 	# remove quotation marks necessary for passing parameters with whitespaces through the shell
 	$_ =~ tr /"//d;
-	($column, $file) = /(?:declare -x)?([^=]+)=(.+)/;
+	($column, $file) = /([^\s=]+)=(.+)/;
 	$column=trim( $column );
 	($file, @options) = split(':', $file);
 	($type) = $file =~ /\.(\w+)\.gz$/;

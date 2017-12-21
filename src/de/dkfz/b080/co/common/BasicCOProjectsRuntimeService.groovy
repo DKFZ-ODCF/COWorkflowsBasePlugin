@@ -10,7 +10,6 @@ import de.dkfz.b080.co.files.BasicBamFile
 import de.dkfz.b080.co.files.COConstants
 import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
-import de.dkfz.roddy.Constants
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.Configuration
@@ -20,7 +19,6 @@ import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.execution.jobs.JobManager
-import de.dkfz.roddy.core.*
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
 
@@ -32,13 +30,13 @@ import de.dkfz.roddy.tools.LoggerWrapper
  */
 //@PluginImplementation
 @groovy.transform.CompileStatic
-public class BasicCOProjectsRuntimeService extends RuntimeService {
+class BasicCOProjectsRuntimeService extends RuntimeService {
 
     private static LoggerWrapper logger = LoggerWrapper.getLogger(BasicCOProjectsRuntimeService.class.getName());
 
     private static List<File> alreadySearchedMergedBamFolders = [];
 
-    public Map<String, Object> getDefaultJobParameters(ExecutionContext context, String toolID) {
+    Map<String, Object> getDefaultJobParameters(ExecutionContext context, String toolID) {
         def fs = context.getRuntimeService();
         //File cf = fs..createTemporaryConfigurationFile(executionContext);
         String pid = context.getDataSet().toString()
@@ -53,7 +51,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
     @Deprecated
     @Override
-    public String createJobName(ExecutionContext executionContext, BaseFile file, String toolID, boolean reduceLevel) {
+    String createJobName(ExecutionContext executionContext, BaseFile file, String toolID, boolean reduceLevel) {
         return JobManager.getInstance().createJobName(file, toolID, reduceLevel);
     }
 
@@ -61,19 +59,19 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return new MetadataTable(MetadataTableFactory.getTable(context.getAnalysis()).subsetByDataset(context.getDataSet().id));
     }
 
-    public List<Sample> extractSamplesFromMetadataTable(ExecutionContext context) {
+    List<Sample> extractSamplesFromMetadataTable(ExecutionContext context) {
         return getMetadataTable(context).listSampleNames().collect {
             new Sample(context, it)
         }
     }
 
-    public List<String> extractLibrariesFromMetadataTable(ExecutionContext context, String sampleName) {
+    List<String> extractLibrariesFromMetadataTable(ExecutionContext context, String sampleName) {
         MetadataTable resultTable = new MetadataTable(getMetadataTable(context).subsetBySample(sampleName))
         assert resultTable.size() > 0
         return resultTable.listLibraries()
     }
 
-    public static int indexOfPathElement(String pathnamePattern, String element) {
+    static int indexOfPathElement(String pathnamePattern, String element) {
         int index = pathnamePattern.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == element }
         if (index < 0) {
             throw new RuntimeException("Couldn't match '${element}' in '${pathnamePattern}")
@@ -81,7 +79,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return index
     }
 
-    public static List<String> grepPathElementFromFilenames(String pathnamePattern, String element, List<File> files) {
+    static List<String> grepPathElementFromFilenames(String pathnamePattern, String element, List<File> files) {
         int indexOfElement = indexOfPathElement(pathnamePattern, element)
         return files.collect {
             String[] pathComponents = it.getPath().split(StringConstants.SPLIT_SLASH)
@@ -93,7 +91,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         }.unique()
     }
 
-    public static List<Sample> extractSamplesFromFastqList(List<File> fastqFiles, ExecutionContext context) {
+    static List<Sample> extractSamplesFromFastqList(List<File> fastqFiles, ExecutionContext context) {
         COConfig cfg = new COConfig(context);
         return grepPathElementFromFilenames(cfg.getSequenceDirectory(), '${sample}', fastqFiles).collect {
             new Sample(context, it)
@@ -103,7 +101,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
 
     }
 
-    public static String extractSampleNameFromOutputFile(String filename, boolean enforceAtomicSampleName) {
+    static String extractSampleNameFromOutputFile(String filename, boolean enforceAtomicSampleName) {
         String[] split = filename.split(StringConstants.SPLIT_UNDERSCORE);
         if (split.size() <= 2) {
             return null
@@ -114,7 +112,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return sampleName
     }
 
-    public List<Sample> extractSamplesFromOutputFiles(ExecutionContext context) {
+    List<Sample> extractSamplesFromOutputFiles(ExecutionContext context) {
         //TODO extractSamplesFromOutputFiles fails, when no alignment directory is available. Should one fall back to the default method?
         COConfig cfg = new COConfig(context);
         FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
@@ -133,7 +131,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         }
     }
 
-    public List<Sample> extractSamplesFromSampleDirs(ExecutionContext context) {
+    List<Sample> extractSamplesFromSampleDirs(ExecutionContext context) {
         FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
 
         if (!fileSystemAccessProvider.checkDirectory(context.getInputDirectory(), context, false)) {
@@ -148,11 +146,11 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
     }
 
 
-    public List<String> extractLibrariesFromSampleDirectory(File sampleDirectory) {
+    List<String> extractLibrariesFromSampleDirectory(File sampleDirectory) {
         return FileSystemAccessProvider.getInstance().listDirectoriesInDirectory(sampleDirectory).collect { File f -> f.name } as List<String>;
     }
 
-    public static List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
+    static List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
         COConfig cfg = new COConfig(context)
         LinkedList<Sample> samples = [];
         for (File f : filesInDirectory) {
@@ -171,7 +169,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return samples;
     }
 
-    public List<Sample> getSamplesForContext(ExecutionContext context) {
+    List<Sample> getSamplesForContext(ExecutionContext context) {
         // @Michael: I think that COConfig accessors actually belong into the Context itself.
         COConfig cfg = new COConfig(context);
         List<Sample> samples
@@ -189,7 +187,7 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
             List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f); }
             samples = extractSamplesFromFastqList(fastqFiles, context)
             extractedFrom = "fastq_list configuration value"
-        } else if (cfg.extractSamplesFromOutputFiles) {
+        } else if (cfg.getExtractSamplesFromOutputFiles()) {
             samples = extractSamplesFromOutputFiles(context)
             extractedFrom = "output files"
         } else if (cfg.extractSamplesFromBamList) {
@@ -231,20 +229,20 @@ public class BasicCOProjectsRuntimeService extends RuntimeService {
         return new File(temp);
     }
 
-    public File getSampleDirectory(ExecutionContext process, Sample sample, String library = null) {
+    File getSampleDirectory(ExecutionContext process, Sample sample, String library = null) {
         File sampleDir = getInpDirectory(COConstants.CVALUE_SAMPLE_DIRECTORY, process, sample, library);
         return sampleDir
     }
 
-    public File getSequenceDirectory(ExecutionContext process, Sample sample, String run, String library = null) {
+    File getSequenceDirectory(ExecutionContext process, Sample sample, String run, String library = null) {
         return new File(getInpDirectory(COConstants.CVALUE_SEQUENCE_DIRECTORY, process, sample, library).getAbsolutePath().replace('${run}', run));
     }
 
-    public BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, Sample sample) {
+    BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, Sample sample) {
         return getMergedBamFileForDataSetAndSample(context, null, sample);
     }
 
-    public BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, DataSet dataSet, Sample sample) {
+    BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, DataSet dataSet, Sample sample) {
         //TODO Create constants
         COConfig cfg = new COConfig(context)
         // If no dataset is set, the one from the context object is taken.
