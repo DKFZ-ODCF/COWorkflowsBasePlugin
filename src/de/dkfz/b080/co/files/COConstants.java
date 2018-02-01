@@ -91,7 +91,6 @@ public final class COConstants {
     public static final String PRM_PID = "pid";
     public static final String PRM_PID_CAP = "PID";
     public static final String PRM_ANALYSIS_DIR = "ANALYSIS_DIR";
-    public static final String PRM_CONFIG_FILE= "CONFIG_FILE";
 
     public static final String PRM_SM = "SM";
     public static final String PRM_LB = "LB";

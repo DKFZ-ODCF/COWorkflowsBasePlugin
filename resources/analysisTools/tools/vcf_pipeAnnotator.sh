@@ -14,7 +14,7 @@ filenameVCF=`dirname ${FILENAME_VCF}`/`basename ${FILENAME_VCF} .gz`
 [[ -f ${FILENAME_CHECKPOINT} ]] && rm ${FILENAME_CHECKPOINT}
 
 # create a bunch of pipes using Matthias Schlesners overlapper for multiple annotation files and do a system call with this
-pipe=`perl ${TOOL_CREATEPIPES} ${FILENAME_VCF} ${CONFIG_FILE} ${TOOL_ANNOTATE_VCF_FILE} ${PIPENAME} ${TABIX_BINARY}`
+pipe=`perl ${TOOL_CREATEPIPES} ${FILENAME_VCF} ${PARAMETER_FILE} ${TOOL_ANNOTATE_VCF_FILE} ${PIPENAME} ${TABIX_BINARY}`
 pipeTemp=${FILENAME_VCF}.${PIPENAME}.tmp
 if [[ "$?" != 0 ]] || [[ -z "$pipe" ]]; then echo "problem when generating pipe: $PIPENAME. Exiting..."; exit 2; fi
 
