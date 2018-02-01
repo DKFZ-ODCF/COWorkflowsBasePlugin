@@ -70,10 +70,14 @@ public class Sample implements Comparable<Sample>, Serializable {
         this.executionContext = context;
         this.analysis = context.getAnalysis();
         this.project = context.getProject();
+        COConfig cfg = new COConfig(context);
 
         SampleType tempSampleType = determineSampleType(context, name);
         if (tempSampleType == SampleType.UNKNOWN)
-            logger.severe("Sample type is not known for name " + name);
+            logger.severe("Sample type is not known for name '" + name + "'. I know " +
+                    "'" + String.join("', '", cfg.getPossibleControlSampleNamePrefixes()) + "' (control) and " +
+                    "'" + String.join("', '", cfg.getPossibleTumorSampleNamePrefixes()) + "' (tumor).");
+        
         sampleType = tempSampleType;
     }
 
