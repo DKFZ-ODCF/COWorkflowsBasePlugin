@@ -31,11 +31,11 @@ class COConfig {
         configValues.put(flagName, value, typeName)
     }
 
-    boolean getExtractSamplesFromFastqFileList() {
+    boolean getFastqFileListIsSet() {
         return !getFastqList().isEmpty()
     }
 
-    boolean getExtractSamplesFromMetadataTable() {
+    boolean getMetadataTableIsSet() {
         return Roddy.isMetadataCLOptionSet()
     }
 

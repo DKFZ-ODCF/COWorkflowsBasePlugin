@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2017 eilslabs.
+ *
+ * Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
+ */
 package de.dkfz.b080.co.common
 
 import de.dkfz.roddy.core.ExecutionContext
@@ -10,9 +15,6 @@ import groovy.transform.CompileStatic
 
 import java.util.stream.Stream
 
-/**
- * Created by heinold on 13.01.16.
- */
 @CompileStatic
 class ParallelizationHelper {
 

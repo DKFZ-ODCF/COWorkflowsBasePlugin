@@ -24,17 +24,7 @@ public final class COConstants {
     public static final String TOOL_ACCELERATED_ALIGNANDPAIR_SLIM = "accelerated:alignAndPairSlim";
     public static final String TOOL_SAMTOOLS_INDEX = "samtoolsIndex";
     public static final String TOOL_SAMTOOLS_FLAGSTAT = "samtoolsFlagstat";
-    public static final String TOOL_FILTER_VCF_FILES = "indelVcfFilter";
-    public static final String TOOL_SNV_CALLING = "snvCalling";
-    public static final String TOOL_JOIN_SNV_VCF_FILES = "snvJoinVcfFiles";
-    public static final String TOOL_SNV_ANNOTATION = "snvAnnotation";
-    public static final String TOOL_SNV_FILTER = "snvFilter";
-    public static final String TOOL_SNV_DEEP_ANNOTATION = "snvDeepAnnotation";
-    public static final String TOOL_INDEL_CALLING = "indelCalling";
-    public static final String TOOL_INDEL_ANNOTATION = "indelAnnotation";
-    public static final String TOOL_INDEL_DEEP_ANNOTATION = "indelDeepAnnotation";
     public static final String TOOL_PURITY_ESTIMATION = "purityEstimation";
-    public static final String TOOL_PURITY_ESTIMATION_THETA = "purityEstimationTheta";
     public static final String TARGET_EXTRACTION_AND_COVERAGE_SLIM = "targetExtractCoverageSlim";
 
     /**
@@ -44,9 +34,7 @@ public final class COConstants {
     public static final String FLAG_USE_BIOBAMBAM_SORT = "useBioBamBamSort";
     public static final String FLAG_USE_BIOBAMBAM_MARK_DUPLICATES = "useBioBamBamMarkDuplicates";
     public static final String FLAG_USE_ADAPTOR_TRIMMING = "useAdaptorTrimming";
-    public static final String FLAG_USE_EXISTING_PAIRED_BAMS = "useExistingPairedBams";
-    public static final String FLAG_USE_EXISTING_MERGED_BAMS = "useExistingMergedBams";
-    public static final String FLAG_USE_MBUFFER_STREAMING = "useMBufferStreaming";
+    public static final String FLAG_USE_ONLY_EXISTING_PAIRED_BAMS = "useExistingPairedBams";
     public static final String FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES = "extractSamplesFromOutputFiles";
     public static final String FLAG_ENFORCE_ATOMIC_SAMPLE_NAME = "enforceAtomicSampleName";
 
@@ -55,14 +43,9 @@ public final class COConstants {
 
     public static final String FLAG_RUN_ALIGNMENT_ONLY = "runAlignmentOnly";
 
-    public static final String FLAG_ALIGNMENT_PROCESSING_OPTIONS = "alignmentProcessingOptions";
     public static final String FLAG_RUN_COVERAGE_PLOTS = "runCoveragePlots";
-    public static final String FLAG_RUN_COVERAGE_PLOTS_ONLY = "runCoveragePlotsOnly";
     public static final String FLAG_RUN_EXOME_ANALYSIS = "runExomeAnalysis";
-    public static final String FLAG_RUN_SNP_COMPARISON = "runSNPComparison";
     public static final String FLAG_RUN_COLLECT_BAMFILE_METRICS = "runCollectBamFileMetrics";
-    public static final String FLAG_IS_DEBUG_CONFIGURATION = "isDebugConfiguration";
-    public static final String FLAG_RUN_SLIM_WORKFLOW = "runSlimWorkflow";
 
     public static final String FLAG_USE_COMBINED_ALIGN_AND_SAMPE = "useCombinedAlignAndSampe";
     public static final String FLAG_USE_SINGLE_END_PROCESSING = "useSingleEndProcessing";
@@ -70,10 +53,7 @@ public final class COConstants {
      * Parameters for job execution
      */
     public static final String PRM_RAW_SEQ = "RAW_SEQ";
-    public static final String PRM_RAW_SEQ2 = "RAW_SEQ2";
     public static final String PRM_FILENAME_ALIGNMENT = "FILENAME_ALIGNMENT";
-    public static final String PRM_STREAM_BUFFER_PORTEXCHANGE = "STREAM_BUFFER_PORTEXCHANGE";
-    public static final String PRM_LOCKFILE = "LOCKFILE";
     public static final String PRM_RAW_SEQ_1 = "RAW_SEQ_1";
     public static final String PRM_RAW_SEQ_2 = "RAW_SEQ_2";
     public static final String PRM_FILENAME_BAM_INDEX = "FILENAME_BAM_INDEX";
@@ -83,8 +63,6 @@ public final class COConstants {
     public static final String PRM_RAW_SEQ_FILE_1_INDEX = "RAW_SEQ_FILE_1_INDEX";
     public static final String PRM_RAW_SEQ_FILE_2_INDEX = "RAW_SEQ_FILE_2_INDEX";
     public static final String PRM_FILENAME_FLAGSTAT = "FILENAME_FLAGSTAT";
-    public static final String PRM_STREAM_BUFFER_PORTEXCHANGE_0 = "STREAM_BUFFER_PORTEXCHANGE_0";
-    public static final String PRM_STREAM_BUFFER_PORTEXCHANGE_1 = "STREAM_BUFFER_PORTEXCHANGE_1";
     public static final String PRM_RAW_SEQ_JOBJ = "jobj_rawSeq";
     public static final String PRM_CVAL_LIBRARY = "LIB_ADD";
     public static final String PRM_ID = "ID";
@@ -97,8 +75,6 @@ public final class COConstants {
     /**
      * Configuration values
      */
-    public static final String CVALUE_CHROMOSOME_INDICES = "CHROMOSOME_INDICES";
-    public static final String CVALUE_AUTOSOME_INDICES = "AUTOSOME_INDICES";
     public static final String CVALUE_SAMPLE_DIRECTORY = "sampleDirectory";
     public static final String CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME = "alignmentInputDirectory";
     public static final String CVALUE_SEQUENCE_DIRECTORY = "sequenceDirectory";
