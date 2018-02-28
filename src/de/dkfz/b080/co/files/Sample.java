@@ -64,7 +64,7 @@ public class Sample implements Comparable<Sample>, Serializable {
         this(context, path.getName(), path);
     }
 
-    private Sample(ExecutionContext context, String name, File path) {
+    public Sample(ExecutionContext context, String name, File path) {
         this.name = name;
         this.path = path;
         this.executionContext = context;
