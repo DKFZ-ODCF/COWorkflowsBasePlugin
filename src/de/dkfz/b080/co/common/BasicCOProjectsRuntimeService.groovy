@@ -200,7 +200,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
             List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f); }
             samples = extractSamplesFromFastqList(fastqFiles, context)
             extractedFrom = "fastq_list configuration value"
-        } else if (cfg.extractSamplesFromOutputFiles) {
+        } else if (cfg.getExtractSamplesFromOutputFiles()) {
             samples = extractSamplesFromOutputFiles(context)
             extractedFrom = "output files"
         } else if (cfg.extractSamplesFromBamList) {
@@ -238,7 +238,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         // getSamples(). We don't reuse the code there, as there UNKNOWN sample type BAMs
         // are removed and we matching sample and BAM in the bamfile_list branch using array indices and
         // want to keep unclassified samples.
-        if (coConfig.extractSamplesFromOutputFiles) {
+        if (coConfig.getExtractSamplesFromOutputFiles()) {
             for (Sample sample : extractSamplesFromOutputFiles(context))
                 allFound.add(getMergedBamFileFromFilesystem(context, sample))
 
