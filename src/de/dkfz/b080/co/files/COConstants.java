@@ -75,6 +75,8 @@ public final class COConstants {
     /**
      * Configuration values
      */
+    public static final String CVALUE_CHROMOSOME_INDICES = "CHROMOSOME_INDICES";
+    public static final String CVALUE_AUTOSOME_INDICES = "AUTOSOME_INDICES";
     public static final String CVALUE_SAMPLE_DIRECTORY = "sampleDirectory";
     public static final String CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME = "alignmentInputDirectory";
     public static final String CVALUE_SEQUENCE_DIRECTORY = "sequenceDirectory";
