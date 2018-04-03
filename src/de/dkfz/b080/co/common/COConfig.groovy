@@ -59,15 +59,16 @@ class COConfig {
     }
 
     List<String> getFastqList() {
-        return checkAndSplitListFromConfig("fastq_list")
+
+        return checkAndSplitListFromConfig(CVALUE_FASTQ_LIST)
     }
 
     List<String> getBamList() {
-        return checkAndSplitListFromConfig("bamfile_list")
+        return checkAndSplitListFromConfig(CVALUE_BAMFILE_LIST)
     }
 
     List<String> getSampleList() {
-        return checkAndSplitListFromConfig("sample_list")
+        return checkAndSplitListFromConfig(CVALUE_SAMPLE_LIST)
     }
 
     String getSequenceDirectory() {
