@@ -16,8 +16,6 @@ import de.dkfz.roddy.core.Workflow
 import de.dkfz.roddy.knowledge.files.BaseFile
 import groovy.transform.CompileStatic
 
-import java.util.*
-
 import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES
 
 /**
