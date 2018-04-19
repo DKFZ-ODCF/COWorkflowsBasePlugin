@@ -169,25 +169,6 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         return samples;
     }
 
-    // Remove sample, sequence protocol etc. from filename patterns, etc. -- implement this stuff later
-    List<BasicBamFile> getAllBamFiles(ExecutionContext context) {
-        COConfig cfg = new COConfig(context)
-        List<BasicBamFile> bamFiles = []
-        if (Roddy.isMetadataCLOptionSet()) {
-            logger.severe("Metadata table input not implemented. Please use ${COConstants.CVALUE_BAMFILE_LIST} to specify the BAM files to convert.")
-        } else if (cfg.bamList.size() > 0) {
-            bamFiles = cfg.getBamList().collect { filename ->
-                (BasicBamFile) BaseFile.getSourceFile(context, filename, BasicBamFile.class.name)
-            }
-        } else {
-            // Collect files from directory structure.
-            logger.severe("Please use ${COConstants.CVALUE_BAMFILE_LIST} to specify the BAM files to convert.")
-        }
-        if (bamFiles.size() == 0)
-            logger.warning("No input BAM files were specified.")
-        return bamFiles
-    }
-
     List<Sample> extractSamplesFromBamfileListAndSampleList(ExecutionContext context) {
         COConfig cfg = new COConfig(context)
         List<File> bamFiles = cfg.getBamList().collect { String f -> new File(f) }

@@ -20,15 +20,15 @@
       <sourceFolder url="file://$MODULE_DIR$/test/src" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <orderEntry type="jdk" jdkName="1.8.0_162" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="R Skeletons" level="application" />
     <orderEntry type="library" name="R User Library" level="project" />
     <orderEntry type="module" module-name="PluginBase" />
     <orderEntry type="library" name="Gradle: org.codehaus.groovy:groovy-all:2.4.9" level="project" />
-    <orderEntry type="module" module-name="Roddy" />
     <orderEntry type="module" module-name="BatchEuphoria" />
     <orderEntry type="module" module-name="RoddyToolLib" />
+    <orderEntry type="module" module-name="Roddy" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />
