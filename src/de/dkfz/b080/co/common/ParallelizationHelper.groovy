@@ -11,6 +11,7 @@ import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.knowledge.files.FileObject
 import de.dkfz.roddy.knowledge.files.IndexedFileObjects
 import de.dkfz.roddy.knowledge.methods.GenericMethod
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import java.util.stream.Stream
@@ -39,6 +40,7 @@ class ParallelizationHelper {
     /**
      * Called within runParallel
      */
+    @CompileDynamic
     static FileObject callWithOptionalSecondaryBam(String toolID, BaseFile THIS, BaseFile otherBam, LinkedHashMap<String,String> parameters = [:]) {
         if(otherBam == null)
             return GenericMethod.callGenericTool(toolID, THIS, parameters)

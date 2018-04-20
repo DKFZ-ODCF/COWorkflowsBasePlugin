@@ -17,7 +17,7 @@ import static de.dkfz.b080.co.files.COConstants.*
  * getOptionalColumns() methods.
  */
 @CompileStatic
-public class MetadataTable  extends BaseMetadataTable {
+public class MetadataTable extends BaseMetadataTable {
 
     public MetadataTable(BaseMetadataTable baseMetadataTable) {
         super(baseMetadataTable);

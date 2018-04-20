@@ -61,6 +61,12 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      */
     BasicBamFile[] loadInitialBamFilesForDataset(ExecutionContext context) {
         DataSet dataSet = context.getDataSet()
+
+        // Enable extract samples by default.
+        COConfig coConfig = new COConfig(context)
+        context.configuration.configurationValues.put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" +
+                coConfig.getExtractSamplesFromOutputFiles(true), "boolean")
+
         BasicCOProjectsRuntimeService runtimeService = (BasicCOProjectsRuntimeService) context.getRuntimeService()
 
         List<BasicBamFile> bamsTumorMerged = []
@@ -70,6 +76,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
         BasicBamFile[] bamFilesForDataset
 
         synchronized (foundBamFilesForDatasets) {
+
             // Check the cache for the dataset. If not, try to load the files.
             if (!foundBamFilesForDatasets.containsKey(dataSet)) {
 
@@ -94,13 +101,14 @@ abstract class WorkflowUsingMergedBams extends Workflow {
             }
 
             // Now return copies of found files.
+
             // Why do we return the copies? Because we don't want to run the above code several times and to prevent duplicate loader messages.
             // The copies are also linked to the new context now.
             bamFilesForDataset = foundBamFilesForDatasets[dataSet]
-            if (bamFilesForDataset != null &&
-                    bamFilesForDataset.size() > 0 &&
-                    bamFilesForDataset[0] != null &&
-                    bamFilesForDataset[0].getExecutionContext() != context) {
+            if (bamFilesForDataset != null
+                    && bamFilesForDataset.size() > 0
+                    && bamFilesForDataset[0] != null
+                    && bamFilesForDataset[0].getExecutionContext() != context) {
                 BasicBamFile[] copy = new BasicBamFile[bamFilesForDataset.length]
                 for (int i = 0; i < bamFilesForDataset.length; i++) {
                     if (bamFilesForDataset[i] == null) continue

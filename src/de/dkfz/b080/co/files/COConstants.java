@@ -75,6 +75,8 @@ public final class COConstants {
     /**
      * Configuration values
      */
+    public static final String CVALUE_CHROMOSOME_INDICES = "CHROMOSOME_INDICES";
+    public static final String CVALUE_AUTOSOME_INDICES = "AUTOSOME_INDICES";
     public static final String CVALUE_SAMPLE_DIRECTORY = "sampleDirectory";
     public static final String CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME = "alignmentInputDirectory";
     public static final String CVALUE_SEQUENCE_DIRECTORY = "sequenceDirectory";
@@ -83,6 +85,9 @@ public final class COConstants {
     public static final String CVALUE_MARK_DUPLICATES_VARIANT = "markDuplicatesVariant";
     public static final String CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES = "possibleControlSampleNamePrefixes";
     public static final String CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES = "possibleTumorSampleNamePrefixes";
+    public static final String CVALUE_FASTQ_LIST = "fastq_list";
+    public static final String CVALUE_BAMFILE_LIST = "bamfile_list";
+    public static final String CVALUE_SAMPLE_LIST = "sample_list";
 
     /**
      * Input table column names

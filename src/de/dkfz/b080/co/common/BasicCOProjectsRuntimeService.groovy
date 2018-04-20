@@ -166,7 +166,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
 
     static List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
         COConfig cfg = new COConfig(context)
-        LinkedList<Sample> samples = [];
+        LinkedList<Sample> samples = [] as LinkedList;
         for (File f : filesInDirectory) {
             String name = f.getName();
             String sampleName = null;
@@ -183,8 +183,23 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         return samples;
     }
 
-    List<Sample> getSamples(ExecutionContext context) {
-        COConfig cfg = new COConfig(context);
+    List<Sample> extractSamplesFromBamfileListAndSampleList(ExecutionContext context) {
+        COConfig cfg = new COConfig(context)
+        List<File> bamFiles = cfg.getBamList().collect { String f -> new File(f) }
+        List<String> sampleList = cfg.getSampleList()
+        if (bamFiles.size() != sampleList.size()) {
+            context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.
+                    expand("Different number of BAM files and samples in ${COConstants.CVALUE_BAMFILE_LIST} and ${COConstants.CVALUE_SAMPLE_LIST}"))
+            return []
+        } else {
+            return new IntRange(0, bamFiles.size()).collect { i ->
+                new Sample(context, sampleList[i], bamFiles[i])
+            }
+        }
+    }
+
+    List<Sample> getSamplesForContext(ExecutionContext context) {
+        COConfig cfg = new COConfig(context)
         List<Sample> samples
         String extractedFrom
         List<String> samplesPassedInConfig = cfg.getSampleList()
@@ -195,9 +210,9 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         } else if (samplesPassedInConfig) {
             logger.postSometimesInfo("Samples were passed as configuration value: ${samplesPassedInConfig}")
             samples = samplesPassedInConfig.collect { String it -> new Sample(context, it) }
-            extractedFrom = "samples_list configuration value"
+            extractedFrom = "${COConstants.CVALUE_SAMPLE_LIST} configuration value"
         } else if (cfg.fastqFileListIsSet) {
-            List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f); }
+            List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f) }
             samples = extractSamplesFromFastqList(fastqFiles, context)
             extractedFrom = "fastq_list configuration value"
         } else if (cfg.getExtractSamplesFromOutputFiles()) {
@@ -206,8 +221,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         } else if (cfg.extractSamplesFromBamList) {
             List<File> bamFiles = cfg.getBamList().collect { String f -> new File(f); }
             samples = extractSamplesFromFilenames(bamFiles, context)
-            // @Michael: Should that not better be called "bam_list" in analogy to "fastq_list"?
-            extractedFrom = "bamfile_list configuration value "
+            extractedFrom = "${COConstants.CVALUE_BAMFILE_LIST} configuration value "
         } else {
             samples = extractSamplesFromSampleDirs(context)
             extractedFrom = "subdirectories of input directory '${context.inputDirectory}'"
