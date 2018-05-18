@@ -83,9 +83,9 @@ abstract class WorkflowUsingMergedBams extends Workflow {
                 runtimeService.getAllBamFiles(context).collect { BasicBamFile bam ->
                     Sample sample = bam.sample
                     if (sample.getType() == Sample.SampleType.CONTROL)
-                        bamsControlMerged.add(bam)
+                        bamsControlMerged << bam
                     else if (sample.getType() == Sample.SampleType.TUMOR)
-                        bamsTumorMerged.add(bam)
+                        bamsTumorMerged << bam
                     else // Other types of BAMs are ignored!
                         null
                 }.findAll { it }
@@ -95,9 +95,9 @@ abstract class WorkflowUsingMergedBams extends Workflow {
                             bamsControlMerged.collect { "${it.sample.name}: ${it.getAbsolutePath()}" }.join("\n")))
                 }
                 if (!isNoControlWorkflow(context) && bamsControlMerged.size() == 1)
-                    foundBamFilesForDatasets.put(dataSet, (bamsControlMerged + bamsTumorMerged) as BasicBamFile[])
+                    foundBamFilesForDatasets[dataSet] = (bamsControlMerged + bamsTumorMerged) as BasicBamFile[]
                 else
-                    foundBamFilesForDatasets.put(dataSet, bamsTumorMerged as BasicBamFile[])
+                    foundBamFilesForDatasets[dataSet] = bamsTumorMerged as BasicBamFile[]
             }
 
             // Now return copies of found files.

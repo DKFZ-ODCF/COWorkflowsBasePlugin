@@ -254,7 +254,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         // want to keep unclassified samples.
         if (coConfig.getExtractSamplesFromOutputFiles()) {
             for (Sample sample : extractSamplesFromOutputFiles(context))
-                allFound.add(getMergedBamFileFromFilesystem(context, sample))
+                allFound.add(getMergedBamFileFromFilesystem(context, null, sample))
 
         } else if (coConfig.extractSamplesFromBamList) {
             List<File> bamFiles = coConfig.getBamList().collect { String f -> new File(f) }
@@ -297,10 +297,6 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
 
     File getSequenceDirectory(ExecutionContext process, Sample sample, String run, String library = null) {
         return new File(getInpDirectory(COConstants.CVALUE_SEQUENCE_DIRECTORY, process, sample, library).getAbsolutePath().replace('${run}', run));
-    }
-
-    BasicBamFile getMergedBamFileFromFilesystem(ExecutionContext context, Sample sample) {
-        return getMergedBamFileFromFilesystem(context, null, sample)
     }
 
     BasicBamFile getMergedBamFileFromFilesystem(ExecutionContext context, DataSet dataSet, Sample sample) {
