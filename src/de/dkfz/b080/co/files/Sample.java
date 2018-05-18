@@ -74,7 +74,7 @@ public class Sample implements Comparable<Sample>, Serializable {
 
         SampleType tempSampleType = determineSampleType(context, name);
         if (tempSampleType == SampleType.UNKNOWN)
-            logger.severe("Sample type is not known for name '" + name + "'. I know " +
+            logger.always("Sample type is not known for name '" + name + "'. I know " +
                     "'" + String.join("', '", cfg.getPossibleControlSampleNamePrefixes()) + "' (control) and " +
                     "'" + String.join("', '", cfg.getPossibleTumorSampleNamePrefixes()) + "' (tumor).");
         

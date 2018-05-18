@@ -64,59 +64,45 @@ abstract class WorkflowUsingMergedBams extends Workflow {
 
         // Enable extract samples by default.
         COConfig coConfig = new COConfig(context)
-        context.configuration.configurationValues.put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" + coConfig.getExtractSamplesFromOutputFiles(true), "boolean")
+        context.configuration.configurationValues.put(FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES, "" +
+                coConfig.getExtractSamplesFromOutputFiles(true), "boolean")
 
         BasicCOProjectsRuntimeService runtimeService = (BasicCOProjectsRuntimeService) context.getRuntimeService()
 
         List<BasicBamFile> bamsTumorMerged = []
-        BasicBamFile bamControlMerged = null
+        List<BasicBamFile> bamsControlMerged = []
 
         // Array of bam files which hopefully can be found.
         BasicBamFile[] bamFilesForDataset
 
-        def assignBam = { BasicBamFile bam ->
-            Sample sample = bam.sample
-            if (sample.getType() == Sample.SampleType.CONTROL)
-                bamControlMerged = bam
-            else if (sample.getType() == Sample.SampleType.TUMOR)
-                bamsTumorMerged.add(bam)
-        }
-
         synchronized (foundBamFilesForDatasets) {
 
-            // Check the cache for the dataset. If not, try to load the files
-            if (!foundBamFilesForDatasets.containsKey(dataSet as Object)) {
+            // Check the cache for the dataset. If not, try to load the files.
+            if (!foundBamFilesForDatasets.containsKey(dataSet)) {
 
-                List<Sample> samples = runtimeService.getSamplesForContext(context)
-                List<BasicBamFile> allFound = []
+                runtimeService.getAllBamFiles(context).collect { BasicBamFile bam ->
+                    Sample sample = bam.sample
+                    if (sample.getType() == Sample.SampleType.CONTROL)
+                        bamsControlMerged << bam
+                    else if (sample.getType() == Sample.SampleType.TUMOR)
+                        bamsTumorMerged << bam
+                    else // Other types of BAMs are ignored!
+                        null
+                }.findAll { it }
 
-                // If the bam_list is set, use it.
-                if (coConfig.getBamList()) {
-                    List<String> bamFiles = coConfig.getBamList()
-                    if (bamFiles.size() != samples.size()) {
-                        context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.
-                                expand("Number of files in bamfile_list does not match sample number in sample_list (only tumor and control!)"))
-                    } else {
-                        for (int i = 0; i < bamFiles.size(); i++) {
-                            // There is no check that the BAM files and samples type lists are matching.
-                            File path = new File(bamFiles[i])
-                            assignBam(new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(path, context,
-                                    new COFileStageSettings(samples[i], dataSet), null)))
-                        }
-                    }
-                } else { // load it with the runtime service
-                    for (Sample sample : samples)
-                        assignBam(runtimeService.getMergedBamFileForDataSetAndSample(context, sample))
-
+                if (bamsControlMerged.size() > 1) {
+                    context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.expand("More than one control sample in bamfile_list:\n" +
+                            bamsControlMerged.collect { "${it.sample.name}: ${it.getAbsolutePath()}" }.join("\n")))
                 }
-                if (!isNoControlWorkflow(context) && bamControlMerged) allFound.add(bamControlMerged)
-                allFound.addAll(bamsTumorMerged)
-                foundBamFilesForDatasets.put(dataSet, allFound as BasicBamFile[])
+                if (!isNoControlWorkflow(context) && bamsControlMerged.size() == 1)
+                    foundBamFilesForDatasets[dataSet] = (bamsControlMerged + bamsTumorMerged) as BasicBamFile[]
+                else
+                    foundBamFilesForDatasets[dataSet] = bamsTumorMerged as BasicBamFile[]
             }
 
             // Now return copies of found files.
-            // Why do we return the copies? Because we don't want to run the above code several times and to prevent
-            // duplicate loader messages.
+
+            // Why do we return the copies? Because we don't want to run the above code several times and to prevent duplicate loader messages.
             // The copies are also linked to the new context now.
             bamFilesForDataset = foundBamFilesForDatasets[dataSet]
             if (bamFilesForDataset != null
@@ -230,8 +216,6 @@ abstract class WorkflowUsingMergedBams extends Workflow {
 
     @Override
     boolean checkExecutability(ExecutionContext context) {
-        BasicBamFile[] initialBamFiles = loadInitialBamFilesForDataset(context)
-        if (initialBamFiles == null) return false
-        return checkInitialFiles(context, initialBamFiles)
+        return checkInitialFiles(context, loadInitialBamFilesForDataset(context))
     }
 }

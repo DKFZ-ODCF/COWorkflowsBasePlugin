@@ -22,6 +22,9 @@ import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.execution.jobs.JobManager
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
+import de.dkfz.roddy.tools.RoddyIOHelperMethods
+import de.dkfz.roddy.tools.Tuple2
+import groovy.transform.CompileDynamic
 
 /**
  * This service is mainly for qcpipeline. It might be of use for other projects
@@ -71,44 +74,55 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         return resultTable.listLibraries()
     }
 
-    static int indexOfPathElement(String pathnamePattern, String element) {
-        int index = pathnamePattern.split(StringConstants.SPLIT_SLASH).findIndexOf { it -> it == element }
-        if (index < 0) {
-            throw new RuntimeException("Couldn't match '${element}' in '${pathnamePattern}")
-        }
-        return index
-    }
+    /** This is similar to RoddyIOHelperMethods.getPatternVariableFromPath() but does not check that the leading path elements before the component
+     *  match are identical in the files and the pathnamePattern. Instead a list of match-tuples -- (matched element value, prefix up to match) --
+     *  is returned.
+     *
+     *  TODO: This is actually not a nice approach to get the sample for the FASTQ. Why match only a specific component and allow differences for
+     *        the rest (unless we'd really implement a wildcard path element like "*" in filename patterns. Rethink the matching strategy.
+     *        It should probably not get applied to fastq_list or bam[file]_list, but really *only* when getting files from the command line. Sample
+     *        names (metadata) should be provided by other means (extra parameters, metadata table/xml, ...)
+     *
+     * @param pathnamePattern
+     * @param element
+     * @param files
+     * @return
+     */
+    @CompileDynamic
+    static List<Tuple2<String, File>> grepPathElementFromFilenames(String pathnamePattern, String element, List<File> files) {
+        assert pathnamePattern.startsWith("/")   // The pathname needs to be an absolute path!
+        int indexOfElement = RoddyIOHelperMethods.findComponentIndexInPath(pathnamePattern, element).
+                orElseThrow { new RuntimeException("Couldn't match '${element}' in '${pathnamePattern}") }
 
-    static List<String> grepPathElementFromFilenames(String pathnamePattern, String element, List<File> files) {
-        int indexOfElement = indexOfPathElement(pathnamePattern, element)
         return files.collect {
-            String[] pathComponents = it.getPath().split(StringConstants.SPLIT_SLASH)
+            List<String> pathComponents = RoddyIOHelperMethods.splitPathname(it.getAbsolutePath()).toList()
             if (pathComponents.size() <= indexOfElement) {
                 throw new RuntimeException("Path to file '${it.getPath()}' too short to match requested path element '${element}' expected at index ${indexOfElement} (${pathnamePattern})")
             } else {
-                return pathComponents[indexOfElement]
+                new Tuple2<>(pathComponents[indexOfElement], RoddyIOHelperMethods.assembleLocalPath("", *pathComponents[0 .. indexOfElement]))
             }
-        }.unique()
+        }
     }
 
     static List<Sample> extractSamplesFromFastqList(List<File> fastqFiles, ExecutionContext context) {
-        COConfig cfg = new COConfig(context);
-        return grepPathElementFromFilenames(cfg.getSequenceDirectory(), '${sample}', fastqFiles).collect {
-            new Sample(context, it)
+        COConfig cfg = new COConfig(context)
+        return grepPathElementFromFilenames(cfg.getSequenceDirectory(), '${sample}', fastqFiles).unique().collect { Tuple2<String, File> pair ->
+            // TODO: Do we want a test here, that two files with the same sample (i.e. both matching the pattern!) come from the same sample directory?
+            new Sample(context, pair.x, pair.y)
         }.findAll {
             it != null
-        } as List<Sample>;
+        } as List<Sample>
 
     }
 
     static String extractSampleNameFromOutputFile(String filename, boolean enforceAtomicSampleName) {
-        String[] split = filename.split(StringConstants.SPLIT_UNDERSCORE);
+        String[] split = filename.split(StringConstants.SPLIT_UNDERSCORE)
         if (split.size() <= 2) {
             return null
         }
         String sampleName = split[0];
         if (!enforceAtomicSampleName && split[1].isInteger() && split[1].length() <= 2)
-            sampleName = split[0..1].join(StringConstants.UNDERSCORE);
+            sampleName = split[0..1].join(StringConstants.UNDERSCORE)
         return sampleName
     }
 
@@ -223,6 +237,40 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         return samples
     }
 
+    /** Find BAM files from whatever source according to the context and configuration. BAMs for all types samples (tumor, control, unknown) are
+     *  returned.
+     *
+     * @param context
+     * @return
+     */
+    List<BasicBamFile> getAllBamFiles(ExecutionContext context) {
+        DataSet dataSet = context.getDataSet()
+        COConfig coConfig = new COConfig(context)
+
+        List<BasicBamFile> allFound = []
+        // Note, the order extractSamplesFromOutputFiles and extractSamplesFromBamList is the same as in
+        // getSamples(). We don't reuse the code there, as there UNKNOWN sample type BAMs
+        // are removed and we matching sample and BAM in the bamfile_list branch using array indices and
+        // want to keep unclassified samples.
+        if (coConfig.getExtractSamplesFromOutputFiles()) {
+            for (Sample sample : extractSamplesFromOutputFiles(context))
+                allFound.add(getMergedBamFileFromFilesystem(context, null, sample))
+
+        } else if (coConfig.extractSamplesFromBamList) {
+            List<File> bamFiles = coConfig.getBamList().collect { String f -> new File(f) }
+            List<Sample> samples = extractSamplesFromFilenames(bamFiles, context)
+            for (int i = 0; i < bamFiles.size(); i++)
+                allFound.add(new BasicBamFile(new BaseFile.
+                        ConstructionHelperForSourceFiles(bamFiles[i], context, new COFileStageSettings(samples[i], dataSet), null)))
+
+        } else {
+            context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.expand("Please set bamfile_list or extractSamplesFromOutputFiles."))
+        }
+
+        return allFound
+    }
+
+
     protected File getAlignmentDirectory(ExecutionContext context) {
         COConfig cfg = new COConfig(context)
         return getDirectory(cfg.alignmentFolderName, context);
@@ -251,11 +299,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         return new File(getInpDirectory(COConstants.CVALUE_SEQUENCE_DIRECTORY, process, sample, library).getAbsolutePath().replace('${run}', run));
     }
 
-    BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, Sample sample) {
-        return getMergedBamFileForDataSetAndSample(context, null, sample);
-    }
-
-    BasicBamFile getMergedBamFileForDataSetAndSample(ExecutionContext context, DataSet dataSet, Sample sample) {
+    BasicBamFile getMergedBamFileFromFilesystem(ExecutionContext context, DataSet dataSet, Sample sample) {
         //TODO Create constants
         COConfig cfg = new COConfig(context)
         // If no dataset is set, the one from the context object is taken.

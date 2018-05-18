@@ -1,27 +1,37 @@
 package de.dkfz.b080.co.common
 
-import org.junit.Test
+import spock.lang.Specification
 
-/**
- * Created by kensche on 10.06.16.
- */
-public class BasicCOProjectsRuntimeServiceTest {
+class BasicCOProjectsRuntimeServiceSpec extends Specification {
 
-    @Test void testIndexOfPathElement() throws Exception {
-        assert BasicCOProjectsRuntimeService.indexOfPathElement("/a/b/\${sample}/d", '${sample}') == 3
-    }
+    def "GrepPathElementFromFilenames"() {
 
-    @Test void testgrepPathElementFromFilenames () throws Exception {
-        assert BasicCOProjectsRuntimeService.grepPathElementFromFilenames("/a/b/c/\${sample}",
+        when:
+        def files = [new File("/a/b//c1/sampleName1/bla/bla/bla"),
+                     new File("/a/b/c2/sampleName1/bla/bla/blub"),
+                     new File("/a/b/c2/sampleName2/bla/blub/")]
+        def pattern = "/a/b/c/\${sample}"
+
+        then:
+        assert BasicCOProjectsRuntimeService.grepPathElementFromFilenames(
+                pattern,
                 '${sample}',
-                [new File("/a/b/c/sampleName1/bla/bla/bla"),
-                 new File("/a/b/c/sampleName2/bla/blub/")] as List<String>) == ["sampleName1", "sampleName2"] as List<String>
+                files).collect { it.x }.equals(["sampleName1", "sampleName1", "sampleName2"])
+        assert BasicCOProjectsRuntimeService.grepPathElementFromFilenames(
+                pattern,
+                '${sample}',
+                files ).collect { it.y }.equals(["/a/b/c1/sampleName1", "/a/b/c2/sampleName1", "/a/b/c2/sampleName2"].collect { new File(it) })
     }
 
-    @Test
-    public void testgrepPathElementFromFilenames_tooShortPath() throws Exception {
+    def "GrepPathElementFromFilenames_tooShortPath"() {
+
+        when:
+        def file = new File("/a/b/c/")
+        def pattern = "/a/b/c/\${sample}"
+
+        then:
         try {
-            BasicCOProjectsRuntimeService.grepPathElementFromFilenames("/a/b/c/\${sample}", '${sample}', [new File("/a/b/c/")] as List<String>)
+            BasicCOProjectsRuntimeService.grepPathElementFromFilenames(pattern, '${sample}', [file] as List<File>)
         } catch (RuntimeException e) {
             assert e.message.startsWith("Path to file")
         }
