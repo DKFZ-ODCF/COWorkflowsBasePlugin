@@ -80,7 +80,7 @@ class COConfig {
     }
 
     String[] getMergedBamSuffixList() {
-        return configValues.get("mergedBamSuffixList", "merged.bam.dupmarked.bam").toString().split(StringConstants.COMMA)
+        return configValues.get("mergedBamSuffixList", "merged.bam.dupmarked.bam,merged.mdup.bam,merged.bam.rmdup.bam").toString().split(StringConstants.COMMA)
     }
 
     boolean getUseMergedBamsFromInputDirectory() {
