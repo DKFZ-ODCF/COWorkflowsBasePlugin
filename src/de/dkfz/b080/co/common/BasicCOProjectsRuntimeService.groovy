@@ -358,7 +358,13 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
             return null;
         }
         if (bamFiles.size() == 0) {
-            logger.severe("Found no merged bam file for sample ${sample.getName()}. Please make sure that merged bam files exist or are linked to the alignment folder within the result folder.");
+            logger.severe(
+                    "Found no merged bam file for sample ${sample.getName()}. " +
+                            "\n\tPlease make sure that merged bam files exist or are linked to the alignment folder within the result folder." +
+                            "\n\tPlease also check the bam suffix list:\n\t\t " +
+                            cfg.mergedBamSuffixList.join("\n\t\t") +
+                            "\n\tIf wrong suffixes are in the list or values are missing, you can change the configuration value 'mergedBamSuffixList'."
+            );
             return null;
         }
 
