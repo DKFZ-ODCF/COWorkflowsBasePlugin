@@ -91,7 +91,7 @@ class COConfig {
         return configValues.getBoolean("searchMergedBamFilesWithPID", false)
     }
 
-    boolean searchMergedBamWithSeparator() {
+    boolean getSearchMergedBamWithSeparator() {
         return configValues.getBoolean("searchMergedBamWithSeparator", false)
     }
     
