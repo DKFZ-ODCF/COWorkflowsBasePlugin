@@ -307,16 +307,14 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
 
         List<String> filters = [];
         for (String suffix in cfg.mergedBamSuffixList) {
-            if (!cfg.searchMergedBamFilesWithPID) {
-                filters += ["${sample.getName()}*${suffix}".toString()
-                            , "${sample.getName().toLowerCase()}*${suffix}".toString()
-                            , "${sample.getName().toUpperCase()}*${suffix}".toString()]
-            } else {
-                def dataSetID = dataSet.getId()
-                filters += ["${sample.getName()}*${dataSetID}*${suffix}".toString()
-                            , "${sample.getName().toLowerCase()}*${dataSetID}*${suffix}".toString()
-                            , "${sample.getName().toUpperCase()}*${dataSetID}*${suffix}".toString()]
-            }
+            String searchForDId = cfg.searchMergedBamFilesWithPID ? dataSet.getId() : ""
+            String searchWithSeparator = cfg.searchMergedBamWithSeparator ? "_" : ""
+            
+            filters += [
+                "${sample.getName()}${searchWithSeparator}*${searchForDId}*${suffix}".toString()
+                , "${sample.getName().toLowerCase()}${searchWithSeparator}*${searchForDId}*${suffix}".toString()
+                , "${sample.getName().toUpperCase()}${searchWithSeparator}*${searchForDId}*${suffix}".toString()
+            ]
         }
 
         List<File> mergedBamPaths;
