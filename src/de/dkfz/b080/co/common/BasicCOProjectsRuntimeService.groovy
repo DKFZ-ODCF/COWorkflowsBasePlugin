@@ -99,7 +99,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
             if (pathComponents.size() <= indexOfElement) {
                 throw new RuntimeException("Path to file '${it.getPath()}' too short to match requested path element '${element}' expected at index ${indexOfElement} (${pathnamePattern})")
             } else {
-                new Tuple2<>(pathComponents[indexOfElement], RoddyIOHelperMethods.assembleLocalPath("", *pathComponents[0 .. indexOfElement]))
+                new Tuple2<>(pathComponents[indexOfElement], RoddyIOHelperMethods.assembleLocalPath("", *pathComponents[0..indexOfElement]))
             }
         }
     }
@@ -305,16 +305,22 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         // If no dataset is set, the one from the context object is taken.
         if (!dataSet) dataSet = context.getDataSet()
 
+        String searchForDId = cfg.searchMergedBamFilesWithPID ? dataSet.getId() : ""
+        String searchWithSeparator = cfg.searchMergedBamWithSeparator ? "_" : ""
+        logger.sometimes("Searching merged bams with searchMergedBamFilesWithPID='${searchForDId}'")
+        logger.sometimes("Searching merged bams with searchWithSeparator='${searchWithSeparator}'")
+
         List<String> filters = [];
         for (String suffix in cfg.mergedBamSuffixList) {
-            String searchForDId = cfg.searchMergedBamFilesWithPID ? dataSet.getId() : ""
-            String searchWithSeparator = cfg.searchMergedBamWithSeparator ? "_" : ""
-            
-            filters += [
-                "${sample.getName()}${searchWithSeparator}*${searchForDId}*${suffix}".toString()
-                , "${sample.getName().toLowerCase()}${searchWithSeparator}*${searchForDId}*${suffix}".toString()
-                , "${sample.getName().toUpperCase()}${searchWithSeparator}*${searchForDId}*${suffix}".toString()
-            ]
+            List<String> newFilters = [
+                    sample.getName(),
+                    sample.getName().toLowerCase(),
+                    sample.getName().toUpperCase()
+            ].collect { String sampleName ->
+                "${sampleName}${searchWithSeparator}*${searchForDId}*${suffix}".toString()
+            }
+            filters += newFilters
+            logger.sometimes("\tCurrent suffix is '${suffix}, search with the following patterns:'\n\t" + newFilters.join("\n\t"))
         }
 
         List<File> mergedBamPaths;
