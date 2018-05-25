@@ -307,23 +307,23 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
 
         String searchForDId = cfg.searchMergedBamFilesWithPID ? dataSet.getId() : ""
         String searchWithSeparator = cfg.searchMergedBamWithSeparator ? "_" : ""
-        logger.sometimes("Searching merged bams with searchMergedBamFilesWithPID='${searchForDId}'")
-        logger.sometimes("Searching merged bams with searchWithSeparator='${searchWithSeparator}'")
 
-        List<String> filters = [];
-        for (String suffix in cfg.mergedBamSuffixList) {
-            List<String> newFilters = [
+        List<String> filters = cfg.mergedBamSuffixList.collect { String suffix ->
+            return [
                     sample.getName(),
                     sample.getName().toLowerCase(),
                     sample.getName().toUpperCase()
             ].collect { String sampleName ->
                 "${sampleName}${searchWithSeparator}*${searchForDId}*${suffix}".toString()
             }
-            filters += newFilters
-            logger.sometimes("\tCurrent suffix is '${suffix}, search with the following patterns:'\n\t" + newFilters.join("\n\t"))
-        }
+        }.flatten() as List<String>
 
-        List<File> mergedBamPaths;
+        String mergedBamSearchMessage = (([
+                "Searching merged bams with:",
+                "searchMergedBamFilesWithPID='${searchForDId}'",
+                "searchWithSeparator='${searchWithSeparator}'",
+                "Searching with the following patterns:'"
+        ] as List<String>) + filters ).join("\n\t")
 
         File searchDirectory = getAlignmentDirectory(context);
         if (cfg.useMergedBamsFromInputDirectory)
@@ -332,11 +332,12 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         synchronized (alreadySearchedMergedBamFolders) {
             if (!alreadySearchedMergedBamFolders.contains(searchDirectory)) {
                 logger.postAlwaysInfo("Looking for merged bam files in directory ${searchDirectory.getAbsolutePath()}");
+                logger.sometimes(mergedBamSearchMessage)
                 alreadySearchedMergedBamFolders << searchDirectory;
             }
         }
 
-        mergedBamPaths = FileSystemAccessProvider.getInstance().listFilesInDirectory(searchDirectory, filters);
+        List<File> mergedBamPaths = FileSystemAccessProvider.getInstance().listFilesInDirectory(searchDirectory, filters);
 
         List<BasicBamFile> bamFiles = mergedBamPaths.collect({
             File f ->
@@ -355,7 +356,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
             logger.info("\tFound merged bam file ${bamFiles[0].getAbsolutePath()} for sample ${sample.getName()}");
         if (bamFiles.size() > 1) {
             StringBuilder info = new StringBuilder();
-            info << "Found more ${bamFiles.size()} merged bam files for sample ${sample.getName()}.\nConsider using option searchMergedBamFilesWithPID=true in your configuration.";
+            info << "Found ${bamFiles.size()} merged bam files for sample ${sample.getName()}.\nConsider using option searchMergedBamFilesWithPID=true in your configuration.";
             bamFiles.each { BasicBamFile bamFile -> info << "\t" << bamFile.getAbsolutePath() << "\n"; }
 
             logger.postAlwaysInfo(info.toString());
@@ -364,11 +365,12 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         if (bamFiles.size() == 0) {
             logger.severe(
                     "Found no merged bam file for sample ${sample.getName()}. " +
+                            "\n\t" + mergedBamSearchMessage.replace("Searching", "Searched") +
                             "\n\tPlease make sure that merged bam files exist or are linked to the alignment folder within the result folder." +
                             "\n\tPlease also check the bam suffix list:\n\t\t " +
                             cfg.mergedBamSuffixList.join("\n\t\t") +
                             "\n\tIf wrong suffixes are in the list or values are missing, you can change the configuration value 'mergedBamSuffixList'."
-            );
+            )
             return null;
         }
 
