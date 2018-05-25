@@ -91,6 +91,10 @@ class COConfig {
         return configValues.getBoolean("searchMergedBamFilesWithPID", false)
     }
 
+    boolean getSearchMergedBamWithSeparator() {
+        return configValues.getBoolean("searchMergedBamWithSeparator", false)
+    }
+    
     List<String> getPossibleControlSampleNamePrefixes() {
         return configValues.get(COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES).toStringList(" ", ["(", ")"] as String[])
     }
