@@ -201,8 +201,8 @@ abstract class WorkflowUsingMergedBams extends Workflow {
             return false
 
         // Just put them to the context config, so they are available in every case.
-        context.configurationValues[IS_CONTROL_WORKFLOW] = isControlWorkflow().toString()
-        context.configurationValues[IS_NO_CONTROL_WORKFLOW] = isNoControlWorkflow().toString()
+        context.configurationValues.put(IS_CONTROL_WORKFLOW, isControlWorkflow().toString())
+        context.configurationValues.put(IS_NO_CONTROL_WORKFLOW, isNoControlWorkflow().toString())
 
         //TODO Low priority. There were thoughts to have workflows which support multi-tumor samples, this it not supported by any workflow now.
         if (context.getConfiguration().getConfigurationValues().getBoolean(WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES, false)) {
