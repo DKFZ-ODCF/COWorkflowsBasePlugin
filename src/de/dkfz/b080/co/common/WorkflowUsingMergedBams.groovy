@@ -30,6 +30,12 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      */
     public static final String IS_NO_CONTROL_WORKFLOW = "isNoControlWorkflow"
 
+    /**
+     * The flag will automatically be created and is the negative of isNoControlWorkflow. If you set it, it will be
+     * overriden
+     */
+    public static final String IS_CONTROL_WORKFLOW = "isControlWorkflow"
+
     public static final String WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES = "workflowSupportsMultiTumorSamples"
 
     /**
@@ -43,8 +49,17 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      * @param context
      * @return
      */
+    @Deprecated
     boolean isNoControlWorkflow(ExecutionContext context) {
-        getflag(context, IS_NO_CONTROL_WORKFLOW, false)
+        getflag(IS_NO_CONTROL_WORKFLOW, false)
+    }
+
+    boolean isNoControlWorkflow() {
+        getFlag(IS_NO_CONTROL_WORKFLOW, false)
+    }
+
+    boolean isControlWorkflow() {
+        !isNoControlWorkflow()
     }
 
     @Deprecated
@@ -94,7 +109,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
                     context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.expand("More than one control sample in bamfile_list:\n" +
                             bamsControlMerged.collect { "${it.sample.name}: ${it.getAbsolutePath()}" }.join("\n")))
                 }
-                if (!isNoControlWorkflow(context) && bamsControlMerged.size() == 1)
+                if (!isNoControlWorkflow() && bamsControlMerged.size() == 1)
                     foundBamFilesForDatasets[dataSet] = (bamsControlMerged + bamsTumorMerged) as BasicBamFile[]
                 else
                     foundBamFilesForDatasets[dataSet] = bamsTumorMerged as BasicBamFile[]
@@ -142,7 +157,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
             return false
         }
 
-        if (isNoControlWorkflow(context)) {
+        if (isNoControlWorkflow()) {
             boolean foundAll = true
             initialBamFiles.each { BasicBamFile it -> foundAll &= it && ((COFileStageSettings) it.getFileStage()).sample.sampleType == Sample.SampleType.TUMOR }
 
@@ -185,12 +200,16 @@ abstract class WorkflowUsingMergedBams extends Workflow {
         if (!checkInitialFiles(context, initialBamFiles))
             return false
 
+        // Just put them to the context config, so they are available in every case.
+        context.configurationValues[IS_CONTROL_WORKFLOW] = isControlWorkflow().toString()
+        context.configurationValues[IS_NO_CONTROL_WORKFLOW] = isNoControlWorkflow().toString()
+
         //TODO Low priority. There were thoughts to have workflows which support multi-tumor samples, this it not supported by any workflow now.
         if (context.getConfiguration().getConfigurationValues().getBoolean(WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES, false)) {
             return executeMulti(context, initialBamFiles)
         }
 
-        if (isNoControlWorkflow(context))
+        if (isNoControlWorkflow())
             return execute(context, null, initialBamFiles[0])
         else
             return execute(context, initialBamFiles[0], initialBamFiles[1])
