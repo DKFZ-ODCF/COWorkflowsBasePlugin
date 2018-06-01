@@ -92,7 +92,7 @@ public final class COConstants {
     /**
      * Input table column names
      */
-    public static final String INPUT_TABLE_MERGECOL_NAME = "mergeCol";
+    public static final String INPUT_TABLE_SAMPLECOL_NAME = "mergeCol";
     public static final String INPUT_TABLE_MARKCOL_NAME = "markCol";
     public static final String INPUT_TABLE_RUNCOL_NAME = "runCol";
     public static final String INPUT_TABLE_DATASETCOL_NAME = "datasetCol";

@@ -7,7 +7,6 @@
 package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.BasicBamFile
-import de.dkfz.b080.co.files.COConstants
 import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
 import de.dkfz.roddy.Roddy
@@ -26,13 +25,8 @@ import de.dkfz.roddy.tools.RoddyIOHelperMethods
 import de.dkfz.roddy.tools.Tuple2
 import groovy.transform.CompileDynamic
 
-/**
- * This service is mainly for qcpipeline. It might be of use for other projects
- * as well. TODO Think about renaming and extending this as needed.
- *
- * @author michael
- */
-//@PluginImplementation
+import static de.dkfz.b080.co.files.COConstants.*
+
 @groovy.transform.CompileStatic
 class BasicCOProjectsRuntimeService extends RuntimeService {
 
@@ -45,9 +39,9 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         //File cf = fs..createTemporaryConfigurationFile(executionContext);
         String pid = context.getDataSet().toString()
         Map<String, Object> parameters = [
-                (COConstants.PRM_PID)         : (Object) pid,
-                (COConstants.PRM_PID_CAP)     : pid,
-                (COConstants.PRM_ANALYSIS_DIR): context.getOutputDirectory().getParentFile().getParent()
+                (PRM_PID)         : (Object) pid,
+                (PRM_PID_CAP)     : pid,
+                (PRM_ANALYSIS_DIR): context.getOutputDirectory().getParentFile().getParent()
         ]
         return parameters
     }
@@ -59,11 +53,11 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
     }
 
     protected MetadataTable getMetadataTable(ExecutionContext context) {
-        return new MetadataTable(MetadataTableFactory.getTable(context.getAnalysis()).subsetByDataset(context.getDataSet().id));
+        return new MetadataTable(MetadataTableFactory.getTable(context.getAnalysis()).subsetByDataset(context.getDataSet().id))
     }
 
     List<Sample> extractSamplesFromMetadataTable(ExecutionContext context) {
-        return getMetadataTable(context).listSampleNames().collect {
+        return getMetadataTable(context).listColumn(INPUT_TABLE_SAMPLECOL_NAME).unique().collect {
             new Sample(context, it)
         }
     }
@@ -189,7 +183,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         List<String> sampleList = cfg.getSampleList()
         if (bamFiles.size() != sampleList.size()) {
             context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.
-                    expand("Different number of BAM files and samples in ${COConstants.CVALUE_BAMFILE_LIST} and ${COConstants.CVALUE_SAMPLE_LIST}"))
+                    expand("Different number of BAM files and samples in ${CVALUE_BAMFILE_LIST} and ${CVALUE_SAMPLE_LIST}"))
             return []
         } else {
             return new IntRange(0, bamFiles.size()).collect { i ->
@@ -210,7 +204,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         } else if (samplesPassedInConfig) {
             logger.postSometimesInfo("Samples were passed as configuration value: ${samplesPassedInConfig}")
             samples = samplesPassedInConfig.collect { String it -> new Sample(context, it) }
-            extractedFrom = "${COConstants.CVALUE_SAMPLE_LIST} configuration value"
+            extractedFrom = "${CVALUE_SAMPLE_LIST} configuration value"
         } else if (cfg.fastqFileListIsSet) {
             List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f) }
             samples = extractSamplesFromFastqList(fastqFiles, context)
@@ -221,7 +215,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         } else if (cfg.extractSamplesFromBamList) {
             List<File> bamFiles = cfg.getBamList().collect { String f -> new File(f); }
             samples = extractSamplesFromFilenames(bamFiles, context)
-            extractedFrom = "${COConstants.CVALUE_BAMFILE_LIST} configuration value "
+            extractedFrom = "${CVALUE_BAMFILE_LIST} configuration value "
         } else {
             samples = extractSamplesFromSampleDirs(context)
             extractedFrom = "subdirectories of input directory '${context.inputDirectory}'"
@@ -291,12 +285,12 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
     }
 
     File getSampleDirectory(ExecutionContext process, Sample sample, String library = null) {
-        File sampleDir = getInpDirectory(COConstants.CVALUE_SAMPLE_DIRECTORY, process, sample, library);
+        File sampleDir = getInpDirectory(CVALUE_SAMPLE_DIRECTORY, process, sample, library);
         return sampleDir
     }
 
     File getSequenceDirectory(ExecutionContext process, Sample sample, String run, String library = null) {
-        return new File(getInpDirectory(COConstants.CVALUE_SEQUENCE_DIRECTORY, process, sample, library).getAbsolutePath().replace('${run}', run));
+        return new File(getInpDirectory(CVALUE_SEQUENCE_DIRECTORY, process, sample, library).getAbsolutePath().replace('${run}', run));
     }
 
     BasicBamFile getMergedBamFileFromFilesystem(ExecutionContext context, DataSet dataSet, Sample sample) {
@@ -323,7 +317,7 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
 
         File searchDirectory = getAlignmentDirectory(context);
         if (cfg.useMergedBamsFromInputDirectory)
-            searchDirectory = getInpDirectory(COConstants.CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME, context, sample);
+            searchDirectory = getInpDirectory(CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME, context, sample);
 
         synchronized (alreadySearchedMergedBamFolders) {
             if (!alreadySearchedMergedBamFolders.contains(searchDirectory)) {
@@ -348,21 +342,21 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         })
 
         if (bamFiles.size() == 1)
-            logger.info("\tFound merged bam file ${bamFiles[0].getAbsolutePath()} for sample ${sample.getName()}");
+            logger.info("\tFound merged bam file ${bamFiles[0].getAbsolutePath()} for sample ${sample.getName()}")
         if (bamFiles.size() > 1) {
             StringBuilder info = new StringBuilder();
-            info << "Found more ${bamFiles.size()} merged bam files for sample ${sample.getName()}.\nConsider using option searchMergedBamFilesWithPID=true in your configuration.";
-            bamFiles.each { BasicBamFile bamFile -> info << "\t" << bamFile.getAbsolutePath() << "\n"; }
+            info << "Found more ${bamFiles.size()} merged bam files for sample ${sample.getName()}.\nConsider using option searchMergedBamFilesWithPID=true in your configuration."
+            bamFiles.each { BasicBamFile bamFile -> info << "\t" << bamFile.getAbsolutePath() << "\n" }
 
-            logger.postAlwaysInfo(info.toString());
+            logger.postAlwaysInfo(info.toString())
             return null;
         }
         if (bamFiles.size() == 0) {
-            logger.severe("Found no merged bam file for sample ${sample.getName()}. Please make sure that merged bam files exist or are linked to the alignment folder within the result folder.");
-            return null;
+            logger.severe("Found no merged bam file for sample ${sample.getName()}. Please make sure that merged bam files exist or are linked to the alignment folder within the result folder.")
+            return null
         }
 
-        return bamFiles[0];
+        return bamFiles[0]
     }
 
 }

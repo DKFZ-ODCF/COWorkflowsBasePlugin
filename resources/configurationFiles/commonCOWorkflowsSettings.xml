@@ -27,9 +27,9 @@
         <cvalue name='metadataTableColumnIDs' value='datasetCol,mergeCol,markCol,runCol,mateCol,fileCol,readLayoutCol' type="string"
                 description="Column names used internally, such as 'datasetCol' or 'fileCol'. The order of mandatory columns in here determines
                              the priority of the column, not the expected column order in the input file (which can be arbitrary). Higher-
-                             priority values may have to have unique values in the input metadata table, if lower priority columns are selected
-                             to be unique. E.g. when selecting a value for mergeCol (e.g. a Sample), the datasetCol needs to be unique as well
-                             (e.g. the patient ID)."/>
+                             priority values (left) may have to have unique values in the input metadata table, if lower priority columns (right) are
+                             selected to be unique. E.g. when selecting a value for mergeCol (e.g. a Sample), the datasetCol needs to be unique as well
+                             (e.g. the patient ID). However, these restrictions are may depend on the workflow and is implemented on the JVM level (Java or Groovy)."/>
     </configurationvalues>
     <processingTools>
         <tool name="analyzeBamHeader" value="analyzeBamHeader.sh" basepath="tools"/>
