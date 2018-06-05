@@ -14,17 +14,17 @@ class MetadataTableTest {
     public String damagedTable = "InputTableTest_DamagedInputTable.tsv"
 
     public static final Map<String, String> columnIDMap = [
-            (COConstants.INPUT_TABLE_SAMPLECOL_NAME)       : "Sample",
-            (COConstants.INPUT_TABLE_MARKCOL_NAME)         : "Library",
-            (COConstants.INPUT_TABLE_DATASETCOL_NAME)      : "PID",
-            (COConstants.INPUT_TABLE_READLAYOUTCOL_NAME)   : "ReadLayout",
-            (COConstants.INPUT_TABLE_RUNCOL_NAME)          : "Run",
-            (COConstants.INPUT_TABLE_MATECOL_NAME)         : "Mate",
-            (COConstants.INPUT_TABLE_FILECOL_NAME)         : "SequenceFile"
+            (COConstants.INPUT_TABLE_SAMPLECOL_NAME)    : "Sample",
+            (COConstants.INPUT_TABLE_MARKCOL_NAME)      : "Library",
+            (COConstants.INPUT_TABLE_DATASETCOL_NAME)   : "PID",
+            (COConstants.INPUT_TABLE_READLAYOUTCOL_NAME): "ReadLayout",
+            (COConstants.INPUT_TABLE_RUNCOL_NAME)       : "Run",
+            (COConstants.INPUT_TABLE_MATECOL_NAME)      : "Mate",
+            (COConstants.INPUT_TABLE_FASTQCOL_NAME)     : "SequenceFile"
     ];
     public static final List<String> mandatoryColumns = [
             COConstants.INPUT_TABLE_DATASETCOL_NAME,
-            COConstants.INPUT_TABLE_FILECOL_NAME,
+            COConstants.INPUT_TABLE_FASTQCOL_NAME,
             COConstants.INPUT_TABLE_SAMPLECOL_NAME,
             COConstants.INPUT_TABLE_MARKCOL_NAME,
             COConstants.INPUT_TABLE_READLAYOUTCOL_NAME,

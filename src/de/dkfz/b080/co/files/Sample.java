@@ -129,13 +129,7 @@ public class Sample implements Comparable<Sample>, Serializable {
 
     public List<String> getLibraries() {
         if(libraries == null) {
-            COConfig cfg = new COConfig(executionContext);
-            BasicCOProjectsRuntimeService runtimeService = (BasicCOProjectsRuntimeService) executionContext.getRuntimeService();
-            if (Roddy.isMetadataCLOptionSet()) {
-                libraries = runtimeService.extractLibrariesFromMetadataTable(executionContext, name);
-            } else {
-                libraries = runtimeService.extractLibrariesFromSampleDirectory(path);
-            }
+            libraries = ((BasicCOProjectsRuntimeService) analysis.getRuntimeService()).getMetadataAccessor().getLibraries(executionContext, this);
         }
         return libraries;
     }

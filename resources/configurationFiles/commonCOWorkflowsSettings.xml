@@ -16,15 +16,15 @@
         <cvalue name='WINDOW_SIZE' value='1' type="integer" />
 
         <!-- Settings for metadata table -->
-        <cvalue name="mergeCol" tags="mandatory"        value="Sample"          description="Metadata column defining sets of FASTQs belonging to the same sample type (tumor_01, etc.). Default: Sample. Default if undefined: Error!"/>
+        <cvalue name="sampleCol" tags="mandatory"        value="Sample"          description="Metadata column defining sets of FASTQs belonging to the same sample type (tumor_01, etc.). Default: Sample. Default if undefined: Error!"/>
         <cvalue name="markCol" tags="mandatory"         value="Library"         description="Metadata column defining sets of FASTQs pooled for marking. Marking only happens within the same sample. Default: Library. Default if undefined: 1 Library per merged BAM."/>
         <cvalue name="datasetCol" tags="mandatory"      value="PID"             description="Metadata column defining the datasets (e.g. patient ID). Default: PID"/>
         <cvalue name="readLayoutCol" tags="mandatory"   value="ReadLayout"      description="Metadata column defining the read layout. Usually paired, single, or mate_pair. For 'mate_pair' paired-end reads are reverse complemented (by some older workflow variant). Default: ReadLayout. Default if undefined: paired."/>
         <cvalue name="runCol" tags="mandatory"          value="Run"             description="Metadata column defining the name of the run (e.g. run160126_ST-E00350_0017_AHKGFNCCXX). Default: Run"/>
         <cvalue name="mateCol"                          value="Mate"            description="Metadata column mapping FASTQ file to read numbers. Allowed values are 1, 2. If undefined single-end sequencing is assumed, unless readLayout==paired, in which case Roddy will warn you. Default: Mate. Default if undefined: If undefined and paired-end or mate-pair sequencing are set, matching FASTQs are allowed to differ by only a single number (1,2) and automatically identified."/>
-        <cvalue name="fileCol" tags="mandatory"         value="SequenceFile"    description="Metadata column specifying the FASTQ or BAM file to use as input. Default: SequenceFile. Default if undefined: Error."/>
+        <cvalue name="fileCol" tags="mandatory"         value="SequenceFile"    description="Metadata column specifying the FASTQ file to use as input. Default: SequenceFile. Default if undefined: Error."/>
 
-        <cvalue name='metadataTableColumnIDs' value='datasetCol,mergeCol,markCol,runCol,mateCol,fileCol,readLayoutCol' type="string"
+        <cvalue name='metadataTableColumnIDs' value='datasetCol,sampleCol,markCol,runCol,mateCol,fileCol,readLayoutCol' type="string"
                 description="Column names used internally, such as 'datasetCol' or 'fileCol'. The order of mandatory columns in here determines
                              the priority of the column, not the expected column order in the input file (which can be arbitrary). Higher-
                              priority values (left) may have to have unique values in the input metadata table, if lower priority columns (right) are
