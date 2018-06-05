@@ -6,17 +6,16 @@
 
 package de.dkfz.b080.co.common
 
-import de.dkfz.b080.co.files.BasicBamFile
 import de.dkfz.b080.co.files.Sample
 import de.dkfz.b080.co.knowledge.metadata.COMetadataAccessor
 import de.dkfz.roddy.config.Configuration
-import de.dkfz.roddy.core.DataSet
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.jobs.JobManager
 import de.dkfz.roddy.knowledge.files.BaseFile
 
-import static de.dkfz.b080.co.files.COConstants.*
+import static de.dkfz.b080.co.files.COConstants.CVALUE_SAMPLE_DIRECTORY
+import static de.dkfz.b080.co.files.COConstants.CVALUE_SEQUENCE_DIRECTORY
 
 @groovy.transform.CompileStatic
 class BasicCOProjectsRuntimeService extends RuntimeService {
@@ -82,6 +81,11 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
     @Deprecated
     List<Sample> getSamplesForContext(ExecutionContext context) {
         return metadataAccessor.getSamples(context)
+    }
+
+    @Deprecated
+    MetadataTable getMetadataTable(ExecutionContext context) {
+        return metadataAccessor.getMetadataTable(context)
     }
 
 }

@@ -1,6 +1,6 @@
 package de.dkfz.b080.co.common
 
-import de.dkfz.b080.co.files.COConstants
+import static de.dkfz.b080.co.files.COConstants.*
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.plugins.LibrariesFactory
 import groovy.transform.CompileStatic
@@ -14,22 +14,22 @@ class MetadataTableTest {
     public String damagedTable = "InputTableTest_DamagedInputTable.tsv"
 
     public static final Map<String, String> columnIDMap = [
-            (COConstants.INPUT_TABLE_SAMPLECOL_NAME)    : "Sample",
-            (COConstants.INPUT_TABLE_MARKCOL_NAME)      : "Library",
-            (COConstants.INPUT_TABLE_DATASETCOL_NAME)   : "PID",
-            (COConstants.INPUT_TABLE_READLAYOUTCOL_NAME): "ReadLayout",
-            (COConstants.INPUT_TABLE_RUNCOL_NAME)       : "Run",
-            (COConstants.INPUT_TABLE_MATECOL_NAME)      : "Mate",
-            (COConstants.INPUT_TABLE_FASTQCOL_NAME)     : "SequenceFile"
+            (INPUT_TABLE_SAMPLECOL_NAME)    : "Sample",
+            (INPUT_TABLE_MARKCOL_NAME)      : "Library",
+            (INPUT_TABLE_DATASETCOL_NAME)   : "PID",
+            (INPUT_TABLE_READLAYOUTCOL_NAME): "ReadLayout",
+            (INPUT_TABLE_RUNCOL_NAME)       : "Run",
+            (INPUT_TABLE_MATECOL_NAME)      : "Mate",
+            (INPUT_TABLE_FASTQCOL_NAME)     : "SequenceFile"
     ];
     public static final List<String> mandatoryColumns = [
-            COConstants.INPUT_TABLE_DATASETCOL_NAME,
-            COConstants.INPUT_TABLE_FASTQCOL_NAME,
-            COConstants.INPUT_TABLE_SAMPLECOL_NAME,
-            COConstants.INPUT_TABLE_MARKCOL_NAME,
-            COConstants.INPUT_TABLE_READLAYOUTCOL_NAME,
-            COConstants.INPUT_TABLE_RUNCOL_NAME,
-            COConstants.INPUT_TABLE_MATECOL_NAME
+            INPUT_TABLE_DATASETCOL_NAME,
+            INPUT_TABLE_FASTQCOL_NAME,
+            INPUT_TABLE_SAMPLECOL_NAME,
+            INPUT_TABLE_MARKCOL_NAME,
+            INPUT_TABLE_READLAYOUTCOL_NAME,
+            INPUT_TABLE_RUNCOL_NAME,
+            INPUT_TABLE_MATECOL_NAME
     ];
 
     private MetadataTable readTable(String table) {
