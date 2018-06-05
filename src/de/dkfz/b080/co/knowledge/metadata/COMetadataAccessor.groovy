@@ -34,7 +34,7 @@ class COMetadataAccessor {
 
     private static LoggerWrapper logger = LoggerWrapper.getLogger(COMetadataAccessor.class.getName())
 
-    private static List<File> alreadySearchedMergedBamFolders = []
+    private final static List<File> alreadySearchedMergedBamFolders = []
 
     BasicCOProjectsRuntimeService runtimeService
 
@@ -256,34 +256,39 @@ class COMetadataAccessor {
         // If no dataset is set, the one from the context object is taken.
         if (!dataSet) dataSet = context.getDataSet()
 
-        List<String> filters = []
-        for (String suffix in cfg.mergedBamSuffixList) {
-            if (!cfg.searchMergedBamFilesWithPID) {
-                filters += ["${sample.getName()}*${suffix}".toString()
-                            , "${sample.getName().toLowerCase()}*${suffix}".toString()
-                            , "${sample.getName().toUpperCase()}*${suffix}".toString()]
-            } else {
-                def dataSetID = dataSet.getId()
-                filters += ["${sample.getName()}*${dataSetID}*${suffix}".toString()
-                            , "${sample.getName().toLowerCase()}*${dataSetID}*${suffix}".toString()
-                            , "${sample.getName().toUpperCase()}*${dataSetID}*${suffix}".toString()]
+        String searchForDId = cfg.searchMergedBamFilesWithPID ? dataSet.getId() : ""
+        String searchWithSeparator = cfg.searchMergedBamWithSeparator ? "_" : ""
+
+        List<String> filters = cfg.mergedBamSuffixList.collect { String suffix ->
+            return [
+                    sample.getName(),
+                    sample.getName().toLowerCase(),
+                    sample.getName().toUpperCase()
+            ].collect { String sampleName ->
+                "${sampleName}${searchWithSeparator}*${searchForDId}*${suffix}".toString()
             }
-        }
+        }.flatten() as List<String>
 
-        List<File> mergedBamPaths
+        String mergedBamSearchMessage = (([
+                "Searching merged bams with:",
+                "searchMergedBamFilesWithPID='${searchForDId}'",
+                "searchWithSeparator='${searchWithSeparator}'",
+                "Searching with the following patterns:'"
+        ] as List<String>) + filters).join("\n\t")
 
-        File searchDirectory = runtimeService.getAlignmentDirectory(context)
+        File searchDirectory = runtimeService.getAlignmentDirectory(context);
         if (cfg.useMergedBamsFromInputDirectory)
             searchDirectory = runtimeService.fillTemplatesInPathnameString(CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME, context, sample)
 
         synchronized (alreadySearchedMergedBamFolders) {
             if (!alreadySearchedMergedBamFolders.contains(searchDirectory)) {
                 logger.postAlwaysInfo("Looking for merged bam files in directory ${searchDirectory.getAbsolutePath()}")
+                logger.sometimes(mergedBamSearchMessage)
                 alreadySearchedMergedBamFolders << searchDirectory
             }
         }
 
-        mergedBamPaths = FileSystemAccessProvider.getInstance().listFilesInDirectory(searchDirectory, filters)
+        List<File> mergedBamPaths = FileSystemAccessProvider.getInstance().listFilesInDirectory(searchDirectory, filters)
 
         List<BasicBamFile> bamFiles = mergedBamPaths.collect({
             File f ->
@@ -294,7 +299,8 @@ class COMetadataAccessor {
                     runIndex = 2
                 }
                 RunID run = new RunID(split[runIndex..-2].join(StringConstants.UNDERSCORE))
-                BasicBamFile bamFile = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(f, context, new COFileStageSettings(run, null, sample, dataSet), null))
+                BasicBamFile bamFile = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(f, context,
+                        new COFileStageSettings(run, null, sample, dataSet), null))
                 return bamFile
         })
 
@@ -302,15 +308,23 @@ class COMetadataAccessor {
             logger.info("\tFound merged bam file ${bamFiles[0].getAbsolutePath()} for sample ${sample.getName()}")
         if (bamFiles.size() > 1) {
             StringBuilder info = new StringBuilder()
-            info << "Found more ${bamFiles.size()} merged bam files for sample ${sample.getName()}.\nConsider using option searchMergedBamFilesWithPID=true in your configuration."
+            info << "Found ${bamFiles.size()} merged bam files for sample ${sample.getName()}.\nConsider using option searchMergedBamFilesWithPID=true in your configuration."
             bamFiles.each { BasicBamFile bamFile -> info << "\t" << bamFile.getAbsolutePath() << "\n" }
 
             logger.postAlwaysInfo(info.toString())
             return null
         }
         if (bamFiles.size() == 0) {
-            logger.severe("Found no merged bam file for sample ${sample.getName()}. Please make sure that merged bam files exist or are linked to the alignment folder within the result folder.")
+            logger.severe(
+                    "Found no merged bam file for sample ${sample.getName()}. " +
+                            "\n\t" + mergedBamSearchMessage.replace("Searching", "Searched") +
+                            "\n\tPlease make sure that merged bam files exist or are linked to the alignment folder within the result folder." +
+                            "\n\tPlease also check the bam suffix list:\n\t\t " +
+                            cfg.mergedBamSuffixList.join("\n\t\t") +
+                            "\n\tIf wrong suffixes are in the list or values are missing, you can change the configuration value 'mergedBamSuffixList'."
+            )
             return null
+
         }
 
         return bamFiles[0]

@@ -80,7 +80,7 @@ class COConfig {
     }
 
     String[] getMergedBamSuffixList() {
-        return configValues.get("mergedBamSuffixList", "merged.bam.dupmarked.bam").toString().split(StringConstants.COMMA)
+        return configValues.get("mergedBamSuffixList", "merged.bam.dupmarked.bam,merged.mdup.bam,merged.bam.rmdup.bam").toString().split(StringConstants.COMMA)
     }
 
     boolean getUseMergedBamsFromInputDirectory() {
@@ -91,6 +91,10 @@ class COConfig {
         return configValues.getBoolean("searchMergedBamFilesWithPID", false)
     }
 
+    boolean getSearchMergedBamWithSeparator() {
+        return configValues.getBoolean("searchMergedBamWithSeparator", false)
+    }
+    
     List<String> getPossibleControlSampleNamePrefixes() {
         return configValues.get(CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES).toStringList(" ", ["(", ")"] as String[])
     }

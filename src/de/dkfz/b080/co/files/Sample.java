@@ -77,32 +77,35 @@ public class Sample implements Comparable<Sample>, Serializable {
             logger.always("Sample type is not known for name '" + name + "'. I know " +
                     "'" + String.join("', '", cfg.getPossibleControlSampleNamePrefixes()) + "' (control) and " +
                     "'" + String.join("', '", cfg.getPossibleTumorSampleNamePrefixes()) + "' (tumor).");
-        
+
         sampleType = tempSampleType;
     }
 
     public static SampleType determineSampleType(ExecutionContext context, String sampleName) {
         COConfig cfg = new COConfig(context);
         SampleType tempSampleType = SampleType.UNKNOWN;
-        if (isInSampleList(cfg.getPossibleControlSampleNamePrefixes(), sampleName)) {
-            if (isInSampleList(cfg.getPossibleTumorSampleNamePrefixes(), sampleName)) {
+        if (isInSampleList(cfg, cfg.getPossibleControlSampleNamePrefixes(), sampleName)) {
+            if (isInSampleList(cfg, cfg.getPossibleTumorSampleNamePrefixes(), sampleName)) {
                 context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.expand(
                         "Sample name '" + sampleName + "' matches both values of " +
-                            COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES + " and " +
-                            COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES));
+                                COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES + " and " +
+                                COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES));
                 tempSampleType = SampleType.UNKNOWN;
             } else {
                 tempSampleType = SampleType.CONTROL;
             }
-        } else if (isInSampleList(cfg.getPossibleTumorSampleNamePrefixes(), sampleName)) {
+        } else if (isInSampleList(cfg, cfg.getPossibleTumorSampleNamePrefixes(), sampleName)) {
             tempSampleType = SampleType.TUMOR;
         }
         return tempSampleType;
     }
 
-    private static boolean isInSampleList(List<String> possibleControlSampleNamePrefixes, String sampleName) {
+    private static boolean isInSampleList(COConfig cfg, List<String> possibleControlSampleNamePrefixes, String sampleName) {
         for (String s : possibleControlSampleNamePrefixes) {
-            if (sampleName.startsWith(s)) {
+            if (cfg.getSearchMergedBamWithSeparator()) {
+                if (sampleName.equals(s))
+                    return true;
+            } else if (sampleName.startsWith(s)) {
                 return true;
             }
         }
@@ -113,7 +116,9 @@ public class Sample implements Comparable<Sample>, Serializable {
         return name;
     }
 
-    public SampleType getSampleType() { return sampleType; }
+    public SampleType getSampleType() {
+        return sampleType;
+    }
 
     public File getPath() {
         return path;
@@ -128,7 +133,7 @@ public class Sample implements Comparable<Sample>, Serializable {
     }
 
     public List<String> getLibraries() {
-        if(libraries == null) {
+        if (libraries == null) {
             libraries = ((BasicCOProjectsRuntimeService) analysis.getRuntimeService()).getMetadataAccessor().getLibraries(executionContext, this);
         }
         return libraries;
