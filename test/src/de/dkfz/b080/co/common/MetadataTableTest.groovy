@@ -9,7 +9,7 @@ import org.junit.Test
 @CompileStatic
 class MetadataTableTest {
 
-    public File resourceDir = new File("test/resources");
+    public File resourceDir = new File("test/resources")
     public String correctTable = "InputTableTest_CorrectTable1.tsv"
     public String damagedTable = "InputTableTest_DamagedInputTable.tsv"
 
@@ -21,7 +21,7 @@ class MetadataTableTest {
             (INPUT_TABLE_RUNCOL_NAME)       : "Run",
             (INPUT_TABLE_MATECOL_NAME)      : "Mate",
             (INPUT_TABLE_FASTQCOL_NAME)     : "SequenceFile"
-    ];
+    ]
     public static final List<String> mandatoryColumns = [
             INPUT_TABLE_DATASETCOL_NAME,
             INPUT_TABLE_FASTQCOL_NAME,
@@ -30,7 +30,7 @@ class MetadataTableTest {
             INPUT_TABLE_READLAYOUTCOL_NAME,
             INPUT_TABLE_RUNCOL_NAME,
             INPUT_TABLE_MATECOL_NAME
-    ];
+    ]
 
     private MetadataTable readTable(String table) {
         String testFileName = LibrariesFactory.getGroovyClassLoader().getResource(table).file

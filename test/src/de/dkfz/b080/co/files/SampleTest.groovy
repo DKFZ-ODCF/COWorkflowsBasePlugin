@@ -3,13 +3,17 @@ package de.dkfz.b080.co.files
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.config.ConfigurationValue
 import de.dkfz.roddy.core.ExecutionContext;
-import de.dkfz.roddy.core.MockupExecutionContextBuilder
+import de.dkfz.roddy.core.ContextResource
 import groovy.transform.CompileStatic
-import org.junit.Test;
+import org.junit.Rule
+import org.junit.Test
 
 
 @CompileStatic
-public class SampleTest {
+class SampleTest {
+
+    @Rule
+    final public ContextResource contextResource = new ContextResource()
 
     Configuration getConfiguration(String control, String tumor) {
         Configuration config = new Configuration(null)
@@ -21,12 +25,12 @@ public class SampleTest {
     }
 
     ExecutionContext getExecutionContext(String control, String tumor) {
-        return MockupExecutionContextBuilder.createSimpleContext(Sample.class, getConfiguration(control, tumor))
+        return contextResource.createSimpleContext(Sample.class, getConfiguration(control, tumor))
     }
 
 
     @Test
-    public void testGetSampleType_MatchInBothPrefixSets() throws Exception {
+    void testGetSampleType_MatchInBothPrefixSets() throws Exception {
         ExecutionContext context = getExecutionContext("tumor1", "tumor1a")
         Sample.SampleType sampleType = Sample.determineSampleType(context, "tumor1a")
         assert sampleType == Sample.SampleType.UNKNOWN
@@ -36,19 +40,19 @@ public class SampleTest {
     }
 
     @Test
-    public void testGetSampleType_MatchControlPrefix() throws Exception {
+    void testGetSampleType_MatchControlPrefix() throws Exception {
         ExecutionContext context = getExecutionContext("control", "tumor")
         assert Sample.determineSampleType(context, "control") == Sample.SampleType.CONTROL
     }
 
     @Test
-    public void testGetSampleType_MatchTumorPrefix() throws Exception {
+    void testGetSampleType_MatchTumorPrefix() throws Exception {
         ExecutionContext context = getExecutionContext("blood", "metastasis")
         assert Sample.determineSampleType(context, "metastasis") == Sample.SampleType.TUMOR
     }
 
     @Test
-    public void testGetSampleType_MatchNeitherPrefix() throws Exception {
+    void testGetSampleType_MatchNeitherPrefix() throws Exception {
         ExecutionContext context = getExecutionContext("blood", "tumor")
         assert Sample.determineSampleType(context, "metastasis") == Sample.SampleType.UNKNOWN
     }
