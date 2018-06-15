@@ -34,7 +34,7 @@ class COMetadataAccessor {
 
     private static LoggerWrapper logger = LoggerWrapper.getLogger(COMetadataAccessor.class.getName())
 
-    private final static List<File> alreadySearchedMergedBamFolders = []
+    private final static List<File> _alreadySearchedMergedBamFolders = []
 
     BasicCOProjectsRuntimeService runtimeService
 
@@ -63,7 +63,7 @@ class COMetadataAccessor {
 
     }
 
-    protected String extractSampleNameFromOutputFile(String filename, boolean enforceAtomicSampleName) {
+    protected String extractSampleNameFromBamBasename(String filename, boolean enforceAtomicSampleName) {
         String[] split = filename.split(StringConstants.SPLIT_UNDERSCORE)
         if (split.size() <= 2) {
             return null
@@ -81,13 +81,13 @@ class COMetadataAccessor {
 
         File alignmentDirectory = runtimeService.getAlignmentDirectory(context)
         if (!fileSystemAccessProvider.checkDirectory(alignmentDirectory, context, false)) {
-            logger.severe("Cannot retrieve samples from missing directory: " + alignmentDirectory.absolutePath)
+            logger.severe("Cannot retrieve samples from missing directory (${FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES}=${cfg.getExtractSamplesFromOutputFiles()}): " + alignmentDirectory.absolutePath)
             return (List<Sample>) []
         }
         List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort()
 
         return filesInDirectory.collect { File file ->
-            extractSampleNameFromOutputFile(file.name, cfg.enforceAtomicSampleName)
+            extractSampleNameFromBamBasename(file.name, cfg.enforceAtomicSampleName)
         }.unique().findAll { it != null }.collect {
             new Sample(context, it)
         }
@@ -97,7 +97,7 @@ class COMetadataAccessor {
         FileSystemAccessProvider fileSystemAccessProvider = FileSystemAccessProvider.getInstance()
 
         if (!fileSystemAccessProvider.checkDirectory(context.getInputDirectory(), context, false)) {
-            logger.severe("Cannot retrieve samples from missing directory: " + context.getInputDirectory().getAbsolutePath())
+            logger.severe("Cannot retrieve samples from missing directory (fallback-strategy): " + context.getInputDirectory().getAbsolutePath())
             return (List<Sample>) []
         }
         List<File> sampleDirs = fileSystemAccessProvider.listFilesInDirectory(context.getInputDirectory()).sort()
@@ -191,7 +191,9 @@ class COMetadataAccessor {
         // getSamples(). We don't reuse the code there, as there UNKNOWN sample type BAMs
         // are removed and we matching sample and BAM in the bamfile_list branch using array indices and
         // want to keep unclassified samples.
-        return new COConfig(context).bamList.collect { filename ->
+        COConfig cfg = new COConfig(context)
+        return cfg.bamList.collect { filename ->
+            extractSampleNameFromBamBasename(new File(filename).name, cfg.enforceAtomicSampleName)
             BaseFile.getSourceFile(context, filename, "BasicBamFile") as BasicBamFile
         }
     }
@@ -280,11 +282,11 @@ class COMetadataAccessor {
         if (cfg.useMergedBamsFromInputDirectory)
             searchDirectory = runtimeService.fillTemplatesInPathnameString(CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME, context, sample)
 
-        synchronized (alreadySearchedMergedBamFolders) {
-            if (!alreadySearchedMergedBamFolders.contains(searchDirectory)) {
+        synchronized (_alreadySearchedMergedBamFolders) {
+            if (!_alreadySearchedMergedBamFolders.contains(searchDirectory)) {
                 logger.postAlwaysInfo("Looking for merged bam files in directory ${searchDirectory.getAbsolutePath()}")
                 logger.sometimes(mergedBamSearchMessage)
-                alreadySearchedMergedBamFolders << searchDirectory
+                _alreadySearchedMergedBamFolders << searchDirectory
             }
         }
 
