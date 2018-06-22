@@ -1,8 +1,13 @@
-package de.dkfz.b080.co.common
+/*
+ * Copyright (c) 2018 German Cancer Research Center (DKFZ).
+ *
+ * Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/Roddy/LICENSE.txt).
+ */
+package de.dkfz.b080.co.knowledge.metadata
 
 import spock.lang.Specification
 
-class BasicCOProjectsRuntimeServiceSpec extends Specification {
+class COMetadataAccessorSpec extends Specification {
 
     def "GrepPathElementFromFilenames"() {
 
@@ -13,11 +18,11 @@ class BasicCOProjectsRuntimeServiceSpec extends Specification {
         def pattern = "/a/b/c/\${sample}"
 
         then:
-        assert BasicCOProjectsRuntimeService.grepPathElementFromFilenames(
+        assert COMetadataAccessor.grepPathElementFromFilenames(
                 pattern,
                 '${sample}',
                 files).collect { it.x }.equals(["sampleName1", "sampleName1", "sampleName2"])
-        assert BasicCOProjectsRuntimeService.grepPathElementFromFilenames(
+        assert COMetadataAccessor.grepPathElementFromFilenames(
                 pattern,
                 '${sample}',
                 files ).collect { it.y }.equals(["/a/b/c1/sampleName1", "/a/b/c2/sampleName1", "/a/b/c2/sampleName2"].collect { new File(it) })
@@ -31,9 +36,10 @@ class BasicCOProjectsRuntimeServiceSpec extends Specification {
 
         then:
         try {
-            BasicCOProjectsRuntimeService.grepPathElementFromFilenames(pattern, '${sample}', [file] as List<File>)
+            COMetadataAccessor.grepPathElementFromFilenames(pattern, '${sample}', [file] as List<File>)
         } catch (RuntimeException e) {
             assert e.message.startsWith("Path to file")
         }
     }
+
 }

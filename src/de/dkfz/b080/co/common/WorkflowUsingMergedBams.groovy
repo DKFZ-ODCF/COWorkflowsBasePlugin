@@ -16,6 +16,8 @@ import de.dkfz.roddy.core.Workflow
 import de.dkfz.roddy.knowledge.files.BaseFile
 import groovy.transform.CompileStatic
 
+import java.util.logging.Level
+
 import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES
 
 /**
@@ -95,14 +97,17 @@ abstract class WorkflowUsingMergedBams extends Workflow {
             // Check the cache for the dataset. If not, try to load the files.
             if (!foundBamFilesForDatasets.containsKey(dataSet)) {
 
-                runtimeService.getAllBamFiles(context).collect { BasicBamFile bam ->
+                runtimeService.metadataAccessor.getAllBamFiles(context).collect { BasicBamFile bam ->
                     Sample sample = bam.sample
                     if (sample.getType() == Sample.SampleType.CONTROL)
                         bamsControlMerged << bam
                     else if (sample.getType() == Sample.SampleType.TUMOR)
                         bamsTumorMerged << bam
-                    else // Other types of BAMs are ignored!
+                    else {
+                        context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.
+                                expand("Skipping BAM that is not classified as tumor or control: ${bam.getAbsolutePath()}", Level.WARNING))
                         null
+                    }
                 }.findAll { it }
 
                 if (bamsControlMerged.size() > 1) {

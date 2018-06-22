@@ -1,6 +1,7 @@
 == Description
 
-Initial import for the COWorkflows (Computational Oncology Workflows Base Plugin for Roddy) repo into Phabricator.
+The COWorkflowsBasePlugin (Computational Oncology Workflows Base Plugin for Roddy) provides some general classes and framework for some of the other
+Roddy plugins. This includes both, JVM-based code (Java, Groovy) as well as command line tools used in cluster jobs.
 
 == Run flags / switches
 
@@ -14,7 +15,38 @@ workflowSupportsMultiTumorSamples         false   Allow the workflow to run with
 
 == Changelist
 
+* Version update to 1.0.4
+
+- Roddy 3.1 has changed unit test framework classes. COWFBP unit tests require Roddy 3.1.
+- contributors
+- changed internal column names for metadata table
+- refactoring: moved a lot of code to new MetadataAccessor class (will be facade for more elaborate metadata backend), no effect on client code (that we know of) is expected)
+
+* Version update to 1.0.3
+
+- bugfixes
+- improved error detection and reporting
+- more default merged-BAM suffixes (to ease configuration-free start)
+
+* Version update to 1.0.2
+
+- Minor release.
+
+* Version update to 1.0.1
+
+- Roddy 3.0 is required
+- dead code removal
+- added bamIsComplete.sh that check for BAM termination sequences
+- re-added some scripts that were incorrectly removed when publishing the workflow to Github
+- refactorings and smaller bugfixes
+
+* Version update to 1.0.0
+
 - Introduce flag isNoControlWorkflow
+
+== Changelist of COWorkflowsPlugin
+
+* Plugin rename to COWorkflowsBasePlugin
 
 * Version update to 1.1.59
 

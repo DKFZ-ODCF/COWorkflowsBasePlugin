@@ -17,10 +17,10 @@ import static de.dkfz.b080.co.files.COConstants.*
  * getOptionalColumns() methods.
  */
 @CompileStatic
-public class MetadataTable extends BaseMetadataTable {
+class MetadataTable extends BaseMetadataTable {
 
-    public MetadataTable(BaseMetadataTable baseMetadataTable) {
-        super(baseMetadataTable);
+    MetadataTable(BaseMetadataTable baseMetadataTable) {
+        super(baseMetadataTable)
     }
 
     private void assertUniqueFastq() {
@@ -40,27 +40,27 @@ public class MetadataTable extends BaseMetadataTable {
         return new MetadataTable(super.subsetByColumn(columnName, value));
     }
 
-    public MetadataTable subsetBySample(String sampleName) {
-        return (MetadataTable)subsetByColumn(INPUT_TABLE_MERGECOL_NAME, sampleName);
+    MetadataTable subsetBySample(String sampleName) {
+        return (MetadataTable)subsetByColumn(INPUT_TABLE_SAMPLECOL_NAME, sampleName);
     }
 
-    public MetadataTable subsetByRun(String runId) {
+    MetadataTable subsetByRun(String runId) {
         return (MetadataTable)subsetByColumn(INPUT_TABLE_RUNCOL_NAME, runId);
     }
 
-    public MetadataTable subsetByLibrary(String library) {
+    MetadataTable subsetByLibrary(String library) {
         return (MetadataTable)subsetByColumn(INPUT_TABLE_MARKCOL_NAME, library);
     }
 
-    public List<String> listSampleNames() {
-        return listColumn(INPUT_TABLE_MERGECOL_NAME).unique()
+    List<String> listSampleNames() {
+        return listColumn(INPUT_TABLE_SAMPLECOL_NAME).unique()
     }
 
-    public List<String> listRunIDs() {
+    List<String> listRunIDs() {
         return listColumn(INPUT_TABLE_RUNCOL_NAME).unique()
     }
 
-    public List<String> listLibraries() {
+    List<String> listLibraries() {
         return listColumn(INPUT_TABLE_MARKCOL_NAME).unique()
     }
 
