@@ -1,10 +1,9 @@
 #!/bin/sh
-
-##
-# Copyright (c) 2017 eilslabs.
 #
-# Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
-##
+# Copyright (c) 2018 German Cancer Research Center (DKFZ).
+#
+# Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+#
 
 # This script tries to lookup the bwa version and to determine the used index version.
 # If both fits everything is fine. In any other case it throws an error.

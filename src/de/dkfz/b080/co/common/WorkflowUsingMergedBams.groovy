@@ -1,9 +1,8 @@
 /*
- * Copyright (c) 2017 eilslabs.
+ * Copyright (c) 2018 German Cancer Research Center (DKFZ).
  *
- * Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
+ * Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
  */
-
 package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.BasicBamFile
@@ -22,7 +21,9 @@ import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT
 
 /**
  * A basic workflow which uses merged bam files as an input and offers some check routines for those files.
- * Created by michael on 05.05.14.
+ *
+ * @author Michael Heinold
+ *
  */
 @CompileStatic
 abstract class WorkflowUsingMergedBams extends Workflow {
@@ -64,6 +65,11 @@ abstract class WorkflowUsingMergedBams extends Workflow {
         !isNoControlWorkflow()
     }
 
+    /**
+     * The first element is the control BAM and the remaining the tumor BAMs.
+     * @param context
+     * @return
+     */
     @Deprecated
     BasicBamFile[] getInitialBamFiles(ExecutionContext context) {
         return loadInitialBamFilesForDataset(context)
@@ -71,6 +77,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
 
     /**
      * Load and cache bam files for a dataset.
+     * The first element is the control BAM and the remaining the tumor BAMs.
      * If the bam files were already loaded for a dataset, they are returned from the cache.
      *
      * @param context

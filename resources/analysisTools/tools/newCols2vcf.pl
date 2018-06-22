@@ -1,18 +1,16 @@
 #!/usr/bin/env perl
-
-##
-# Copyright (c) 2017 eilslabs.
 #
-# Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
-##
-
-### This script adds columns to a vcf file (or updates them if columns with these names are already present).
-### Both files must be sorted in the same order (including chromosomal order).
-### It is for exact matches, e.g. to merge annovar output to a vcf.
-### It is crucial that there is no entry in the newcol File which does not match an entry in the vcf file
-### Missing entries in the newcol file are fine
-### Chromosomal identifiers in the newcol file may be plain numbers while longer identifiers are used in the vcf file e.g. after annovar; use chrPrefix and chrSuffix then
-### (long chr identifiers in the newcol file and short identifiers in the vcf file are not supported)
+# Copyright (c) 2018 German Cancer Research Center (DKFZ).
+#
+# Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+#
+# This script adds columns to a vcf file (or updates them if columns with these names are already present).
+# Both files must be sorted in the same order (including chromosomal order).
+# It is for exact matches, e.g. to merge annovar output to a vcf.
+# It is crucial that there is no entry in the newcol File which does not match an entry in the vcf file
+# Missing entries in the newcol file are fine
+# Chromosomal identifiers in the newcol file may be plain numbers while longer identifiers are used in the vcf file e.g. after annovar; use chrPrefix and chrSuffix then
+# (long chr identifiers in the newcol file and short identifiers in the vcf file are not supported)
 
 use strict;
 use warnings;

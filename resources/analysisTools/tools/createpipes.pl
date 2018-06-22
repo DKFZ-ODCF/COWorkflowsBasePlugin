@@ -1,10 +1,9 @@
 #!/usr/bin/env perl
-
-##
-# Copyright (c) 2017 eilslabs.
 #
-# Distributed under the MIT License (license terms are at https://www.github.com/eilslabs/COWorkflowsBasePlugin/LICENSE.txt).
-##
+# Copyright (c) 2018 German Cancer Research Center (DKFZ).
+#
+# Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+#
 
 # create a command with a bunch of pipes to use ngs2/trunk/tools/annotate_vcf.pl for deepAnnotation
 
