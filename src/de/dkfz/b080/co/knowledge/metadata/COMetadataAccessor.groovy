@@ -17,15 +17,20 @@ import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.core.DataSet
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.core.ExecutionContextError
+import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.knowledge.files.BaseFile
+import de.dkfz.roddy.knowledge.files.FileStage
+import de.dkfz.roddy.knowledge.files.FileStageSettings
 import de.dkfz.roddy.tools.LoggerWrapper
 import de.dkfz.roddy.tools.RoddyIOHelperMethods
 import de.dkfz.roddy.tools.Tuple2
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
+
+import java.nio.file.Files
 
 import static de.dkfz.b080.co.files.COConstants.*
 
@@ -193,8 +198,11 @@ class COMetadataAccessor {
         // want to keep unclassified samples.
         COConfig cfg = new COConfig(context)
         return cfg.bamList.collect { filename ->
-            extractSampleNameFromBamBasename(new File(filename).name, cfg.enforceAtomicSampleName)
-            BaseFile.getSourceFile(context, filename, "BasicBamFile") as BasicBamFile
+            File file = new File(filename)
+            Sample sample = new Sample(context, extractSampleNameFromBamBasename(file.name, cfg.enforceAtomicSampleName), file)
+            BasicBamFile bamFile = BaseFile.getSourceFile(context, filename, "BasicBamFile") as BasicBamFile
+            bamFile.fileStage = new COFileStageSettings(null, null, sample, context.getDataSet())
+            bamFile
         }
     }
 
