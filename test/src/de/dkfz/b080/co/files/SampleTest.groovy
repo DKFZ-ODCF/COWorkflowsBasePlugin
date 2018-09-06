@@ -1,5 +1,6 @@
 package de.dkfz.b080.co.files
 
+import de.dkfz.b080.co.common.COConstants
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.config.ConfigurationValue
 import de.dkfz.roddy.core.ExecutionContext;
