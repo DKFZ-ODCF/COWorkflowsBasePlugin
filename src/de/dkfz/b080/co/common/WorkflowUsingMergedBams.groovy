@@ -104,7 +104,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
             // Check the cache for the dataset. If not, try to load the files.
             if (!foundBamFilesForDatasets.containsKey(dataSet)) {
 
-                runtimeService.metadataAccessor.getAllBamFiles(context).collect { BasicBamFile bam ->
+                runtimeService.metadataAccessor.getAllBamFiles(context).findAll().collect { BasicBamFile bam ->
                     Sample sample = bam.sample
                     if (sample.getType() == Sample.SampleType.CONTROL)
                         bamsControlMerged << bam
