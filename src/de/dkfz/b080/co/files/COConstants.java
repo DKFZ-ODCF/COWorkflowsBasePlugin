@@ -8,6 +8,9 @@ package de.dkfz.b080.co.files;
 /**
  * A static class for the storage of computational oncology based constants.
  */
+
+// This class was moved do de.dkfz.b080.co.common and there plugin-specific constants were removed and moved into the plugins. Kept here only for backwards compatibility.
+@Deprecated
 @groovy.transform.CompileStatic
 public final class COConstants {
     /**

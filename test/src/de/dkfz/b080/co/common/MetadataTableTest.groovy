@@ -1,6 +1,6 @@
 package de.dkfz.b080.co.common
 
-import static de.dkfz.b080.co.files.COConstants.*
+import static COConstants.*
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.plugins.LibrariesFactory
 import groovy.transform.CompileStatic

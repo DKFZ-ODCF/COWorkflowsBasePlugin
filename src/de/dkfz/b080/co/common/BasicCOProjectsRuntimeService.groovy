@@ -14,8 +14,8 @@ import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.jobs.JobManager
 import de.dkfz.roddy.knowledge.files.BaseFile
 
-import static de.dkfz.b080.co.files.COConstants.CVALUE_SAMPLE_DIRECTORY
-import static de.dkfz.b080.co.files.COConstants.CVALUE_SEQUENCE_DIRECTORY
+import static COConstants.CVALUE_SAMPLE_DIRECTORY
+import static COConstants.CVALUE_SEQUENCE_DIRECTORY
 
 @groovy.transform.CompileStatic
 class BasicCOProjectsRuntimeService extends RuntimeService {

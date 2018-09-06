@@ -6,12 +6,11 @@
 
 package de.dkfz.b080.co.common
 
-import de.dkfz.b080.co.files.COConstants
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
 import de.dkfz.roddy.core.ExecutionContext
-import static de.dkfz.b080.co.files.COConstants.*
+import static COConstants.*
 
 @groovy.transform.CompileStatic
 class COConfig {

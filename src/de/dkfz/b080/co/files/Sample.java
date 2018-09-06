@@ -7,7 +7,7 @@ package de.dkfz.b080.co.files;
 
 import de.dkfz.b080.co.common.BasicCOProjectsRuntimeService;
 import de.dkfz.b080.co.common.COConfig;
-import de.dkfz.roddy.Roddy;
+import de.dkfz.b080.co.common.COConstants;
 import de.dkfz.roddy.core.Analysis;
 import de.dkfz.roddy.core.ExecutionContext;
 import de.dkfz.roddy.core.ExecutionContextError;

@@ -8,7 +8,7 @@ package de.dkfz.b080.co.common
 import de.dkfz.roddy.execution.io.BaseMetadataTable
 import groovy.transform.CompileStatic
 
-import static de.dkfz.b080.co.files.COConstants.*
+import static COConstants.*
 
 /**
  * MetadataTable keeps an overview over all factors relevant for guiding the analyses, such as PID, SampleName / TissueType,

@@ -17,7 +17,7 @@ import groovy.transform.CompileStatic
 
 import java.util.logging.Level
 
-import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES
+import static COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES
 
 /**
  * A basic workflow which uses merged bam files as an input and offers some check routines for those files.
@@ -190,7 +190,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
             }
 
             if (bamControlMerged == null || ((COFileStageSettings) bamControlMerged.getFileStage()).sample.sampleType == Sample.SampleType.TUMOR) {
-                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control BAM is missing and workflow is not set to accept tumor only."))
+                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control BAM is missing and workflow is not set to accept tumor only ($IS_NO_CONTROL_WORKFLOW variable)."))
                 foundAll = false
             }
 

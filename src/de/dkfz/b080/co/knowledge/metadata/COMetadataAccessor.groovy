@@ -10,6 +10,7 @@ import de.dkfz.b080.co.common.COConfig
 import de.dkfz.b080.co.common.MetadataTable
 import de.dkfz.b080.co.common.RunID
 import de.dkfz.b080.co.files.BasicBamFile
+import de.dkfz.b080.co.common.COConstants
 import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
 import de.dkfz.roddy.Roddy
@@ -17,12 +18,9 @@ import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.core.DataSet
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.core.ExecutionContextError
-import de.dkfz.roddy.core.RuntimeService
 import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.knowledge.files.BaseFile
-import de.dkfz.roddy.knowledge.files.FileStage
-import de.dkfz.roddy.knowledge.files.FileStageSettings
 import de.dkfz.roddy.tools.LoggerWrapper
 import de.dkfz.roddy.tools.RoddyIOHelperMethods
 import de.dkfz.roddy.tools.Tuple2
@@ -30,9 +28,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
-import java.nio.file.Files
-
-import static de.dkfz.b080.co.files.COConstants.*
+import static de.dkfz.b080.co.common.COConstants.*
 
 @CompileStatic
 class COMetadataAccessor {
@@ -86,7 +82,7 @@ class COMetadataAccessor {
 
         File alignmentDirectory = runtimeService.getAlignmentDirectory(context)
         if (!fileSystemAccessProvider.checkDirectory(alignmentDirectory, context, false)) {
-            logger.severe("Cannot retrieve samples from missing directory (${FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES}=${cfg.getExtractSamplesFromOutputFiles()}): " + alignmentDirectory.absolutePath)
+            logger.severe("Cannot retrieve samples from missing directory (${COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES}=${cfg.getExtractSamplesFromOutputFiles()}): " + alignmentDirectory.absolutePath)
             return (List<Sample>) []
         }
         List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort()
