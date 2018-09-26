@@ -18,6 +18,9 @@ import groovy.transform.CompileStatic
 import java.util.logging.Level
 
 import static COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES
+import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES
+import static de.dkfz.b080.co.files.Sample.SampleType.CONTROL
+import static de.dkfz.b080.co.files.Sample.SampleType.TUMOR
 
 /**
  * A basic workflow which uses merged bam files as an input and offers some check routines for those files.
@@ -108,7 +111,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
                     Sample sample = bam.sample
                     if (sample.getType() == Sample.SampleType.CONTROL)
                         bamsControlMerged << bam
-                    else if (sample.getType() == Sample.SampleType.TUMOR)
+                    else if (sample.getType() == TUMOR)
                         bamsTumorMerged << bam
                     else {
                         context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.
@@ -164,39 +167,57 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      * @return
      */
     boolean checkInitialFiles(ExecutionContext context, BasicBamFile[] initialBamFiles) {
+        // Check size
         if (!initialBamFiles) {
-            context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Did not find any BAM files."))
+            context.addError(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Did not find any bam files."))
             return false
         }
 
-        if (isNoControlWorkflow()) {
-            boolean foundAll = true
-            initialBamFiles.each { BasicBamFile it -> foundAll &= it && ((COFileStageSettings) it.getFileStage()).sample.sampleType == Sample.SampleType.TUMOR }
-
-            if (!foundAll) {
-                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Not all found files are tumor BAM files."))
-                return false
-            }
-
-        } else {
-            boolean foundAll = true
-            BasicBamFile bamControlMerged = initialBamFiles[0]
-
-            for (int i = 1; i < initialBamFiles.size(); i++) {
-                if (initialBamFiles[i] == null || !((COFileStageSettings) initialBamFiles[i].getFileStage()).sample.sampleType == Sample.SampleType.TUMOR) {
-                    context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Tumor BAM is missing."))
-                    foundAll = false
-                }
-            }
-
-            if (bamControlMerged == null || ((COFileStageSettings) bamControlMerged.getFileStage()).sample.sampleType == Sample.SampleType.TUMOR) {
-                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control BAM is missing and workflow is not set to accept tumor only ($IS_NO_CONTROL_WORKFLOW variable)."))
-                foundAll = false
-            }
-
-            if (!foundAll) return false
+        if (isControlWorkflow() && initialBamFiles.size()<2) {
+            context.addError(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Bam file list is too small, need one bam for no control and two bams for control workflows."))
+            return false
         }
-        return true
+
+        // Check, if the bams were created properly
+        if (initialBamFiles.any { it == null }) {
+            context.addError(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of bam files contains an empty entry."))
+            return false
+        }
+
+        if (initialBamFiles.any { BasicBamFile bam -> bam.fileStage == null }) {
+            context.addError(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of bam files contains an entry with unset sample."))
+            return false
+        }
+
+        // Check, if samples are ok (one control, several tumors)
+        // Control first, if it is a control based workflow, then tumors
+
+        List<ExecutionContextError> errors = []
+        int tumorIndex
+        if (isControlWorkflow()) {
+            tumorIndex = 1
+            if (initialBamFiles[0].sample.type != CONTROL) {
+                errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control bam file is missing and workflow is not set to accept tumor only.")
+            }
+        } else {
+            tumorIndex = 0
+        }
+
+        // Now check tumor files
+
+        def tumorFiles = initialBamFiles[tumorIndex..-1]
+        def tumorFileCount = tumorFiles.size()
+
+        boolean allAreTumors = tumorFiles.every { it.sample.sampleType == TUMOR }
+
+        if (tumorFileCount == 0) {
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("No tumor bam files found.")
+        } else if (tumorFileCount > 0 && !allAreTumors) {
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The bam files in the tumor list are not all marked as tumor files.")
+        }
+
+        errors.each { context.addError(it) }
+        return !errors
     }
 
     /**
