@@ -25,6 +25,11 @@ class WorkflowUsingMergedBamsSpec extends Specification {
         }
     }
 
+    static final boolean CONTROL = false
+    static final boolean NOCONTROL = true
+    static final boolean SINGLETUMOR = false
+    static final boolean MULTITUMOR = true
+
     @Ignore
     @CompileStatic
     private WorkflowUsingMergedBams createMockupWorkflow(ExecutionContext _context) {
@@ -72,8 +77,7 @@ class WorkflowUsingMergedBamsSpec extends Specification {
         [null] as BasicBamFile[]
     }
 
-
-    void checkInitialFilesWithValidEntriesForControl(ExecutionContext context, BasicBamFile[] initialFiles) {
+    void "check initial files with valid entries for control/tumor workflows without exceptions"(ExecutionContext context, BasicBamFile[] initialFiles) {
         when:
         boolean result = createMockupWorkflow(context).checkInitialFiles(context, initialFiles)
         context.errors.each { println(it) }
@@ -82,12 +86,12 @@ class WorkflowUsingMergedBamsSpec extends Specification {
         result == true
 
         where:
-        context                  | initialFiles
-        getContext(false, false) | getControlBam(context) + getTumorBam(context)        // Control + Tumor
-        getContext(false, true)  | getControlBam(context) + getTumorBamArray(context)   // Control + Multitumor
+        context                          | initialFiles
+        getContext(CONTROL, SINGLETUMOR) | getControlBam(context) + getTumorBam(context)        // Control + Tumor
+        getContext(CONTROL, MULTITUMOR)  | getControlBam(context) + getTumorBamArray(context)   // Control + Multitumor
     }
 
-    void checkInitialFilesWithValidEntriesForNoControl(ExecutionContext context, BasicBamFile[] initialFiles) {
+    void "check initial files with valid entries for no-control workflows without exceptions"(ExecutionContext context, BasicBamFile[] initialFiles) {
         when:
         boolean result = createMockupWorkflow(context).checkInitialFiles(context, initialFiles)
         context.errors.each { println(it) }
@@ -96,12 +100,12 @@ class WorkflowUsingMergedBamsSpec extends Specification {
         result == true
 
         where:
-        context                 | initialFiles
-        getContext(true, false) | getTumorBam(context)                 // No control + Tumor
-        getContext(true, true)  | getTumorBamArray(context)            // No control + Multitumor
+        context                            | initialFiles
+        getContext(NOCONTROL, SINGLETUMOR) | getTumorBam(context)                 // No control + Tumor
+        getContext(NOCONTROL, MULTITUMOR)  | getTumorBamArray(context)            // No control + Multitumor
     }
 
-    void checkInitialFilesWithInvalidEntriesControl(ExecutionContext context, BasicBamFile[] initialFiles, int errorCount) {
+    void "check initial files with invalid entries for control/tumor workflows without exceptions"(ExecutionContext context, BasicBamFile[] initialFiles, int errorCount) {
         when:
         boolean result = createMockupWorkflow(context).checkInitialFiles(context, initialFiles)
         context.errors.each { println(it) }
@@ -111,14 +115,15 @@ class WorkflowUsingMergedBamsSpec extends Specification {
         context.getErrors().size() == errorCount
 
         where:
-        context                  | initialFiles                              | errorCount
-        getContext(false, false) | new BasicBamFile[0]                       | 1                // Without anything
-        getContext(false, false) | getEmptyBam()                             | 1                // Without tumor bam
-        getContext(false, false) | getEmptyBam() + getTumorBam(context)      | 1                // Without control and runflag
-        getContext(false, false) | getEmptyBam() + getTumorBamArray(context) | 1                // Without control and runflags
+        context                          | initialFiles              | errorCount
+        getContext(CONTROL, SINGLETUMOR) | null                      | 1
+        getContext(CONTROL, SINGLETUMOR) | new BasicBamFile[0]       | 1
+        getContext(CONTROL, SINGLETUMOR) | getControlBam(context)    | 1
+        getContext(CONTROL, SINGLETUMOR) | getTumorBam(context)      | 1
+        getContext(CONTROL, SINGLETUMOR) | getTumorBamArray(context) | 1
     }
 
-    void checkInitialFilesWithInvalidEntriesNoControl(ExecutionContext context, BasicBamFile[] initialFiles, int errorCount) {
+    void "check initial files with invalid entries for no-control workflows without exceptions"(ExecutionContext context, BasicBamFile[] initialFiles, int errorCount) {
         when:
         boolean result = createMockupWorkflow(context).checkInitialFiles(context, initialFiles)
         context.errors.each { println(it) }
@@ -128,12 +133,25 @@ class WorkflowUsingMergedBamsSpec extends Specification {
         context.getErrors().size() == errorCount
 
         where:
-        context                  | initialFiles                                       | errorCount
-
-        getContext(true, false) | getControlBam(context)                             | 1                // Without tumor bam
-        getContext(true, false) | getControlBam(context) + getEmptyBam()             | 1                // Without tumor bam
-        getContext(true, false) | getControlBam(context) + getTumorBam(context)      | 1                // Without control and runflag
-        getContext(true, false) | getControlBam(context) + getTumorBamArray(context) | 1                // Without control and runflags
+        context                            | initialFiles                                       | errorCount
+        getContext(NOCONTROL, SINGLETUMOR) | getControlBam(context)                             | 1
+        getContext(NOCONTROL, SINGLETUMOR) | getControlBam(context) + getTumorBam(context)      | 1
+        getContext(NOCONTROL, SINGLETUMOR) | getControlBam(context) + getTumorBamArray(context) | 1
     }
 
+    void "check initial files with invalid entries for control/tumor workflows with exceptions"(ExecutionContext context, BasicBamFile[] initialFiles, Class<Throwable> expectedException) {
+        when:
+        createMockupWorkflow(context).checkInitialFiles(context, initialFiles)
+
+        then:
+        thrown(expectedException)
+
+        where:
+        context                            | initialFiles                              | expectedException
+        getContext(CONTROL, SINGLETUMOR)   | getEmptyBam()                             | RuntimeException
+        getContext(CONTROL, SINGLETUMOR)   | getEmptyBam() + getTumorBam(context)      | RuntimeException
+        getContext(CONTROL, SINGLETUMOR)   | getEmptyBam() + getTumorBamArray(context) | RuntimeException
+        getContext(NOCONTROL, SINGLETUMOR) | getEmptyBam()                             | RuntimeException
+        getContext(NOCONTROL, SINGLETUMOR) | getControlBam(context) + getEmptyBam()    | RuntimeException
+    }
 }
