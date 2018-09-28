@@ -6,7 +6,6 @@
 package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.BasicBamFile
-import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
 import de.dkfz.roddy.core.DataSet
 import de.dkfz.roddy.core.ExecutionContext
@@ -17,7 +16,9 @@ import groovy.transform.CompileStatic
 
 import java.util.logging.Level
 
-import static COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES
+import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES
+import static de.dkfz.b080.co.files.Sample.SampleType.CONTROL
+import static de.dkfz.b080.co.files.Sample.SampleType.TUMOR
 
 /**
  * A basic workflow which uses merged bam files as an input and offers some check routines for those files.
@@ -108,7 +109,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
                     Sample sample = bam.sample
                     if (sample.getType() == Sample.SampleType.CONTROL)
                         bamsControlMerged << bam
-                    else if (sample.getType() == Sample.SampleType.TUMOR)
+                    else if (sample.getType() == TUMOR)
                         bamsTumorMerged << bam
                     else {
                         context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.
@@ -165,38 +166,57 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      */
     boolean checkInitialFiles(ExecutionContext context, BasicBamFile[] initialBamFiles) {
         if (!initialBamFiles) {
-            context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Did not find any BAM files."))
+            context.addError(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Did not find any BAM files."))
             return false
         }
 
-        if (isNoControlWorkflow()) {
-            boolean foundAll = true
-            initialBamFiles.each { BasicBamFile it -> foundAll &= it && ((COFileStageSettings) it.getFileStage()).sample.sampleType == Sample.SampleType.TUMOR }
+        assertBamfileArrayValidity(initialBamFiles)
 
-            if (!foundAll) {
-                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Not all found files are tumor BAM files."))
-                return false
-            }
+        if (isControlWorkflow())
+            return checkBamfileArrayContentForControlWorkflows(context, initialBamFiles)
 
-        } else {
-            boolean foundAll = true
-            BasicBamFile bamControlMerged = initialBamFiles[0]
+        return checkBamfileArrayContentForTumorOnlyWorkflows(context, initialBamFiles)
+    }
 
-            for (int i = 1; i < initialBamFiles.size(); i++) {
-                if (initialBamFiles[i] == null || !((COFileStageSettings) initialBamFiles[i].getFileStage()).sample.sampleType == Sample.SampleType.TUMOR) {
-                    context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Tumor BAM is missing."))
-                    foundAll = false
-                }
-            }
-
-            if (bamControlMerged == null || ((COFileStageSettings) bamControlMerged.getFileStage()).sample.sampleType == Sample.SampleType.TUMOR) {
-                context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control BAM is missing and workflow is not set to accept tumor only ($IS_NO_CONTROL_WORKFLOW variable)."))
-                foundAll = false
-            }
-
-            if (!foundAll) return false
+    void assertBamfileArrayValidity(BasicBamFile[] initialBamFiles) {
+        if (initialBamFiles.any { it == null }) {
+            throw new RuntimeException(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("WorkflowUsingMergedBams.checkInitialFiles failed: The list of BAM files contains an empty entry.").getDescription())
         }
-        return true
+
+        if (initialBamFiles.any { BasicBamFile bam -> bam.fileStage == null }) {
+            throw new RuntimeException(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("WorkflowUsingMergedBams.checkInitialFiles failed: The list of BAM files contains an entry with unset sample.").getDescription())
+        }
+    }
+
+    boolean checkBamfileArrayContentForTumorOnlyWorkflows(ExecutionContext context, BasicBamFile[] initialBamFiles) {
+        List<ExecutionContextError> errors = []
+        if (initialBamFiles.size() == 0)
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("No tumor BAM files found.")
+        else if (initialBamFiles.size() > 0 && !initialBamFiles.every { BasicBamFile bam -> bam.sample.sampleType == TUMOR }) {
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of BAM files must consist one or more tumor BAM files. Not all files are tumor BAM files.")
+        }
+        errors.each { context.addError(it) }
+        return !errors
+    }
+
+    boolean checkBamfileArrayContentForControlWorkflows(ExecutionContext context, BasicBamFile[] initialBamFiles) {
+        List<ExecutionContextError> errors = []
+        boolean controlWasFound = true
+        if (initialBamFiles[0].sample.type != CONTROL) {
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control BAM file is missing and workflow is not set to accept tumor only." +
+                    "\n\t- Set the cvalue isNoControlWorkflow=true in your configuration to allow this." +
+                    "\n\t- Please note, that the workflow needs to support this option."
+            )
+            controlWasFound = false
+        }
+
+        if (controlWasFound && initialBamFiles.size() == 1)
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("No tumor BAM file found.")
+        else if (!initialBamFiles[(controlWasFound ? 1 : 0)..-1].every { it.sample.sampleType == TUMOR }) {
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of BAM files must contain one control BAM file and one or more tumor BAM files. Some of these files are neither of sample type control nor tumor.")
+        }
+        errors.each { context.addError(it) }
+        return !errors
     }
 
     /**
