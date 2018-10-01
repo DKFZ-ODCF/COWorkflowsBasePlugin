@@ -64,15 +64,27 @@ class COMetadataAccessor {
 
     }
 
-    protected String extractSampleNameFromBamBasename(String filename, boolean enforceAtomicSampleName) {
-        String[] split = filename.split(StringConstants.SPLIT_UNDERSCORE)
-        if (split.size() <= 2) {
-            return null
-        }
-        String sampleName = split[0]
-        if (!enforceAtomicSampleName && split[1].isInteger() && split[1].length() <= 2)
-            sampleName = split[0..1].join(StringConstants.UNDERSCORE)
-        return sampleName
+    // TODO: Regex?
+    String extractSampleNameFromBamBasename(String filename, ExecutionContext context) {
+        COConfig cfg = new COConfig(context)
+
+        // Get list of all known samples. Sort and revert them, so we can use them properly.
+        // Get rid of empty samples! Sort and revert for first match searches. (e.g. control_abc comes before control!)
+        def listOfAll = (cfg.possibleControlSampleNamePrefixes + cfg.possibleTumorSampleNamePrefixes)
+                .findAll().sort().reverse()
+        listOfAll = listOfAll
+
+        // TODO Rename this value! Does not fit in the future.
+        String searchMergedBamWithSeparator = cfg.searchMergedBamWithSeparator ? "_" : ""
+
+        // FIRST match!
+        String sampleName = listOfAll.find { filename.toLowerCase().startsWith(it + searchMergedBamWithSeparator) }
+        if (sampleName == null)
+            return filename.split(StringConstants.SPLIT_UNDERSCORE)[0]
+
+        // As we work with sample prefixes, the sample in the filename can actually be a bit longer than the found value.
+        // Count delimiters in the sample name, extract the proper part of the filename and join that again.
+        return filename.split(StringConstants.SPLIT_UNDERSCORE)[0..(sampleName.count("_"))].join("_")
     }
 
     protected List<Sample> extractSamplesFromOutputFiles(ExecutionContext context) {
@@ -88,7 +100,7 @@ class COMetadataAccessor {
         List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort()
 
         return filesInDirectory.collect { File file ->
-            extractSampleNameFromBamBasename(file.name, cfg.enforceAtomicSampleName)
+            extractSampleNameFromBamBasename(file.name, context)
         }.unique().findAll { it != null }.collect {
             new Sample(context, it)
         }
@@ -195,7 +207,7 @@ class COMetadataAccessor {
         COConfig cfg = new COConfig(context)
         return cfg.bamList.collect { filename ->
             File file = new File(filename)
-            Sample sample = new Sample(context, extractSampleNameFromBamBasename(file.name, cfg.enforceAtomicSampleName), file)
+            Sample sample = new Sample(context, extractSampleNameFromBamBasename(file.name, context), file)
             BasicBamFile bamFile = BaseFile.getSourceFile(context, filename, "BasicBamFile") as BasicBamFile
             bamFile.fileStage = new COFileStageSettings(null, null, sample, context.getDataSet())
             bamFile
@@ -251,7 +263,7 @@ class COMetadataAccessor {
             if (pathComponents.size() <= indexOfElement) {
                 throw new RuntimeException("Path to file '${it.getPath()}' too short to match requested path element '${element}' expected at index ${indexOfElement} (${pathnamePattern})")
             } else {
-                new Tuple2<>(pathComponents[indexOfElement], RoddyIOHelperMethods.assembleLocalPath("", *pathComponents[0 .. indexOfElement]))
+                new Tuple2<>(pathComponents[indexOfElement], RoddyIOHelperMethods.assembleLocalPath("", *pathComponents[0..indexOfElement]))
             }
         }
     }
