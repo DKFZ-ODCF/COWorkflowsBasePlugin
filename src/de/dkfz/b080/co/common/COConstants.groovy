@@ -37,7 +37,6 @@ final class COConstants {
     public static final String PRM_PID = "pid"
     public static final String PRM_PID_CAP = "PID"
     public static final String PRM_ANALYSIS_DIR = "ANALYSIS_DIR"
-
     public static final String PRM_SM = "SM"
     public static final String PRM_LB = "LB"
     /**
@@ -52,6 +51,11 @@ final class COConstants {
     public static final String CVALUE_WINDOW_SIZE = "WINDOW_SIZE"
     public static final String CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES = "possibleControlSampleNamePrefixes"
     public static final String CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES = "possibleTumorSampleNamePrefixes"
+    public static final String CVALUE_SEARCH_MERGEDBAM_WITH_SEPARATOR = "searchMergedBamWithSeparator"
+    public static final String CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD = "selectSampleExtractionMethod"
+    public static final String CVALUE_USE_ATOMIC_SAMPLE_NAMES = "useAtomicSampleNames"
+    public static final String CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX = "allowSampleTerminationWithIndex"
+    public static final String CVALUE_MATCH_EXACT_SAMPLE_NAMES = "matchExactSampleNames"
     public static final String CVALUE_FASTQ_LIST = "fastq_list"
     public static final String CVALUE_BAMFILE_LIST = "bamfile_list"
     public static final String CVALUE_SAMPLE_LIST = "sample_list"

@@ -12,7 +12,37 @@ The WorkflowUsingMergedBams in the plugin supports switches:
 |isNoControlWorkflow                      |false    |Set to true to allow this workflow to work without a control bam file. |
 |workflowSupportsMultiTumorSamples        |false    |Allow the workflow to run with several tumor bam files. This is done with a for loop (see code documentation in WorkflowUsingMergedBam) |
 
+
+To extract samples from filenames, multiple methods exist or are planned. You can control
+the workflows behaviour with the variable "selectSampleExtractionMethod".
+
+Valid values with their control variables are:
+version
+|selectSampleExtractionMethod             |version_2| Alternative values are "version_1" |
+
+#### "version_1"
+This one is very simple and just splits the filename. Afterwards, it takes the first splitted value
+and uses it as the sample name. Further control is possible with:
+
+|Switch                                   | Default | Description |
+|-----------------------------------------|---------|-------------|
+|enforceAtomicSampleName||
+
+#### "version_2"
+|useAtomicSampleNames                     |false    | Used in |
+|allowSampleTerminationWithIndex          |true     |          Allow recognition of e.g. tumor_02                           |
+
+Describe matching strategy
+
+#### "regex" (planned)
+Not implemented, but planned.
+
+
 ## Changelist
+
+    - Add new method for sample from filename extraction
+
+...
 
   * Version update to 1.0.4
     - Roddy 3.1 has changed unit test framework classes. COWFBP unit tests require Roddy 3.1.

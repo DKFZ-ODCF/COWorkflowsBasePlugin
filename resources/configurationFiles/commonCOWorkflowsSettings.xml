@@ -15,8 +15,14 @@
 
         <cvalue name='WINDOW_SIZE' value='1' type="integer" />
 
+        <cvalue name='searchMergedBamsWithSeparator'    value='false' type="boolean" description="" />
+
+        <cvalue name='selectSampleExtractionMethod'     value='version_1'   type="string"  description="" />
+        <cvalue name='useAtomicSampleNames'             value='false'       type="boolean" description="" />
+        <cvalue name='allowSampleTerminationWithIndex ' value='true'        type="boolean" description="" />
+
         <!-- Settings for metadata table -->
-        <cvalue name="sampleCol" tags="mandatory"        value="Sample"          description="Metadata column defining sets of FASTQs belonging to the same sample type (tumor_01, etc.). Default: Sample. Default if undefined: Error!"/>
+        <cvalue name="sampleCol" tags="mandatory"       value="Sample"          description="Metadata column defining sets of FASTQs belonging to the same sample type (tumor_01, etc.). Default: Sample. Default if undefined: Error!"/>
         <cvalue name="markCol" tags="mandatory"         value="Library"         description="Metadata column defining sets of FASTQs pooled for marking. Marking only happens within the same sample. Default: Library. Default if undefined: 1 Library per merged BAM."/>
         <cvalue name="datasetCol" tags="mandatory"      value="PID"             description="Metadata column defining the datasets (e.g. patient ID). Default: PID"/>
         <cvalue name="readLayoutCol" tags="mandatory"   value="ReadLayout"      description="Metadata column defining the read layout. Usually paired, single, or mate_pair. For 'mate_pair' paired-end reads are reverse complemented (by some older workflow variant). Default: ReadLayout. Default if undefined: paired."/>

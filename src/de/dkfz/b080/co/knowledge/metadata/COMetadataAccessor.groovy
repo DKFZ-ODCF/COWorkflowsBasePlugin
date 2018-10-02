@@ -64,27 +64,52 @@ class COMetadataAccessor {
 
     }
 
-    // TODO: Regex?
-    String extractSampleNameFromBamBasename(String filename, ExecutionContext context) {
+    /**
+     * Untested and deprecated, replaced by extractSampleNameFromBamBasenameVersion2
+     */
+    private String extractSampleNameFromBamBasenameVersion1(String filename, ExecutionContext context) {
+        COConfig cfg = new COConfig(context)
+        String[] split = filename.split(StringConstants.SPLIT_UNDERSCORE)
+        if (split.size() <= 2) {
+            return null
+        }
+        String sampleName = split[0]
+        if (!cfg.enforceAtomicSampleName && split[1].isInteger() && split[1].length() <= 2)
+            sampleName = split[0..1].join(StringConstants.UNDERSCORE)
+        return sampleName
+    }
+
+    private String extractSampleNameFromBamBasenameVersion2(File file, ExecutionContext context) {
         COConfig cfg = new COConfig(context)
 
         // Get list of all known samples. Sort and revert them, so we can use them properly.
-        // Get rid of empty samples! Sort and revert for first match searches. (e.g. control_abc comes before control!)
+        // Get rid of empty samples! Sort and reverse for first match searches. (e.g. control_abc comes before control!)
         def listOfAll = (cfg.possibleControlSampleNamePrefixes + cfg.possibleTumorSampleNamePrefixes)
                 .findAll().sort().reverse()
-        listOfAll = listOfAll
 
         // TODO Rename this value! Does not fit in the future.
         String searchMergedBamWithSeparator = cfg.searchMergedBamWithSeparator ? "_" : ""
 
         // FIRST match!
-        String sampleName = listOfAll.find { filename.toLowerCase().startsWith(it + searchMergedBamWithSeparator) }
+        String sampleName = listOfAll.find { file.name.toLowerCase().startsWith(it + searchMergedBamWithSeparator) }
         if (sampleName == null)
-            return filename.split(StringConstants.SPLIT_UNDERSCORE)[0]
+            return file.name.split(StringConstants.SPLIT_UNDERSCORE)[0]
 
         // As we work with sample prefixes, the sample in the filename can actually be a bit longer than the found value.
         // Count delimiters in the sample name, extract the proper part of the filename and join that again.
-        return filename.split(StringConstants.SPLIT_UNDERSCORE)[0..(sampleName.count("_"))].join("_")
+        return file.name.split(StringConstants.SPLIT_UNDERSCORE)[0..(sampleName.count("_"))].join("_")
+    }
+
+    // TODO: Regex
+    String extractSampleNameFromBamBasename(File file, ExecutionContext context) {
+        COConfig cfg = new COConfig(context)
+
+        switch (cfg.selectedSampleExtractionMethod) {
+            case MethodForSampleFromFilenameExtraction.version_1:
+                return extractSampleNameFromBamBasenameVersion1(file.name, context)
+            case MethodForSampleFromFilenameExtraction.version_2:
+                return extractSampleNameFromBamBasenameVersion2(file, context)
+        }
     }
 
     protected List<Sample> extractSamplesFromOutputFiles(ExecutionContext context) {
@@ -100,7 +125,7 @@ class COMetadataAccessor {
         List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort()
 
         return filesInDirectory.collect { File file ->
-            extractSampleNameFromBamBasename(file.name, context)
+            extractSampleNameFromBamBasename(file, context)
         }.unique().findAll { it != null }.collect {
             new Sample(context, it)
         }
@@ -207,7 +232,7 @@ class COMetadataAccessor {
         COConfig cfg = new COConfig(context)
         return cfg.bamList.collect { filename ->
             File file = new File(filename)
-            Sample sample = new Sample(context, extractSampleNameFromBamBasename(file.name, context), file)
+            Sample sample = new Sample(context, extractSampleNameFromBamBasename(file, context), file)
             BasicBamFile bamFile = BaseFile.getSourceFile(context, filename, "BasicBamFile") as BasicBamFile
             bamFile.fileStage = new COFileStageSettings(null, null, sample, context.getDataSet())
             bamFile
@@ -365,5 +390,4 @@ class COMetadataAccessor {
             return extractLibrariesFromSampleDirectory(sample.path)
         }
     }
-
 }

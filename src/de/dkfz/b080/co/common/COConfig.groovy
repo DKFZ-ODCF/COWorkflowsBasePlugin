@@ -6,8 +6,10 @@
 
 package de.dkfz.b080.co.common
 
+import de.dkfz.b080.co.knowledge.metadata.MethodForSampleFromFilenameExtraction
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
+import de.dkfz.roddy.config.ConfigurationError
 import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
 import de.dkfz.roddy.core.ExecutionContext
 import static COConstants.*
@@ -52,7 +54,7 @@ class COConfig {
 
     private List<String> checkAndSplitListFromConfig(String listID) {
         String list = configValues.getString(listID, null)
-        if(list)
+        if (list)
             return list.split(StringConstants.SPLIT_SEMICOLON) as List<String>
         return []
     }
@@ -93,7 +95,7 @@ class COConfig {
     boolean getSearchMergedBamWithSeparator() {
         return configValues.getBoolean("searchMergedBamWithSeparator", false)
     }
-    
+
     List<String> getPossibleControlSampleNamePrefixes() {
         return configValues.get(COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES, "( control )").toStringList(" ", ["(", ")"] as String[])
     }
@@ -102,4 +104,16 @@ class COConfig {
         return configValues.get(COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES, "( tumor )").toStringList(" ", ["(", ")"] as String[])
     }
 
+    MethodForSampleFromFilenameExtraction getSelectedSampleExtractionMethod() {
+        try {
+            String value = configValues.get(COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD)
+            return value as MethodForSampleFromFilenameExtraction
+        } catch (Exception ex) {
+            throw new ConfigurationError(
+                    [
+                            "Value for selectSampleExtractionMethod is wrong, needs to be one of:",
+                            MethodForSampleFromFilenameExtraction.values()
+                    ].flatten().join("\n\t- "), context.configuration)
+        }
+    }
 }
