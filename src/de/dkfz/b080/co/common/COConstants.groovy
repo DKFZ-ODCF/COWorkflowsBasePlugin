@@ -55,6 +55,7 @@ final class COConstants {
     public static final String CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD = "selectSampleExtractionMethod"
     public static final String CVALUE_USE_ATOMIC_SAMPLE_NAMES = "useAtomicSampleNames"
     public static final String CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX = "allowSampleTerminationWithIndex"
+    public static final String CVALUE_USE_ALL_LOWER_CASE_SAMPLE_NAMES = "useAllLowerCaseSampleNames"
     public static final String CVALUE_MATCH_EXACT_SAMPLE_NAMES = "matchExactSampleNames"
     public static final String CVALUE_FASTQ_LIST = "fastq_list"
     public static final String CVALUE_BAMFILE_LIST = "bamfile_list"

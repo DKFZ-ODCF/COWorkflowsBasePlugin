@@ -116,4 +116,24 @@ class COConfig {
                     ].flatten().join("\n\t- "), context.configuration)
         }
     }
+
+    /**
+     * For sample extraction method version 2
+     * @return
+     */
+    boolean getMatchExactSampleNames() {
+        return configValues.getBoolean(CVALUE_MATCH_EXACT_SAMPLE_NAMES, false)
+    }
+
+    /**
+     * For sample extraction method version 2
+     * @return
+     */
+    boolean getAllowSampleTerminationWithIndex() {
+        return configValues.getBoolean(CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX, true)
+    }
+
+    boolean getUseAllLowerCaseSampleNames() {
+        return configValues.getBoolean(CVALUE_USE_ALL_LOWER_CASE_SAMPLE_NAMES, true)
+    }
 }

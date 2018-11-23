@@ -22,6 +22,7 @@ import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
+import de.dkfz.roddy.tools.RoddyConversionHelperMethods
 import de.dkfz.roddy.tools.RoddyIOHelperMethods
 import de.dkfz.roddy.tools.Tuple2
 import groovy.transform.CompileDynamic
@@ -82,22 +83,71 @@ class COMetadataAccessor {
     private String extractSampleNameFromBamBasenameVersion2(File file, ExecutionContext context) {
         COConfig cfg = new COConfig(context)
 
+        boolean matchExactSampleNames = cfg.matchExactSampleNames
+        boolean allowSampleTerminationWithIndex = cfg.allowSampleTerminationWithIndex
+        boolean useAllLowerCaseSampleNames = cfg.useAllLowerCaseSampleNames
+
         // Get list of all known samples. Sort and revert them, so we can use them properly.
         // Get rid of empty samples! Sort and reverse for first match searches. (e.g. control_abc comes before control!)
         def listOfAll = (cfg.possibleControlSampleNamePrefixes + cfg.possibleTumorSampleNamePrefixes)
                 .findAll().sort().reverse()
 
-        // TODO Rename this value! Does not fit in the future.
-        String searchMergedBamWithSeparator = cfg.searchMergedBamWithSeparator ? "_" : ""
+        String filename = file.name
+        if (useAllLowerCaseSampleNames)
+            filename = filename.toLowerCase()
+
+        String searchString = matchExactSampleNames ? "_" : ""
 
         // FIRST match!
-        String sampleName = listOfAll.find { file.name.toLowerCase().startsWith(it + searchMergedBamWithSeparator) }
-        if (sampleName == null)
-            return file.name.split(StringConstants.SPLIT_UNDERSCORE)[0]
+        String sampleName = listOfAll.find { String sampleID ->
+            String _searchString = searchString
+            if (sampleID.endsWith("_")) {
+                logger.always("A sample name was given with an underscore at the end. We assume this is intentional and set matchExactSampleNames for '$sampleID'")
+                _searchString = ""
+            }
+            String[] sampleSplit = sampleID.split(StringConstants.SPLIT_UNDERSCORE)
+            if (sampleSplit.last().isInteger() && !matchExactSampleNames) {
+                logger.always("A sample name was given with an index at the end. We assume this is intentional and set allowSampleTerminationWithIndex for '$sampleID'")
+                sampleID = sampleID[0..-2]
+            }
 
-        // As we work with sample prefixes, the sample in the filename can actually be a bit longer than the found value.
-        // Count delimiters in the sample name, extract the proper part of the filename and join that again.
-        return file.name.split(StringConstants.SPLIT_UNDERSCORE)[0..(sampleName.count("_"))].join("_")
+            if (useAllLowerCaseSampleNames)
+                filename.toLowerCase().startsWith(sampleID + _searchString)
+            else
+                filename.startsWith(sampleID + _searchString)
+        }
+
+        if(!matchExactSampleNames && sampleName) {
+            String[] sampleSplit = sampleName.split(StringConstants.SPLIT_UNDERSCORE)
+            if (sampleSplit.last().isInteger()) {
+//                logger.always("A sample name was given with an index at the end. We assume this is intentional and set allowSampleTerminationWithIndex for '$sampleName'")
+                sampleName = sampleName[0..-3]
+                allowSampleTerminationWithIndex = true
+            }
+        }
+
+
+        String[] splitFilename = filename.split(StringConstants.SPLIT_UNDERSCORE)
+        if (sampleName == null && matchExactSampleNames)
+            return null
+        else if (sampleName == null) // Fallback, in case we do not want an exact match but did not find anything.
+            sampleName = splitFilename[0]
+        else {
+            if (sampleName.endsWith("_"))
+                sampleName = sampleName[0..-2] // In this special case, we remove the "_" char at the end.
+
+            // As we work with sample prefixes, the sample in the filename can actually be a bit longer than the found value.
+            // Count delimiters in the sample name, extract the proper part of the filename and join that again.
+            sampleName = splitFilename[0..(sampleName.count("_"))].join("_")
+        }
+
+        if (allowSampleTerminationWithIndex) {
+            String indexPart = filename[(sampleName.size() + 1)..-1].split(StringConstants.SPLIT_UNDERSCORE)[0]
+            if (RoddyConversionHelperMethods.isInteger(indexPart)) {
+                sampleName += "_$indexPart"
+            }
+        }
+        return sampleName
     }
 
     // TODO: Regex

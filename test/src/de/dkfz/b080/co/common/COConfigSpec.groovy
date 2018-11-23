@@ -1,6 +1,7 @@
 package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.knowledge.metadata.MethodForSampleFromFilenameExtraction
+import de.dkfz.roddy.RoddyTestSpec
 import de.dkfz.roddy.config.ConfigurationError
 import de.dkfz.roddy.config.ConfigurationValue;
 import de.dkfz.roddy.core.ContextResource;
@@ -9,14 +10,7 @@ import org.junit.ClassRule;
 import spock.lang.Shared;
 import spock.lang.Specification;
 
-class COConfigSpec extends Specification {
-
-    @ClassRule
-    static final ContextResource contextResource = new ContextResource() {
-        {
-            before()
-        }
-    }
+class COConfigSpec extends RoddyTestSpec {
 
     @Shared
     static final ExecutionContext context = contextResource.createSimpleContext(COConfigSpec)

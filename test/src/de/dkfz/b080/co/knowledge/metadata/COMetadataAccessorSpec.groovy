@@ -7,23 +7,28 @@ package de.dkfz.b080.co.knowledge.metadata
 
 import de.dkfz.b080.co.common.BasicCOProjectsRuntimeService
 import de.dkfz.b080.co.common.COConstants
+import de.dkfz.roddy.RoddyTestSpec
+import de.dkfz.roddy.RunMode
 import de.dkfz.roddy.config.ConfigurationConstants
 import de.dkfz.roddy.config.ConfigurationValue
 import de.dkfz.roddy.core.ContextResource
 import de.dkfz.roddy.core.ExecutionContext
+import de.dkfz.roddy.execution.io.ExecutionService
+import de.dkfz.roddy.execution.io.LocalExecutionService
+import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
+import groovy.transform.CompileStatic
 import org.junit.ClassRule
 import spock.lang.Shared
 import spock.lang.Specification
 
-class COMetadataAccessorSpec extends Specification {
+import static de.dkfz.b080.co.common.COConstants.CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX
+import static de.dkfz.b080.co.common.COConstants.CVALUE_MATCH_EXACT_SAMPLE_NAMES
+import static de.dkfz.b080.co.common.COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES
+import static de.dkfz.b080.co.common.COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES
+import static de.dkfz.b080.co.common.COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD
+import static de.dkfz.b080.co.common.COConstants.CVALUE_USE_ALL_LOWER_CASE_SAMPLE_NAMES
 
-
-    @ClassRule
-    static final ContextResource contextResource = new ContextResource() {
-        {
-            before()
-        }
-    }
+class COMetadataAccessorSpec extends RoddyTestSpec {
 
     @Shared
     static final ExecutionContext context = contextResource.createSimpleContext(COMetadataAccessorSpec)
@@ -65,49 +70,58 @@ class COMetadataAccessorSpec extends Specification {
 
     }
 
-    def "Version_2: Extract sample name from BAM basename"(String filename, String possibleControlSampleNamePrefixes, String possibleTumorSampleNamePrefixes, boolean matchExactSampleNames, boolean allowSampleTerminationWithIndex, String resultSample) {
+    def "Version_2: Extract sample name from BAM basename"(String filename, String possibleControlSampleNamePrefixes, String possibleTumorSampleNamePrefixes, boolean matchExactSampleNames, boolean allowSampleTerminationWithIndex, boolean useAllLowerCaseSampleNames, String expectedSample) {
 
         when:
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD, "version_2", ConfigurationConstants.CVALUE_TYPE_STRING))
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES, possibleControlSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY))
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES, possibleTumorSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY))
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_MATCH_EXACT_SAMPLE_NAMES, matchExactSampleNames, ConfigurationConstants.CVALUE_TYPE_BOOLEAN))
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX, allowSampleTerminationWithIndex.toString(), ConfigurationConstants.CVALUE_TYPE_BOOLEAN))
+        context.configurationValues << new ConfigurationValue(CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD, "version_2")
+        context.configurationValues << new ConfigurationValue(CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES, possibleControlSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY)
+        context.configurationValues << new ConfigurationValue(CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES, possibleTumorSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY)
+        context.configurationValues << new ConfigurationValue(CVALUE_MATCH_EXACT_SAMPLE_NAMES, matchExactSampleNames)
+        context.configurationValues << new ConfigurationValue(CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX, allowSampleTerminationWithIndex)
+        context.configurationValues << new ConfigurationValue(CVALUE_USE_ALL_LOWER_CASE_SAMPLE_NAMES, useAllLowerCaseSampleNames)
+
+        def accessor = new COMetadataAccessor(new BasicCOProjectsRuntimeService())
+        def file = new File("/tmp/", filename)
+        def extractedSample = accessor.extractSampleNameFromBamBasename(file, context)
 
         then:
-        (new COMetadataAccessor(new BasicCOProjectsRuntimeService()).extractSampleNameFromBamBasename(new File("/tmp/", filename), context)) == resultSample
+        // The filename has no actual meaning. It is solely for debugging
+        "$filename:$extractedSample" == "$filename:$expectedSample"
 
         where:
-        filename                          | possibleControlSampleNamePrefixes | possibleTumorSampleNamePrefixes | matchExactSampleNames | allowSampleTerminationWithIndex | resultSample
-        "control_TEST000_mdup.bam"        | "( cont )"                        | "( tumor )"                     | false                 | true                            | "control"
-        "control_TEST001_mdup.bam"        | "( cont )"                        | "( tumor )"                     | true                  | true                            | null
-        "control_TEST002_mdup.bam"        | "( control_ )"                    | "( tumor )"                     | false                 | true                            | "control"
-        "control_abc_TEST003_mdup.bam"    | "( control_abc )"                 | "( tumor )"                     | false                 | true                            | "control_abc"
-        "control_abc_TEST004_mdup.bam"    | "( control control_abc )"         | "( tumor )"                     | false                 | true                            | "control_abc"
-        "control_abc_0_TEST005_mdup.bam"  | "( control control_abc_0 )"       | "( tumor )"                     | false                 | true                            | "control_abc_0"
-        "control_abc_01_TEST006_mdup.bam" | "( control control_abc_0 )"       | "( tumor )"                     | false                 | true                            | "control_abc_01"
-        "control_abc_01_TEST007_mdup.bam" | "( control control_abc_0 )"       | "( tumor )"                     | true                  | true                            | "control"
-        "control_02_TEST008_mdup.bam"     | "( control_02 )"                  | "( tumor )"                     | false                 | true                            | "control_02"
-        "Control_02_TEST009_mdup.bam"     | "( control_02 )"                  | "( )"                           | false                 | true                            | "Control_02"
-        "CONTROL_02_TEST010_mdup.bam"     | "( control_02 )"                  | "( )"                           | false                 | true                            | "CONTROL_02"
-        "control_02_TEST008_mdup.bam"     | "( control_02 )"                  | "( tumor )"                     | true                  | true                            | null
-        "Control_02_TEST009_mdup.bam"     | "( control_02 )"                  | "( )"                           | true                  | true                            | null
-        "CONTROL_02_TEST010_mdup.bam"     | "( control_02 )"                  | "( )"                           | true                  | true                            | null
+        filename                          | possibleControlSampleNamePrefixes | possibleTumorSampleNamePrefixes | matchExactSampleNames | allowSampleTerminationWithIndex | useAllLowerCaseSampleNames | expectedSample
+        "control_TEST000_mdup.bam"        | "( cont )"                        | "( tumor )"                     | false                 | true                            | true                       | "control"
+        "control_TEST001_mdup.bam"        | "( cont )"                        | "( tumor )"                     | true                  | true                            | true                       | null
+        "control_TEST002_mdup.bam"        | "( control_ )"                    | "( tumor )"                     | false                 | true                            | true                       | "control"
+        "control_abc_TEST003_mdup.bam"    | "( control_abc )"                 | "( tumor )"                     | false                 | true                            | true                       | "control_abc"
+        "control_abc_TEST004_mdup.bam"    | "( control control_abc )"         | "( tumor )"                     | false                 | true                            | true                       | "control_abc"
+        "control_abc_0_TEST005_mdup.bam"  | "( control control_abc_0 )"       | "( tumor )"                     | false                 | true                            | true                       | "control_abc_0"
+        "control_abc_01_TEST006_mdup.bam" | "( control control_abc_0 )"       | "( tumor )"                     | false                 | true                            | true                       | "control_abc_01"
+        "control_abc_01_TEST007_mdup.bam" | "( control control_abc_0 )"       | "( tumor )"                     | true                  | true                            | true                       | "control"
+        "control_02_TEST008_mdup.bam"     | "( control_02 )"                  | "( tumor )"                     | false                 | true                            | true                       | "control_02"
+        "Control_02_TEST009_mdup.bam"     | "( control_02 )"                  | "( )"                           | false                 | true                            | true                       | "control_02"
+        "CONTROL_02_TEST010_mdup.bam"     | "( control_02 )"                  | "( )"                           | false                 | true                            | true                       | "control_02"
+        "control_02_TEST011b_mdup.bam"    | "( control )"                     | "( tumor )"                     | true                  | true                            | true                       | "control_02"
+        "Control_02_TEST012b_mdup.bam"    | "( control )"                     | "( )"                           | true                  | true                            | true                       | "control_02"
+        "CONTROL_02_TEST013b_mdup.bam"    | "( control )"                     | "( )"                           | true                  | true                            | true                       | "control_02"
+        "control_02_TEST011c_mdup.bam"    | "( control_02 )"                  | "( tumor )"                     | true                  | true                            | false                      | "control_02"
+        "Control_02_TEST012c_mdup.bam"    | "( Control_02 )"                  | "( )"                           | true                  | true                            | false                      | "Control_02"
+        "CONTROL_02_TEST013c_mdup.bam"    | "( CONTROL_02 )"                  | "( )"                           | true                  | true                            | false                      | "CONTROL_02"
 
         // In the following cases, the sample extraction will "Fail". But this is not a fault of the code, we just do not have enough |information to
         // extract more. Maybe later, this could be extended with regex etc. But for now it is not possible.
-        "control_abc_02_TEST011_mdup.bam" | "( control )"                     | "( )"                           | false                 | true                            | "control"
-        "control_abc_02_TEST012_mdup.bam" | "( control )"                     | "( )"                           | true                  | true                            | "control"
+        "control_abc_02_TEST014_mdup.bam" | "( control )"                     | "( )"                           | false                 | true                            | true                       | "control"
+        "control_abc_02_TEST015_mdup.bam" | "( control )"                     | "( )"                           | true                  | true                            | true                       | "control"
 
         // Fallback. If no sample was found ( could be matched against the list ), the first part of the filename will be used. This
         // way, we will keep the old process.
-        "control_abc_01_TEST013_mdup.bam" | "( control_abc_0 )"               | "( )"                           | true                  | true                            | "control"
-        "xeno_TEST014_mdup.bam"           | "( control )"                     | "( )"                           | false                 | true                            | "xeno"
-        "xeno_TEST015_mdup.bam"           | "( control )"                     | "( )"                           | true                  | true                            | "xeno"
+        "control_abc_01_TEST016_mdup.bam" | "( control_abc_0 )"               | "( )"                           | true                  | true                            | true                       | null
+        "control_abc_01_TEST016_mdup.bam" | "( control_abc_0 )"               | "( )"                           | false                 | true                            | true                       | "control_abc_01"
 
-        "tumor_02_TEST015_mdup.bam"       | "( control )"                     | "( tumor )"                     | false                 | false                           | "tumor"
-        "tumor_02_TEST015_mdup.bam"       | "( control )"                     | "( tumor )"                     | true                  | true                            | "tumor_02"
-        "tumor02_TEST015_mdup.bam"        | "( control )"                     | "( tumor )"                     | true                  | true                            | "tumor02"
+        "tumor_02_TEST019a_mdup.bam"      | "( control )"                     | "( tumor )"                     | false                 | false                           | true                       | "tumor"
+        "tumor_02_TEST019b_mdup.bam"      | "( control )"                     | "( tumor )"                     | true                  | true                            | true                       | "tumor_02"
+        "tumor02_TEST019c_mdup.bam"       | "( control )"                     | "( tumor )"                     | true                  | true                            | true                       | null
+        "tumor02_TEST019c_mdup.bam"       | "( control )"                     | "( tumor )"                     | false                 | true                            | true                       | "tumor02"
     }
 
 }

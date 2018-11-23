@@ -3,6 +3,7 @@ package de.dkfz.b080.co.common
 import de.dkfz.b080.co.files.BasicBamFile
 import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
+import de.dkfz.roddy.RoddyTestSpec
 import de.dkfz.roddy.config.ConfigurationValue
 import de.dkfz.roddy.core.ContextResource
 import de.dkfz.roddy.core.ExecutionContext
@@ -16,14 +17,7 @@ import spock.lang.Specification
 /**
  * Created by heinold on 10.07.16.
  */
-class WorkflowUsingMergedBamsSpec extends Specification {
-
-    @ClassRule
-    static ContextResource contextResource = new ContextResource() {
-        {
-            before()
-        }
-    }
+class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
 
     static final boolean CONTROL = false
     static final boolean NOCONTROL = true
