@@ -131,8 +131,8 @@ class COMetadataAccessor {
             if (sampleName.endsWith("_"))
                 sampleName = sampleName[0..-2] // In this special case, we remove the "_" char at the end.
 
-            // As we work with sample prefixes, the sample in the filename can actually be a bit longer than the found value.
-            // Count delimiters in the sample name, extract the proper part of the filename and join that again.
+            // A sample can contain underscore characters "_". Here, we make sure, that the whole samplename is returned
+            // by including the count of underscore characters in the sample name.
             sampleName = splitFilename[0..(sampleName.count("_"))].join("_")
         }
 
