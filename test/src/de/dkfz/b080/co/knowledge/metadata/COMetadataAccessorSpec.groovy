@@ -6,27 +6,19 @@
 package de.dkfz.b080.co.knowledge.metadata
 
 import de.dkfz.b080.co.common.BasicCOProjectsRuntimeService
-import de.dkfz.b080.co.common.COConstants
+import de.dkfz.b080.co.files.Sample
 import de.dkfz.roddy.RoddyTestSpec
-import de.dkfz.roddy.RunMode
 import de.dkfz.roddy.config.ConfigurationConstants
 import de.dkfz.roddy.config.ConfigurationValue
-import de.dkfz.roddy.core.ContextResource
 import de.dkfz.roddy.core.ExecutionContext
-import de.dkfz.roddy.execution.io.ExecutionService
-import de.dkfz.roddy.execution.io.LocalExecutionService
-import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
-import groovy.transform.CompileStatic
-import org.junit.ClassRule
 import spock.lang.Shared
-import spock.lang.Specification
 
 import static de.dkfz.b080.co.common.COConstants.CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX
 import static de.dkfz.b080.co.common.COConstants.CVALUE_MATCH_EXACT_SAMPLE_NAMES
 import static de.dkfz.b080.co.common.COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES
 import static de.dkfz.b080.co.common.COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES
 import static de.dkfz.b080.co.common.COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD
-import static de.dkfz.b080.co.common.COConstants.CVALUE_USE_ALL_LOWER_CASE_SAMPLE_NAMES
+import static de.dkfz.b080.co.common.COConstants.CVALUE_USE_LOWER_CASE_FILENAMES_FOR_SAMPLE_EXTRACTION
 
 class COMetadataAccessorSpec extends RoddyTestSpec {
 
@@ -78,7 +70,7 @@ class COMetadataAccessorSpec extends RoddyTestSpec {
         context.configurationValues << new ConfigurationValue(CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES, possibleTumorSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY)
         context.configurationValues << new ConfigurationValue(CVALUE_MATCH_EXACT_SAMPLE_NAMES, matchExactSampleNames)
         context.configurationValues << new ConfigurationValue(CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX, allowSampleTerminationWithIndex)
-        context.configurationValues << new ConfigurationValue(CVALUE_USE_ALL_LOWER_CASE_SAMPLE_NAMES, useAllLowerCaseSampleNames)
+        context.configurationValues << new ConfigurationValue(CVALUE_USE_LOWER_CASE_FILENAMES_FOR_SAMPLE_EXTRACTION, useAllLowerCaseSampleNames)
 
         def accessor = new COMetadataAccessor(new BasicCOProjectsRuntimeService())
         def file = new File("/tmp/", filename)
@@ -124,4 +116,29 @@ class COMetadataAccessorSpec extends RoddyTestSpec {
         "tumor02_TEST019c_mdup.bam"       | "( control )"                     | "( tumor )"                     | false                 | true                            | true                       | "tumor02"
     }
 
+    def "test extract samples from filenames"(List<String> filenames, List<String> expected) {
+        when:
+        def accessor = new COMetadataAccessor(new BasicCOProjectsRuntimeService())
+        def context = contextResource.createSimpleContext(COMetadataAccessorSpec)
+        context.configurationValues << new ConfigurationValue(CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD, "version_2")
+        context.configurationValues << new ConfigurationValue(CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES, "( control )", ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY)
+        context.configurationValues << new ConfigurationValue(CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES, "( tumor )", ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY)
+        context.configurationValues << new ConfigurationValue(CVALUE_MATCH_EXACT_SAMPLE_NAMES, true)
+        context.configurationValues << new ConfigurationValue(CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX, true)
+        context.configurationValues << new ConfigurationValue(CVALUE_USE_LOWER_CASE_FILENAMES_FOR_SAMPLE_EXTRACTION, true)
+        def files = filenames.collect { new File(it) } as List<File>
+        def samples = accessor.extractSamplesFromFilenames(files, context)
+        def expectedSamples = expected.collect { new Sample(context, it) }
+
+        then:
+        samples == expectedSamples
+
+        where:
+        filenames                                                                        | expected
+        ["/tmp/control_pid_merged.bam.rmdup.bam"]                                        | ["control"]
+        ["/tmp/control_02_pid_merged.bam.rmdup.bam"]                                     | ["control_02"]
+        ["/tmp/tumor_pid_merged.bam.rmdup.bam"]                                          | ["tumor"]
+        ["/tmp/tumor_pid_merged.bam.rmdup.bam", "/tmp/control_pid_merged.bam.rmdup.bam"] | ["tumor", "control"]
+
+    }
 }

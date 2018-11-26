@@ -85,7 +85,7 @@ class COMetadataAccessor {
 
         boolean matchExactSampleNames = cfg.matchExactSampleNames
         boolean allowSampleTerminationWithIndex = cfg.allowSampleTerminationWithIndex
-        boolean useAllLowerCaseSampleNames = cfg.useAllLowerCaseSampleNames
+        boolean useLowerCaseFilenamesForSampleExtraction = cfg.useLowerCaseFilenamesForSampleExtraction
 
         // Get list of all known samples. Sort and revert them, so we can use them properly.
         // Get rid of empty samples! Sort and reverse for first match searches. (e.g. control_abc comes before control!)
@@ -93,7 +93,7 @@ class COMetadataAccessor {
                 .findAll().sort().reverse()
 
         String filename = file.name
-        if (useAllLowerCaseSampleNames)
+        if (useLowerCaseFilenamesForSampleExtraction)
             filename = filename.toLowerCase()
 
         String searchString = matchExactSampleNames ? "_" : ""
@@ -111,21 +111,16 @@ class COMetadataAccessor {
                 sampleID = sampleID[0..-2]
             }
 
-            if (useAllLowerCaseSampleNames)
-                filename.toLowerCase().startsWith(sampleID + _searchString)
-            else
-                filename.startsWith(sampleID + _searchString)
+            filename.startsWith(sampleID + _searchString)
         }
 
-        if(!matchExactSampleNames && sampleName) {
+        if (!matchExactSampleNames && sampleName) {
             String[] sampleSplit = sampleName.split(StringConstants.SPLIT_UNDERSCORE)
             if (sampleSplit.last().isInteger()) {
-//                logger.always("A sample name was given with an index at the end. We assume this is intentional and set allowSampleTerminationWithIndex for '$sampleName'")
                 sampleName = sampleName[0..-3]
                 allowSampleTerminationWithIndex = true
             }
         }
-
 
         String[] splitFilename = filename.split(StringConstants.SPLIT_UNDERSCORE)
         if (sampleName == null && matchExactSampleNames)
@@ -172,7 +167,13 @@ class COMetadataAccessor {
             logger.severe("Cannot retrieve samples from missing directory (${COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES}=${cfg.getExtractSamplesFromOutputFiles()}): " + alignmentDirectory.absolutePath)
             return (List<Sample>) []
         }
-        List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort()
+
+        List<File> filesInDirectory
+        if (cfg.extractSampleNameOnlyFromBamFiles) {
+            List<String> filterList = cfg.mergedBamSuffixList.collect { "*${it}" } as List<String>
+            filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory, filterList).sort()
+        } else
+            filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort()
 
         return filesInDirectory.collect { File file ->
             extractSampleNameFromBamBasename(file, context)
@@ -195,21 +196,12 @@ class COMetadataAccessor {
         }
     }
 
-    protected List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
-        COConfig cfg = new COConfig(context)
-        LinkedList<Sample> samples = [] as LinkedList
+    List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
+        List<Sample> samples = []
         for (File f : filesInDirectory) {
-            String name = f.getName()
-            String sampleName = null
-            String[] split = name.split(StringConstants.SPLIT_UNDERSCORE)
-            sampleName = split[0]
-            if (!cfg.getEnforceAtomicSampleName() && split[1].isInteger() && split[1].length() <= 2)
-                sampleName = split[0..1].join(StringConstants.UNDERSCORE)
-            if (!samples.find { sample -> sample.name == sampleName })
+            String sampleName = extractSampleNameFromBamBasename(f, context)
+            if (!samples.find { Sample sample -> sample.name == sampleName })
                 samples << new Sample(context, sampleName)
-        }
-        if (samples.size() == 0) {
-            logger.warning("There were no samples available for dataset ${context.getDataSet().getId()}, extractSamplesFromOutputFiles is set to true, should this value be false?")
         }
         return samples
     }
@@ -219,7 +211,7 @@ class COMetadataAccessor {
         List<File> bamFiles = cfg.getBamList().collect { String f -> new File(f) }
         List<String> sampleList = cfg.getSampleList()
         if (bamFiles.size() != sampleList.size()) {
-            context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.
+            context.addError(ExecutionContextError.EXECUTION_SETUP_INVALID.
                     expand("Different number of BAM files and samples in ${CVALUE_BAMFILE_LIST} and ${CVALUE_SAMPLE_LIST}"))
             return []
         } else {
@@ -246,7 +238,7 @@ class COMetadataAccessor {
             List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f) }
             samples = extractSamplesFromFastqList(fastqFiles, context)
             extractedFrom = "fastq_list configuration value"
-        } else if (cfg.getExtractSamplesFromOutputFiles()) {
+        } else if (cfg.getExtractSamplesFromOutputFiles()) { // Groovy won't recognize property. Keep the get()
             samples = extractSamplesFromOutputFiles(context)
             extractedFrom = "output files"
         } else if (cfg.extractSamplesFromBamList) {
@@ -262,7 +254,9 @@ class COMetadataAccessor {
         samples.removeAll { Sample sample ->
             sample.sampleType == Sample.SampleType.UNKNOWN
         }
-        if (samples.size() == 0) {
+        // Sort an remove duplicates
+        samples = samples.sort().unique()
+        if (!samples) {
             logger.warning("No valid samples could be extracted from ${extractedFrom} for dataset ${context.getDataSet().getId()}.")
         }
         return samples

@@ -5,12 +5,14 @@ Roddy plugins. This includes both, JVM-based code (Java, Groovy) as well as comm
 
 ## Run flags / switches
 
-The WorkflowUsingMergedBams in the plugin supports switches: 
+### For classes extending WorkflowUsingMergedBams: 
 
 |Switch                                   | Default | Description |
 |-----------------------------------------|---------|-------------|
 |isNoControlWorkflow                      |false    |Set to true to allow this workflow to work without a control bam file. |
 |workflowSupportsMultiTumorSamples        |false    |Allow the workflow to run with several tumor bam files. This is done with a for loop (see code documentation in WorkflowUsingMergedBam) |
+
+### For sample extraction from filenames:
 
 
 To extract samples from filenames, multiple methods exist or are planned. You can control
@@ -29,14 +31,23 @@ and uses it as the sample name. Further control is possible with:
 |enforceAtomicSampleName||
 
 #### "version_2"
-|useAtomicSampleNames                     |false    | Used in |
-|allowSampleTerminationWithIndex          |true     |          Allow recognition of e.g. tumor_02                           |
+|Switch                                   | Default | Description |
+|---|---|---|
+|matchExactSampleName                     |false    | If set, the sample will be extract like they are set in the config. This is compatible with allowSampleTerminationWithIndex. |
+|allowSampleTerminationWithIndex          |true     | Allow recognition of trailing integer numbers for sample names, e.g. tumor_02, if tumor is set. |
+|useLowerCaseFilenamesForSampleExtraction |true     | The switch will tell the method to work on lowercase filenames.|
 
 Describe matching strategy
 
 #### "regex" (planned)
 Not implemented, but planned.
 
+### For sample extraction from the alignment directory
+
+|Switch                            | Default | Description |
+|----------------------------------|---------|-------------|
+|extractSamplesFromOutputFiles     | false   | If this is true and samples are neither passed by MDT, configuration or sample list, samples are extracted from files in the alignment folder.            |
+|extractSampleNameOnlyFromBamFiles | false   | By default, the method will search for samples in all files in the alignment directory. With this switch, you can restrict it to BAM files.            |
 
 ## Changelist
 

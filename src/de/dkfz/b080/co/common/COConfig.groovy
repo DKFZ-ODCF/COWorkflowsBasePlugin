@@ -133,7 +133,11 @@ class COConfig {
         return configValues.getBoolean(CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX, true)
     }
 
-    boolean getUseAllLowerCaseSampleNames() {
-        return configValues.getBoolean(CVALUE_USE_ALL_LOWER_CASE_SAMPLE_NAMES, true)
+    boolean getUseLowerCaseFilenamesForSampleExtraction() {
+        return configValues.getBoolean(CVALUE_USE_LOWER_CASE_FILENAMES_FOR_SAMPLE_EXTRACTION, true)
+    }
+
+    boolean getExtractSampleNameOnlyFromBamFiles() {
+        return configValues.getBoolean(CVALUE_EXTRACT_SAMPLE_NAME_ONLY_FROM_BAM_FILES, false)
     }
 }
