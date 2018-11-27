@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2018 German Cancer Research Center (DKFZ).
+ * Copyright (c) 2018 German Cancer Research Center (Deutsches Krebsforschungszentrum, DKFZ).
  *
- * Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+ * Distributed under the MIT License (license terms are at https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/LICENSE).
  */
 package de.dkfz.b080.co;
 
@@ -13,8 +13,8 @@ import de.dkfz.roddy.plugins.BasePlugin;
  */
 public class COWorkflowsBasePlugin extends BasePlugin {
 
-    public static final String CURRENT_VERSION_STRING = "1.2.3";
-    public static final String CURRENT_VERSION_BUILD_DATE = "Wed Nov 14 13:36:41 CET 2018";
+    public static final String CURRENT_VERSION_STRING = "1.2.4";
+    public static final String CURRENT_VERSION_BUILD_DATE = "Mon Nov 26 16:34:21 CET 2018";
 
     @Override
     public String getVersionInfo() {

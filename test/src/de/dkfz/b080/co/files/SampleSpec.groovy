@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2018 German Cancer Research Center (Deutsches Krebsforschungszentrum, DKFZ).
+ *
+ * Distributed under the MIT License (license terms are at https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/LICENSE.txt).
+ */
 package de.dkfz.b080.co.files
 
 import de.dkfz.b080.co.common.COConstants
@@ -5,11 +10,7 @@ import de.dkfz.roddy.RoddyTestSpec
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.config.ConfigurationConstants
 import de.dkfz.roddy.config.ConfigurationValue
-import de.dkfz.roddy.core.ExecutionContext;
-import de.dkfz.roddy.core.ContextResource
-import groovy.transform.CompileStatic
-import org.junit.Rule
-import org.junit.Test
+import de.dkfz.roddy.core.ExecutionContext
 
 class SampleSpec extends RoddyTestSpec {
 
