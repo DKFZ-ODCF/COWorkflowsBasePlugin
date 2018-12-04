@@ -5,6 +5,30 @@ Roddy plugins. This includes both, JVM-based code (Java, Groovy) as well as comm
 
 ## Run flags / switches
 
+### Hints
+
+#### Alignment folder
+
+The alignment folder is referenced several times. For the plugin to work, it is currently necessary to have a folder
+for your dataset like e.g.:
+```bash
+/tmp/[dataset_id]
+```
+Inside this, you will need to create the alignment subfolder:
+```bash
+/tmp/[dataset_id]/alignment
+```
+And inside this, you will need to place or link your merged bams, e.g.:
+```bash
+/tmp/[dataset_id]/alignment/[sample_id]_[dataset_id]_merged.rmdup.bam
+/tmp/[dataset_id]/alignment/[sample_id]_[dataset_id]_merged.rmdup.bam.bai
+```
+So whenever we speak of the alignment folder, it is basically the described structure.
+You can change the alignment folder by overriding in your xml:
+```xml
+<cvalue name='alignmentOutputDirectory' value='alignment' type="path"/>
+```
+
 ### For classes extending WorkflowUsingMergedBams: 
 
 |Switch                                   | Default | Description |
@@ -33,11 +57,13 @@ and uses it as the sample name. Further control is possible with:
 #### "version_2"
 |Switch                                   | Default | Description |
 |---|---|---|
-|matchExactSampleName                     |false    | If set, the sample will be extract like they are set in the config. This is compatible with allowSampleTerminationWithIndex. |
+|matchExactSampleName                     |false    | If set, the sample will be extracted like they are set in the config. This is compatible with allowSampleTerminationWithIndex. |
 |allowSampleTerminationWithIndex          |true     | Allow recognition of trailing integer numbers for sample names, e.g. tumor_02, if tumor is set. |
 |useLowerCaseFilenamesForSampleExtraction |true     | The switch will tell the method to work on lowercase filenames.|
 
-Describe matching strategy
+Please take a close look at the file SampleFromFilenameExtractorVersionTwoTest (search with find or so). There is 
+a large test case *"Version_2: Extract sample name from BAM basename"*, which features a table with input, switches and
+expected output.
 
 #### "regex" (planned)
 Not implemented, but planned.
@@ -46,7 +72,7 @@ Not implemented, but planned.
 
 |Switch                            | Default | Description |
 |----------------------------------|---------|-------------|
-|extractSamplesFromOutputFiles     | false   | If this is true and samples are neither passed by MDT, configuration or sample list, samples are extracted from files in the alignment folder.            |
+|extractSamplesFromOutputFiles     | false   | If this is true and samples are neither passed by metadata table, configuration or sample list, samples are extracted from files in the alignment folder.            |
 |extractSampleNameOnlyFromBamFiles | false   | By default, the method will search for samples in all files in the alignment directory. With this switch, you can restrict it to BAM files.            |
 
 ## Changelist
@@ -63,7 +89,8 @@ Not implemented, but planned.
       * Added the 'extractSampleNameOnlyFromBamFiles' flag which tells extractSamplesFromOutputFiles() to ignore non BAM files.
         * Added variable and description to the xml.
       * Minimized the code in extractSamplesFromFilenames() by reusing existing code. 
-      * Add another sample from filename extraction method.
+    - Add another sample from filename extraction method and move code from the COMetadataAccessor
+      to custom strategy classes (SampleFromFilenameExtractionVersionOne/Two)  
         * Add variable and descriptions for the new (and old) method to the xml.
         * Add a lot of tests for the new method.
     - Add the COConfigSpec test class.

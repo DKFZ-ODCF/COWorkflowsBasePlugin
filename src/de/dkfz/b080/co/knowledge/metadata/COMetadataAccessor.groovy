@@ -5,14 +5,12 @@
  */
 package de.dkfz.b080.co.knowledge.metadata
 
-import de.dkfz.b080.co.common.BasicCOProjectsRuntimeService
-import de.dkfz.b080.co.common.COConfig
-import de.dkfz.b080.co.common.MetadataTable
-import de.dkfz.b080.co.common.RunID
+import de.dkfz.b080.co.common.*
 import de.dkfz.b080.co.files.BasicBamFile
-import de.dkfz.b080.co.common.COConstants
 import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
+import de.dkfz.b080.co.knowledge.metadata.sampleextractorstrategies.SampleFromFilenameExtractorVersionOne
+import de.dkfz.b080.co.knowledge.metadata.sampleextractorstrategies.SampleFromFilenameExtractorVersionTwo
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.core.DataSet
@@ -22,7 +20,6 @@ import de.dkfz.roddy.execution.io.MetadataTableFactory
 import de.dkfz.roddy.execution.io.fs.FileSystemAccessProvider
 import de.dkfz.roddy.knowledge.files.BaseFile
 import de.dkfz.roddy.tools.LoggerWrapper
-import de.dkfz.roddy.tools.RoddyConversionHelperMethods
 import de.dkfz.roddy.tools.RoddyIOHelperMethods
 import de.dkfz.roddy.tools.Tuple2
 import groovy.transform.CompileDynamic
@@ -65,85 +62,6 @@ class COMetadataAccessor {
 
     }
 
-    /**
-     * Untested and deprecated, replaced by extractSampleNameFromBamBasenameVersion2
-     */
-    private String extractSampleNameFromBamBasenameVersion1(String filename, ExecutionContext context) {
-        COConfig cfg = new COConfig(context)
-        String[] split = filename.split(StringConstants.SPLIT_UNDERSCORE)
-        if (split.size() <= 2) {
-            return null
-        }
-        String sampleName = split[0]
-        if (!cfg.enforceAtomicSampleName && split[1].isInteger() && split[1].length() <= 2)
-            sampleName = split[0..1].join(StringConstants.UNDERSCORE)
-        return sampleName
-    }
-
-    private String extractSampleNameFromBamBasenameVersion2(File file, ExecutionContext context) {
-        COConfig cfg = new COConfig(context)
-
-        boolean matchExactSampleNames = cfg.matchExactSampleNames
-        boolean allowSampleTerminationWithIndex = cfg.allowSampleTerminationWithIndex
-        boolean useLowerCaseFilenamesForSampleExtraction = cfg.useLowerCaseFilenamesForSampleExtraction
-
-        // Get list of all known samples. Sort and revert them, so we can use them properly.
-        // Get rid of empty samples! Sort and reverse for first match searches. (e.g. control_abc comes before control!)
-        def listOfAll = (cfg.possibleControlSampleNamePrefixes + cfg.possibleTumorSampleNamePrefixes)
-                .findAll().sort().reverse()
-
-        String filename = file.name
-        if (useLowerCaseFilenamesForSampleExtraction)
-            filename = filename.toLowerCase()
-
-        String searchString = matchExactSampleNames ? "_" : ""
-
-        // FIRST match!
-        String sampleName = listOfAll.find { String sampleID ->
-            String _searchString = searchString
-            if (sampleID.endsWith("_")) {
-                logger.always("A sample name was given with an underscore at the end. We assume this is intentional and set matchExactSampleNames for '$sampleID'")
-                _searchString = ""
-            }
-            String[] sampleSplit = sampleID.split(StringConstants.SPLIT_UNDERSCORE)
-            if (sampleSplit.last().isInteger() && !matchExactSampleNames) {
-                logger.always("A sample name was given with an index at the end. We assume this is intentional and set allowSampleTerminationWithIndex for '$sampleID'")
-                sampleID = sampleID[0..-2]
-            }
-
-            filename.startsWith(sampleID + _searchString)
-        }
-
-        if (!matchExactSampleNames && sampleName) {
-            String[] sampleSplit = sampleName.split(StringConstants.SPLIT_UNDERSCORE)
-            if (sampleSplit.last().isInteger()) {
-                sampleName = sampleName[0..-3]
-                allowSampleTerminationWithIndex = true
-            }
-        }
-
-        String[] splitFilename = filename.split(StringConstants.SPLIT_UNDERSCORE)
-        if (sampleName == null && matchExactSampleNames)
-            return null
-        else if (sampleName == null) // Fallback, in case we do not want an exact match but did not find anything.
-            sampleName = splitFilename[0]
-        else {
-            if (sampleName.endsWith("_"))
-                sampleName = sampleName[0..-2] // In this special case, we remove the "_" char at the end.
-
-            // A sample can contain underscore characters "_". Here, we make sure, that the whole samplename is returned
-            // by including the count of underscore characters in the sample name.
-            sampleName = splitFilename[0..(sampleName.count("_"))].join("_")
-        }
-
-        if (allowSampleTerminationWithIndex) {
-            String indexPart = filename[(sampleName.size() + 1)..-1].split(StringConstants.SPLIT_UNDERSCORE)[0]
-            if (RoddyConversionHelperMethods.isInteger(indexPart)) {
-                sampleName += "_$indexPart"
-            }
-        }
-        return sampleName
-    }
 
     // TODO: Regex
     String extractSampleNameFromBamBasename(File file, ExecutionContext context) {
@@ -151,9 +69,16 @@ class COMetadataAccessor {
 
         switch (cfg.selectedSampleExtractionMethod) {
             case MethodForSampleFromFilenameExtraction.version_1:
-                return extractSampleNameFromBamBasenameVersion1(file.name, context)
+                return new SampleFromFilenameExtractorVersionOne(file, cfg.enforceAtomicSampleName).extract()
             case MethodForSampleFromFilenameExtraction.version_2:
-                return extractSampleNameFromBamBasenameVersion2(file, context)
+                return new SampleFromFilenameExtractorVersionTwo(file,
+                        cfg.possibleControlSampleNamePrefixes + cfg.possibleTumorSampleNamePrefixes,
+                        cfg.matchExactSampleNames,
+                        cfg.allowSampleTerminationWithIndex,
+                        cfg.useLowerCaseFilenamesForSampleExtraction
+                ).extract()
+        // default is not implemented. selectSampleExtractionMethod can only be version_1 or version_2 and that
+        // is already checked earlier.
         }
     }
 
