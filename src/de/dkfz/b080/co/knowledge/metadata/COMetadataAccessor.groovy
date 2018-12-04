@@ -1,18 +1,16 @@
 /*
- * Copyright (c) 2018 German Cancer Research Center (DKFZ).
+ * Copyright (c) 2018 German Cancer Research Center (Deutsches Krebsforschungszentrum, DKFZ).
  *
- * Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+ * Distributed under the MIT License (license terms are at https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/LICENSE).
  */
 package de.dkfz.b080.co.knowledge.metadata
 
-import de.dkfz.b080.co.common.BasicCOProjectsRuntimeService
-import de.dkfz.b080.co.common.COConfig
-import de.dkfz.b080.co.common.MetadataTable
-import de.dkfz.b080.co.common.RunID
+import de.dkfz.b080.co.common.*
 import de.dkfz.b080.co.files.BasicBamFile
-import de.dkfz.b080.co.common.COConstants
 import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
+import de.dkfz.b080.co.knowledge.metadata.sampleextractorstrategies.SampleFromFilenameExtractorVersionOne
+import de.dkfz.b080.co.knowledge.metadata.sampleextractorstrategies.SampleFromFilenameExtractorVersionTwo
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
 import de.dkfz.roddy.core.DataSet
@@ -64,15 +62,24 @@ class COMetadataAccessor {
 
     }
 
-    protected String extractSampleNameFromBamBasename(String filename, boolean enforceAtomicSampleName) {
-        String[] split = filename.split(StringConstants.SPLIT_UNDERSCORE)
-        if (split.size() <= 2) {
-            return null
+
+    // TODO: Regex
+    String extractSampleNameFromBamBasename(File file, ExecutionContext context) {
+        COConfig cfg = new COConfig(context)
+
+        switch (cfg.selectedSampleExtractionMethod) {
+            case MethodForSampleFromFilenameExtraction.version_1:
+                return new SampleFromFilenameExtractorVersionOne(file, cfg.enforceAtomicSampleName).extract()
+            case MethodForSampleFromFilenameExtraction.version_2:
+                return new SampleFromFilenameExtractorVersionTwo(file,
+                        cfg.possibleControlSampleNamePrefixes + cfg.possibleTumorSampleNamePrefixes,
+                        cfg.matchExactSampleNames,
+                        cfg.allowSampleTerminationWithIndex,
+                        cfg.useLowerCaseFilenamesForSampleExtraction
+                ).extract()
+        // default is not implemented. selectSampleExtractionMethod can only be version_1 or version_2 and that
+        // is already checked earlier.
         }
-        String sampleName = split[0]
-        if (!enforceAtomicSampleName && split[1].isInteger() && split[1].length() <= 2)
-            sampleName = split[0..1].join(StringConstants.UNDERSCORE)
-        return sampleName
     }
 
     protected List<Sample> extractSamplesFromOutputFiles(ExecutionContext context) {
@@ -85,10 +92,16 @@ class COMetadataAccessor {
             logger.severe("Cannot retrieve samples from missing directory (${COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES}=${cfg.getExtractSamplesFromOutputFiles()}): " + alignmentDirectory.absolutePath)
             return (List<Sample>) []
         }
-        List<File> filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort()
+
+        List<File> filesInDirectory
+        if (cfg.extractSampleNameOnlyFromBamFiles) {
+            List<String> filterList = cfg.mergedBamSuffixList.collect { "*${it}" } as List<String>
+            filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory, filterList).sort()
+        } else
+            filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort()
 
         return filesInDirectory.collect { File file ->
-            extractSampleNameFromBamBasename(file.name, cfg.enforceAtomicSampleName)
+            extractSampleNameFromBamBasename(file, context)
         }.unique().findAll { it != null }.collect {
             new Sample(context, it)
         }
@@ -108,21 +121,12 @@ class COMetadataAccessor {
         }
     }
 
-    protected List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
-        COConfig cfg = new COConfig(context)
-        LinkedList<Sample> samples = [] as LinkedList
+    List<Sample> extractSamplesFromFilenames(List<File> filesInDirectory, ExecutionContext context) {
+        List<Sample> samples = []
         for (File f : filesInDirectory) {
-            String name = f.getName()
-            String sampleName = null
-            String[] split = name.split(StringConstants.SPLIT_UNDERSCORE)
-            sampleName = split[0]
-            if (!cfg.getEnforceAtomicSampleName() && split[1].isInteger() && split[1].length() <= 2)
-                sampleName = split[0..1].join(StringConstants.UNDERSCORE)
-            if (!samples.find { sample -> sample.name == sampleName })
+            String sampleName = extractSampleNameFromBamBasename(f, context)
+            if (!samples.find { Sample sample -> sample.name == sampleName })
                 samples << new Sample(context, sampleName)
-        }
-        if (samples.size() == 0) {
-            logger.warning("There were no samples available for dataset ${context.getDataSet().getId()}, extractSamplesFromOutputFiles is set to true, should this value be false?")
         }
         return samples
     }
@@ -132,7 +136,7 @@ class COMetadataAccessor {
         List<File> bamFiles = cfg.getBamList().collect { String f -> new File(f) }
         List<String> sampleList = cfg.getSampleList()
         if (bamFiles.size() != sampleList.size()) {
-            context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.
+            context.addError(ExecutionContextError.EXECUTION_SETUP_INVALID.
                     expand("Different number of BAM files and samples in ${CVALUE_BAMFILE_LIST} and ${CVALUE_SAMPLE_LIST}"))
             return []
         } else {
@@ -159,7 +163,7 @@ class COMetadataAccessor {
             List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f) }
             samples = extractSamplesFromFastqList(fastqFiles, context)
             extractedFrom = "fastq_list configuration value"
-        } else if (cfg.getExtractSamplesFromOutputFiles()) {
+        } else if (cfg.getExtractSamplesFromOutputFiles()) { // Groovy won't recognize property. Keep the get()
             samples = extractSamplesFromOutputFiles(context)
             extractedFrom = "output files"
         } else if (cfg.extractSamplesFromBamList) {
@@ -175,7 +179,9 @@ class COMetadataAccessor {
         samples.removeAll { Sample sample ->
             sample.sampleType == Sample.SampleType.UNKNOWN
         }
-        if (samples.size() == 0) {
+        // Sort an remove duplicates
+        samples = samples.sort().unique()
+        if (!samples) {
             logger.warning("No valid samples could be extracted from ${extractedFrom} for dataset ${context.getDataSet().getId()}.")
         }
         return samples
@@ -195,7 +201,7 @@ class COMetadataAccessor {
         COConfig cfg = new COConfig(context)
         return cfg.bamList.collect { filename ->
             File file = new File(filename)
-            Sample sample = new Sample(context, extractSampleNameFromBamBasename(file.name, cfg.enforceAtomicSampleName), file)
+            Sample sample = new Sample(context, extractSampleNameFromBamBasename(file, context), file)
             BasicBamFile bamFile = BaseFile.getSourceFile(context, filename, "BasicBamFile") as BasicBamFile
             bamFile.fileStage = new COFileStageSettings(null, null, sample, context.getDataSet())
             bamFile
@@ -251,7 +257,7 @@ class COMetadataAccessor {
             if (pathComponents.size() <= indexOfElement) {
                 throw new RuntimeException("Path to file '${it.getPath()}' too short to match requested path element '${element}' expected at index ${indexOfElement} (${pathnamePattern})")
             } else {
-                new Tuple2<>(pathComponents[indexOfElement], RoddyIOHelperMethods.assembleLocalPath("", *pathComponents[0 .. indexOfElement]))
+                new Tuple2<>(pathComponents[indexOfElement], RoddyIOHelperMethods.assembleLocalPath("", *pathComponents[0..indexOfElement]))
             }
         }
     }
@@ -353,5 +359,4 @@ class COMetadataAccessor {
             return extractLibrariesFromSampleDirectory(sample.path)
         }
     }
-
 }

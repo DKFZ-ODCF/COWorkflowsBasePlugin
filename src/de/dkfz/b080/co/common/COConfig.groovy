@@ -1,13 +1,15 @@
 /*
- * Copyright (c) 2018 German Cancer Research Center (DKFZ).
+ * Copyright (c) 2018 German Cancer Research Center (Deutsches Krebsforschungszentrum, DKFZ).
  *
- * Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+ * Distributed under the MIT License (license terms are at https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/LICENSE).
  */
 
 package de.dkfz.b080.co.common
 
+import de.dkfz.b080.co.knowledge.metadata.MethodForSampleFromFilenameExtraction
 import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.StringConstants
+import de.dkfz.roddy.config.ConfigurationError
 import de.dkfz.roddy.config.RecursiveOverridableMapContainerForConfigurationValues
 import de.dkfz.roddy.core.ExecutionContext
 import static COConstants.*
@@ -52,7 +54,7 @@ class COConfig {
 
     private List<String> checkAndSplitListFromConfig(String listID) {
         String list = configValues.getString(listID, null)
-        if(list)
+        if (list)
             return list.split(StringConstants.SPLIT_SEMICOLON) as List<String>
         return []
     }
@@ -93,7 +95,7 @@ class COConfig {
     boolean getSearchMergedBamWithSeparator() {
         return configValues.getBoolean("searchMergedBamWithSeparator", false)
     }
-    
+
     List<String> getPossibleControlSampleNamePrefixes() {
         return configValues.get(COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES, "( control )").toStringList(" ", ["(", ")"] as String[])
     }
@@ -102,4 +104,40 @@ class COConfig {
         return configValues.get(COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES, "( tumor )").toStringList(" ", ["(", ")"] as String[])
     }
 
+    MethodForSampleFromFilenameExtraction getSelectedSampleExtractionMethod() {
+        try {
+            String value = configValues.get(COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD)
+            return value as MethodForSampleFromFilenameExtraction
+        } catch (Exception ex) {
+            throw new ConfigurationError(
+                    [
+                            "Value for selectSampleExtractionMethod is wrong, needs to be one of:",
+                            MethodForSampleFromFilenameExtraction.values()
+                    ].flatten().join("\n\t- "), context.configuration)
+        }
+    }
+
+    /**
+     * For sample extraction method version 2
+     * @return
+     */
+    boolean getMatchExactSampleNames() {
+        return configValues.getBoolean(CVALUE_MATCH_EXACT_SAMPLE_NAMES, false)
+    }
+
+    /**
+     * For sample extraction method version 2
+     * @return
+     */
+    boolean getAllowSampleTerminationWithIndex() {
+        return configValues.getBoolean(CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX, true)
+    }
+
+    boolean getUseLowerCaseFilenamesForSampleExtraction() {
+        return configValues.getBoolean(CVALUE_USE_LOWER_CASE_FILENAMES_FOR_SAMPLE_EXTRACTION, true)
+    }
+
+    boolean getExtractSampleNameOnlyFromBamFiles() {
+        return configValues.getBoolean(CVALUE_EXTRACT_SAMPLE_NAME_ONLY_FROM_BAM_FILES, false)
+    }
 }

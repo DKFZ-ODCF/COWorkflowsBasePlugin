@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 #
-# Copyright (c) 2018 German Cancer Research Center (DKFZ).
+# Copyright (c) 2018 German Cancer Research Center (Deutsches Krebsforschungszentrum, DKFZ).
 #
-# Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+# Distributed under the MIT License (license terms are at https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/LICENSE).
 #
 # This script adds columns to a vcf file (or updates them if columns with these names are already present).
 # Both files must be sorted in the same order (including chromosomal order).

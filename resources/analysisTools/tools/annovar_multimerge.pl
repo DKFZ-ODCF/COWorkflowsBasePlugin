@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 #
-# Copyright (c) 2018 German Cancer Research Center (DKFZ).
+# Copyright (c) 2018 German Cancer Research Center (Deutsches Krebsforschungszentrum, DKFZ).
 #
-# Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+# Distributed under the MIT License (license terms are at https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/LICENSE).
 #
 # This script takes an snv file and a number of annovar result files as input.
 # Annofiles should be passed as ANNOCOLUMN=ANNOFILE(column[1-based]).

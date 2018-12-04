@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2018 German Cancer Research Center (DKFZ).
+ * Copyright (c) 2018 German Cancer Research Center (Deutsches Krebsforschungszentrum, DKFZ).
  *
- * Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+ * Distributed under the MIT License (license terms are at https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/LICENSE).
  */
 package de.dkfz.b080.co.files;
 
@@ -17,6 +17,7 @@ import de.dkfz.roddy.tools.LoggerWrapper;
 import java.io.File;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A sample is either control or tumor. It has a name and a path and belongs to a project.
@@ -31,11 +32,6 @@ public class Sample implements Comparable<Sample>, Serializable {
      * A list of libraries which might be filled (or not)
      */
     private List<String> libraries;
-
-    @Override
-    public int compareTo(Sample o) {
-        return ((Integer) sampleType.ordinal()).compareTo(o.sampleType.ordinal());
-    }
 
     public enum SampleType {
         CONTROL,
@@ -78,6 +74,27 @@ public class Sample implements Comparable<Sample>, Serializable {
                     "'" + String.join("', '", cfg.getPossibleTumorSampleNamePrefixes()) + "' (tumor).");
 
         sampleType = tempSampleType;
+    }
+
+    @Override
+    public int compareTo(Sample o) {
+        int compareSampleTypeResult = sampleType.name().compareTo(o.sampleType.name());
+        if (compareSampleTypeResult != 0) return compareSampleTypeResult;
+        return name.compareTo(o.name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sample sample = (Sample) o;
+        return name.equals(sample.name) &&
+                sampleType == sample.sampleType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, sampleType);
     }
 
     public static SampleType determineSampleType(ExecutionContext context, String sampleName) {

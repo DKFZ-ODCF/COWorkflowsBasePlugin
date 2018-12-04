@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 #
-# Copyright (c) 2018 German Cancer Research Center (DKFZ).
+# Copyright (c) 2018 German Cancer Research Center (Deutsches Krebsforschungszentrum, DKFZ).
 #
-# Distributed under the MIT License (license terms are at https://www.github.com/TheRoddyWMS/COWorkflowsBasePlugin/LICENSE).
+# Distributed under the MIT License (license terms are at https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/LICENSE).
 #
 # Small filter which reads a sorted vcf file from stdin, merges duplicate lines (lines where chrom and pos are identical),
 # and prints duplicate-free file to stdout it detects which column(s) differ in the duplicates and joins the entries with an '&'.
