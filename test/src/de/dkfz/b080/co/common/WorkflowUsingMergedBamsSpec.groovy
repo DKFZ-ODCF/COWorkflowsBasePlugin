@@ -86,7 +86,6 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
         boolean result = createMockupWorkflow(context).checkInitialFiles(context, _initialFiles)
-        context.errors.each { println(it) }
 
         then:
         result == true
@@ -102,7 +101,6 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
         boolean result = createMockupWorkflow(context).checkInitialFiles(context, _initialFiles)
-        context.errors.each { println(it) }
 
         then:
         result == true
@@ -118,7 +116,6 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
         boolean result = createMockupWorkflow(context).checkInitialFiles(context, _initialFiles)
-        context.errors.each { println(it) }
 
         then:
         result == false
@@ -138,7 +135,6 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
         boolean result = createMockupWorkflow(context).checkInitialFiles(context, _initialFiles)
-        context.errors.each { println(it) }
 
         then:
         result == false

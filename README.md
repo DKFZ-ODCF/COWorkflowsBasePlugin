@@ -54,6 +54,10 @@ and uses it as the sample name. Further control is possible with:
 |-----------------------------------------|---------|-------------|
 |enforceAtomicSampleName||
 
+Please take a close look at the file SampleFromFilenameExtractorVersionOneTest (to be found [here](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionOneTest.groovy)) to 
+see a table of filenames and expected samples. 
+
+
 #### "version_2"
 |Switch                                   | Default | Description |
 |---|---|---|
@@ -61,7 +65,7 @@ and uses it as the sample name. Further control is possible with:
 |allowSampleTerminationWithIndex          |true     | Allow recognition of trailing integer numbers for sample names, e.g. tumor_02, if tumor is set. |
 |useLowerCaseFilenamesForSampleExtraction |true     | The switch will tell the method to work on lowercase filenames.|
 
-Please take a close look at the file SampleFromFilenameExtractorVersionTwoTest (search with find or so). There is 
+Please take a close look at the file SampleFromFilenameExtractorVersionTwoTest (to be found [here](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionTwoTest.groovy)). There is 
 a large test case *"Version_2: Extract sample name from BAM basename"*, which features a table with input, switches and
 expected output.
 
