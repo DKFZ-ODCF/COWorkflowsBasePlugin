@@ -53,7 +53,6 @@ final class COConstants {
     public static final String CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES = "possibleTumorSampleNamePrefixes"
     public static final String CVALUE_SEARCH_MERGEDBAM_WITH_SEPARATOR = "searchMergedBamWithSeparator"
     public static final String CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD = "selectSampleExtractionMethod"
-    public static final String CVALUE_USE_ATOMIC_SAMPLE_NAMES = "useAtomicSampleNames"
     public static final String CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX = "allowSampleTerminationWithIndex"
     public static final String CVALUE_USE_LOWER_CASE_FILENAMES_FOR_SAMPLE_EXTRACTION = "useLowerCaseFilenamesForSampleExtraction"
     public static final String CVALUE_MATCH_EXACT_SAMPLE_NAMES = "matchExactSampleNames"

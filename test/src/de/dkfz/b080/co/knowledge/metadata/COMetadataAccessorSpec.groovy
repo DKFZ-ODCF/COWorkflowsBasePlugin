@@ -11,19 +11,11 @@ import de.dkfz.roddy.RoddyTestSpec
 import de.dkfz.roddy.config.ConfigurationConstants
 import de.dkfz.roddy.config.ConfigurationValue
 import de.dkfz.roddy.core.ExecutionContext
-import spock.lang.Shared
+import spock.lang.Ignore
 
-import static de.dkfz.b080.co.common.COConstants.CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX
-import static de.dkfz.b080.co.common.COConstants.CVALUE_MATCH_EXACT_SAMPLE_NAMES
-import static de.dkfz.b080.co.common.COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES
-import static de.dkfz.b080.co.common.COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES
-import static de.dkfz.b080.co.common.COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD
-import static de.dkfz.b080.co.common.COConstants.CVALUE_USE_LOWER_CASE_FILENAMES_FOR_SAMPLE_EXTRACTION
+import static de.dkfz.b080.co.common.COConstants.*
 
 class COMetadataAccessorSpec extends RoddyTestSpec {
-
-    @Shared
-    static final ExecutionContext context = contextResource.createSimpleContext(COMetadataAccessorSpec)
 
     def "GrepPathElementFromFilenames"() {
 
@@ -58,6 +50,7 @@ class COMetadataAccessorSpec extends RoddyTestSpec {
         }
     }
 
+    @Ignore
     def "Version_1: Extract sample name from BAM basename"(String filename, String possibleControlSampleNamePrefixes, String possibleTumorSampleNamePrefixes, boolean useAtomicSampleNames, boolean allowSampleTerminationWithIndex, String resultSample) {
 
     }
@@ -65,6 +58,7 @@ class COMetadataAccessorSpec extends RoddyTestSpec {
     def "Version_2: Extract sample name from BAM basename"(String filename, String possibleControlSampleNamePrefixes, String possibleTumorSampleNamePrefixes, boolean matchExactSampleNames, boolean allowSampleTerminationWithIndex, boolean useAllLowerCaseSampleNames, String expectedSample) {
 
         when:
+        ExecutionContext context = contextResource.createSimpleContext(COMetadataAccessorSpec)
         context.configurationValues << new ConfigurationValue(CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD, "version_2")
         context.configurationValues << new ConfigurationValue(CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES, possibleControlSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY)
         context.configurationValues << new ConfigurationValue(CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES, possibleTumorSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY)
@@ -114,6 +108,7 @@ class COMetadataAccessorSpec extends RoddyTestSpec {
         "tumor_02_TEST019b_mdup.bam"      | "( control )"                     | "( tumor )"                     | true                  | true                            | true                       | "tumor_02"
         "tumor02_TEST019c_mdup.bam"       | "( control )"                     | "( tumor )"                     | true                  | true                            | true                       | null
         "tumor02_TEST019c_mdup.bam"       | "( control )"                     | "( tumor )"                     | false                 | true                            | true                       | "tumor02"
+        "tumor02_TEST019d_mdup.bam"       | "( control )"                     | "( tumor )"                     | true                  | false                           | true                       | null
     }
 
     def "test extract samples from filenames"(List<String> filenames, List<String> expected) {

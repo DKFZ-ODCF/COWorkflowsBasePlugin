@@ -15,11 +15,34 @@
 
         <cvalue name='WINDOW_SIZE' value='1' type="integer" />
 
-        <cvalue name='searchMergedBamsWithSeparator'    value='false' type="boolean" description="" />
 
-        <cvalue name='selectSampleExtractionMethod'     value='version_1'   type="string"  description="" />
-        <cvalue name='useAtomicSampleNames'             value='false'       type="boolean" description="" />
-        <cvalue name='allowSampleTerminationWithIndex'  value='true'        type="boolean" description="" />
+        <cvalue name='extractSampleNameOnlyFromBamFiles'
+                value='false'
+                type="boolean"
+                description="Tell extractSamplesFromOutputFiles() to ignore non BAM files." />
+
+        <cvalue name='selectSampleExtractionMethod'
+                value='version_1'
+                type="string"
+                description="Selects version_1 for sample from filename extraction." />
+        <cvalue name='enforceAtomicSampleName'
+                value='false'
+                type="boolean"
+                description="Defines whether the search method (version_1) shall append '_' to the search pattern. The method searches then e.g. for 'control_' or 'tumor_something_'" />
+
+        <!--<cvalue name='selectSampleExtractionMethod'     value='version_2'   type="string"  description="Use version_2 of the sample extraction methods." />-->
+        <cvalue name='matchExactSampleNames'
+                value='false'
+                type="boolean"
+                description="Defines whether the search method (version_2) shall append '_' to the search pattern. The method searches then e.g. for 'control_' or 'tumor_something_'" />
+        <cvalue name='allowSampleTerminationWithIndex'
+                value='true'
+                type="boolean"
+                description="Defines, that a sample may end with an integer, e.g. searching for control on file control_02_mer... will find control_02 instead of control." />
+        <cvalue name='useLowerCaseFilenamesForSampleExtraction'
+                value='true'
+                type="boolean"
+                description="Tells the method to turn the filename to lowercase before sample search. Will result in control for e.g. Control or CONTROL." />
 
         <!-- Settings for metadata table -->
         <cvalue name="sampleCol" tags="mandatory"       value="Sample"          description="Metadata column defining sets of FASTQs belonging to the same sample type (tumor_01, etc.). Default: Sample. Default if undefined: Error!"/>

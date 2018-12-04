@@ -51,10 +51,27 @@ Not implemented, but planned.
 
 ## Changelist
 
-    - Add new method for sample from filename extraction
-
-...
-
+  * Version update to 1.3.0
+    - Change tests to extend the RoddyTestSpec class in Roddy 3.4.0
+    - Changed tests in WorkflowUsingMergedBamsSpec to use flags instead of getContext() method.
+      * The ContextResource @Rule did not work anymore for the tests.
+      * Makes it easier to read, flags are boolean values now.
+      * Context and file objects are now created in the test methods.
+    - Updated copyright notes.
+    - Added compareTo(), equals() and hashCode() to Sample class.
+    - In COMetadataAccessor class:
+      * Added the 'extractSampleNameOnlyFromBamFiles' flag which tells extractSamplesFromOutputFiles() to ignore non BAM files.
+        * Added variable and description to the xml.
+      * Minimized the code in extractSamplesFromFilenames() by reusing existing code. 
+      * Add another sample from filename extraction method.
+        * Add variable and descriptions for the new (and old) method to the xml.
+        * Add a lot of tests for the new method.
+    - Add the COConfigSpec test class.
+    - Rename the SampleTest class to SampleSpec and make it extend RoddyTestSpec.
+  * Version updates until 1.2.0
+    
+    ***Description Missing...***
+    
   * Version update to 1.0.4
     - Roddy 3.1 has changed unit test framework classes. COWFBP unit tests require Roddy 3.1.
     - contributors
