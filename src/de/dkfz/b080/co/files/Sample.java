@@ -78,7 +78,9 @@ public class Sample implements Comparable<Sample>, Serializable {
 
     @Override
     public int compareTo(Sample o) {
-        return (sampleType.name() + ":" + name).compareTo(o.sampleType.name() + ":" + o.name);
+        int compareSampleTypeResult = sampleType.name().compareTo(o.sampleType.name());
+        if (compareSampleTypeResult != 0) return compareSampleTypeResult;
+        return name.compareTo(o.name);
     }
 
     @Override
