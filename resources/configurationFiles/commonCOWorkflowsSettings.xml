@@ -17,9 +17,9 @@
 
         <cvalue name='searchMergedBamsWithSeparator'    value='false' type="boolean" description="" />
 
-        <cvalue name='selectSampleExtractionMethod'     value='version_1'   type="string"  description="" />
+        <cvalue name='selectSampleExtractionMethod'     value='version_2'   type="string"  description="" />
         <cvalue name='useAtomicSampleNames'             value='false'       type="boolean" description="" />
-        <cvalue name='allowSampleTerminationWithIndex ' value='true'        type="boolean" description="" />
+        <cvalue name='allowSampleTerminationWithIndex' value='true'        type="boolean" description="" />
 
         <!-- Settings for metadata table -->
         <cvalue name="sampleCol" tags="mandatory"       value="Sample"          description="Metadata column defining sets of FASTQs belonging to the same sample type (tumor_01, etc.). Default: Sample. Default if undefined: Error!"/>

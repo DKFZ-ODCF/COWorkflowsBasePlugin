@@ -11,9 +11,16 @@ import de.dkfz.roddy.config.ConfigurationConstants
 import de.dkfz.roddy.config.ConfigurationValue
 import de.dkfz.roddy.core.ContextResource
 import de.dkfz.roddy.core.ExecutionContext
+import groovy.transform.CompileStatic
 import org.junit.ClassRule
 import spock.lang.Shared
 import spock.lang.Specification
+
+import static de.dkfz.b080.co.common.COConstants.CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX
+import static de.dkfz.b080.co.common.COConstants.CVALUE_MATCH_EXACT_SAMPLE_NAMES
+import static de.dkfz.b080.co.common.COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES
+import static de.dkfz.b080.co.common.COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES
+import static de.dkfz.b080.co.common.COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD
 
 class COMetadataAccessorSpec extends Specification {
 
@@ -68,11 +75,11 @@ class COMetadataAccessorSpec extends Specification {
     def "Version_2: Extract sample name from BAM basename"(String filename, String possibleControlSampleNamePrefixes, String possibleTumorSampleNamePrefixes, boolean matchExactSampleNames, boolean allowSampleTerminationWithIndex, String resultSample) {
 
         when:
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD, "version_2", ConfigurationConstants.CVALUE_TYPE_STRING))
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES, possibleControlSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY))
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES, possibleTumorSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY))
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_MATCH_EXACT_SAMPLE_NAMES, matchExactSampleNames, ConfigurationConstants.CVALUE_TYPE_BOOLEAN))
-        context.configurationValues.add(new ConfigurationValue(COConstants.CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX, allowSampleTerminationWithIndex.toString(), ConfigurationConstants.CVALUE_TYPE_BOOLEAN))
+        context.configurationValues << new ConfigurationValue(CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD, "version_2")
+        context.configurationValues << new ConfigurationValue(CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES, possibleControlSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY)
+        context.configurationValues << new ConfigurationValue(CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES, possibleTumorSampleNamePrefixes, ConfigurationConstants.CVALUE_TYPE_BASH_ARRAY)
+        context.configurationValues << new ConfigurationValue(CVALUE_MATCH_EXACT_SAMPLE_NAMES, matchExactSampleNames)
+        context.configurationValues << new ConfigurationValue(CVALUE_ALLOW_SAMPLE_TERMINATION_WITH_INDEX, allowSampleTerminationWithIndex)
 
         then:
         (new COMetadataAccessor(new BasicCOProjectsRuntimeService()).extractSampleNameFromBamBasename(new File("/tmp/", filename), context)) == resultSample
@@ -105,9 +112,9 @@ class COMetadataAccessorSpec extends Specification {
         "xeno_TEST014_mdup.bam"           | "( control )"                     | "( )"                           | false                 | true                            | "xeno"
         "xeno_TEST015_mdup.bam"           | "( control )"                     | "( )"                           | true                  | true                            | "xeno"
 
-        "tumor_02_TEST015_mdup.bam"       | "( control )"                     | "( tumor )"                     | false                 | false                           | "tumor"
-        "tumor_02_TEST015_mdup.bam"       | "( control )"                     | "( tumor )"                     | true                  | true                            | "tumor_02"
-        "tumor02_TEST015_mdup.bam"        | "( control )"                     | "( tumor )"                     | true                  | true                            | "tumor02"
+        "tumor_02_TEST015a_mdup.bam"       | "( control )"                     | "( tumor )"                     | false                 | false                           | "tumor"
+        "tumor_02_TEST015b_mdup.bam"       | "( control )"                     | "( tumor )"                     | true                  | true                            | "tumor_02"
+        "tumor02_TEST015c_mdup.bam"        | "( control )"                     | "( tumor )"                     | true                  | true                            | "tumor02"
     }
 
 }

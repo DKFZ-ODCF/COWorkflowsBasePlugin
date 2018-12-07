@@ -8,9 +8,11 @@ package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.Sample
 import de.dkfz.b080.co.knowledge.metadata.COMetadataAccessor
+import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.core.RuntimeService
+import de.dkfz.roddy.execution.jobs.BatchEuphoriaJobManager
 import de.dkfz.roddy.execution.jobs.JobManager
 import de.dkfz.roddy.knowledge.files.BaseFile
 
@@ -31,10 +33,13 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
         return this.metadataAccessor
     }
 
+    /**
+     * Use RuntimeService._createJobName or the instance method createJobName
+     */
     @Deprecated
     @Override
     String createJobName(ExecutionContext executionContext, BaseFile file, String toolID, boolean reduceLevel) {
-        return JobManager.getInstance().createJobName(file, toolID, reduceLevel)
+        return _createJobName(executionContext, file, toolID, reduceLevel)
     }
 
     File getAlignmentDirectory(ExecutionContext context) {
