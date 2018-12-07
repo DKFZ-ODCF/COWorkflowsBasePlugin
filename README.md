@@ -143,11 +143,13 @@ Not implemented, but planned.
         * Add a lot of tests for the new method.
     - Add the COConfigSpec test class.
     - Rename the SampleTest class to SampleSpec and make it extend RoddyTestSpec.
-  * Version updates until 1.2.0
-    
-    ***Description Missing...***
-    
-  * Version update to 1.0.4
+  * Version update to 1.2.1
+    - Improved error handling tumor and control for tumor-control workflows
+  * Version update to 1.2.0
+    - Added COConstants class to collect constants (old places left for backward compatibility)
+  * Version update to 1.1.1
+    - Little refactoring
+  * Version update to 1.1.0
     - Roddy 3.1 has changed unit test framework classes. COWFBP unit tests require Roddy 3.1.
     - contributors
     - changed internal column names for metadata table
