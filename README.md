@@ -43,22 +43,58 @@ To extract samples from filenames, multiple methods exist or are planned. You ca
 the workflows behaviour with the variable "selectSampleExtractionMethod".
 
 Valid values with their control variables are:
-version
-|selectSampleExtractionMethod             |version_2| Alternative values are "version_1" |
+
+|Switch | Value | Description |
+|-------|-------|-------------|
+|selectSampleExtractionMethod             |**version_1 (Default)**| The old version for sample from file extraction.|
+|selectSampleExtractionMethod             |version_2| The new version. |
 
 #### "version_1"
+
 This one is very simple and just splits the filename. Afterwards, it takes the first splitted value
 and uses it as the sample name. Further control is possible with:
 
 |Switch                                   | Default | Description |
 |-----------------------------------------|---------|-------------|
-|enforceAtomicSampleName||
+|enforceAtomicSampleName|false|Defines whether the method shall append '_' to the search pattern. The method searches then e.g. for 'control_' or 'tumor_something_'|
 
 Please take a close look at the file SampleFromFilenameExtractorVersionOneTest (to be found [here](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionOneTest.groovy)) to 
 see a table of filenames and expected samples. 
 
+Note that, in difference to version_2, this method does not take the configured samples in possibleControlSampleNamePrefixes 
+and possibleTumorSampleNamePrefixes into account and will return any file prefix separated by "_". 
 
 #### "version_2"
+
+The method is quite complex and can detect a variety of samples. The basic settings will use the samples set in 
+possibleControlSampleNamePrefixes and possibleTumorSampleNamePrefixes as prefixes for the sample search. E.g. 
+"con" will extract "control" from "control_some_merged.bam" and "control02" from "control02_some_merged.bam". Like in 
+version_1, "_" is used as a delimiter for the extraction. Note that, in hindsight to version_1, samples may contain "_"
+delimiters in their name! A sample prefix like "control_sample" will work.
+
+Before the sample is extracted, both possible... lists are joined and sorted in a reverse order. Let's say you have:
+
+```bash
+    possibleControlSampleNamePrefixes=( control control02 control_sample )
+    possibleTumorSampleNamePrefixes=( tumor xeno tumor_02 )
+```
+
+you will get the following list for the extraction:
+
+```bash
+    xeno
+    tumor_02
+    tumor
+    control_sample
+    control02
+    control
+```
+
+We do this to search for the most specific sample prefix first, otherwise in the case above, control would supercede the
+more specific control_sample or control02.
+
+You can modify the search behaviour with several switches:
+
 |Switch                                   | Default | Description |
 |---|---|---|
 |matchExactSampleName                     |false    | If set, the sample will be extracted like they are set in the config. This is compatible with allowSampleTerminationWithIndex. |
@@ -68,6 +104,14 @@ see a table of filenames and expected samples.
 Please take a close look at the file SampleFromFilenameExtractorVersionTwoTest (to be found [here](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionTwoTest.groovy)). There is 
 a large test case *"Version_2: Extract sample name from BAM basename"*, which features a table with input, switches and
 expected output.
+
+If you want to use version_2 in a similar name way like version_1, you can do that by setting
+```bash
+    matchExactSampleName=false
+    allowSampleTerminationWithIndex=true
+    useLowerCaseFilenameForSampleExtraction=true
+```
+However, the method still works a lot more sophisticated than version_1.
 
 #### "regex" (planned)
 Not implemented, but planned.
