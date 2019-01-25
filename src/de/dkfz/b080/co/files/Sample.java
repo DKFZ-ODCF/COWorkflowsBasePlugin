@@ -102,7 +102,7 @@ public class Sample implements Comparable<Sample>, Serializable {
         SampleType tempSampleType = SampleType.UNKNOWN;
         if (isInSampleList(cfg, cfg.getPossibleControlSampleNamePrefixes(), sampleName)) {
             if (isInSampleList(cfg, cfg.getPossibleTumorSampleNamePrefixes(), sampleName)) {
-                context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.expand(
+                context.addError(ExecutionContextError.EXECUTION_SETUP_INVALID.expand(
                         "Sample name '" + sampleName + "' matches both values of " +
                                 COConstants.CVALUE_POSSIBLE_TUMOR_SAMPLE_NAME_PREFIXES + " and " +
                                 COConstants.CVALUE_POSSIBLE_CONTROL_SAMPLE_NAME_PREFIXES));

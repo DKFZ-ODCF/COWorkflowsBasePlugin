@@ -112,14 +112,14 @@ abstract class WorkflowUsingMergedBams extends Workflow {
                     else if (sample.getType() == TUMOR)
                         bamsTumorMerged << bam
                     else {
-                        context.addErrorEntry(ExecutionContextError.EXECUTION_NOINPUTDATA.
+                        context.addError(ExecutionContextError.EXECUTION_NOINPUTDATA.
                                 expand("Skipping BAM that is not classified as tumor or control: ${bam.getAbsolutePath()}", Level.WARNING))
                         null
                     }
                 }.findAll { it }
 
                 if (bamsControlMerged.size() > 1) {
-                    context.addErrorEntry(ExecutionContextError.EXECUTION_SETUP_INVALID.expand("More than one control sample in bamfile_list:\n" +
+                    context.addError(ExecutionContextError.EXECUTION_SETUP_INVALID.expand("More than one control sample in bamfile_list:\n" +
                             bamsControlMerged.collect { "${it.sample.name}: ${it.getAbsolutePath()}" }.join("\n")))
                 }
                 if (!isNoControlWorkflow() && bamsControlMerged.size() == 1)

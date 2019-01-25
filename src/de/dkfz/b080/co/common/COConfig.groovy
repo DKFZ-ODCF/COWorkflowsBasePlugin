@@ -106,7 +106,7 @@ class COConfig {
 
     MethodForSampleFromFilenameExtraction getSelectedSampleExtractionMethod() {
         try {
-            String value = configValues.get(COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD)
+            String value = configValues.get(COConstants.CVALUE_SELECT_SAMPLE_EXTRACTION_METHOD, "version_1")
             return value as MethodForSampleFromFilenameExtraction
         } catch (Exception ex) {
             throw new ConfigurationError(
