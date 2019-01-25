@@ -7,14 +7,12 @@ package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.BasicBamFile
 import de.dkfz.b080.co.files.Sample
-import de.dkfz.roddy.config.ConfigurationError
 import de.dkfz.roddy.core.DataSet
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.core.ExecutionContextError
 import de.dkfz.roddy.core.Workflow
 import de.dkfz.roddy.knowledge.files.BaseFile
 import groovy.transform.CompileStatic
-import groovy.transform.PackageScope
 
 import java.util.logging.Level
 
@@ -180,7 +178,8 @@ abstract class WorkflowUsingMergedBams extends Workflow {
             return false
         }
 
-        assertBamfileArrayValidity(initialBamFiles)
+        if (!checkBamfileArrayValidity(initialBamFiles))
+            return false
 
         if (isControlWorkflow())
             return checkBamfileArrayContentForControlWorkflows(context, initialBamFiles)
@@ -194,14 +193,16 @@ abstract class WorkflowUsingMergedBams extends Workflow {
     }
 
     @Deprecated // change this to private, protected or package scope in next major release
-    void assertBamfileArrayValidity(BasicBamFile[] initialBamFiles) {
-        if (initialBamFiles.any { it == null }) {
-            throw new ConfigurationError(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("WorkflowUsingMergedBams.checkInitialFiles failed: The list of BAM files contains an empty entry.").getDescription(), context.configuration)
-        }
+    boolean checkBamfileArrayValidity(BasicBamFile[] initialBamFiles) {
+        List<ExecutionContextError> errors = []
+        if (initialBamFiles.any { it == null })
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of BAM files contains an empty entry.")
 
-        if (initialBamFiles.any { BasicBamFile bam -> bam.sample == Sample.SampleType.UNKNOWN }) {
-            throw new ConfigurationError(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("WorkflowUsingMergedBams.checkInitialFiles failed: The list of BAM files contains an entry with unset sample.").getDescription(), context.configuration)
-        }
+        if (initialBamFiles.any { BasicBamFile bam -> bam.sample == Sample.SampleType.UNKNOWN })
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of BAM files contains an entry with unset sample.")
+
+        errors.each { context.addError(it) }
+        return !errors
     }
 
     @Deprecated // change this to private, protected or package scope in next major release
@@ -221,18 +222,21 @@ abstract class WorkflowUsingMergedBams extends Workflow {
         List<ExecutionContextError> errors = []
         boolean controlWasFound = true
         if (initialBamFiles[0].sample.type != CONTROL) {
-            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control BAM file is missing and workflow is not set to accept tumor only." +
-                    "\n\t- Set the cvalue isNoControlWorkflow=true in your configuration to allow this." +
-                    "\n\t- Please note, that the workflow needs to support this option."
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.
+                    expand('Control BAM file is missing and workflow is not set to accept tumor only.' +
+                    '\n\t- Set the cvalue isNoControlWorkflow=true in your configuration to allow this.' +
+                    '\n\t- Please note, that the workflow needs to support this option.'
             )
             controlWasFound = false
         }
 
         if (controlWasFound && initialBamFiles.size() == 1)
-            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("No tumor BAM file found.")
-        else if (!initialBamFiles[(controlWasFound ? 1 : 0)..-1].every { it.sample.sampleType == TUMOR }) {
-            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of BAM files must contain one control BAM file and one or more tumor BAM files. Some of these files are neither of sample type control nor tumor.")
-        }
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.
+                    expand('No tumor BAM file found.')
+        else if (!initialBamFiles[(controlWasFound ? 1 : 0)..-1].every { it.sample.sampleType == TUMOR })
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.
+                    expand('The list of BAM files must contain one control BAM file and one or more tumor BAM files. Some of these files are neither of sample type control nor tumor.')
+
         errors.each { context.addError(it) }
         return !errors
     }
@@ -253,15 +257,13 @@ abstract class WorkflowUsingMergedBams extends Workflow {
     @Override
     boolean execute(ExecutionContext context) {
         BasicBamFile[] initialBamFiles = loadInitialBamFilesForDataset(context)
-        if (!checkInitialFiles(initialBamFiles))
-            return false
 
         // Just put them to the context config, so they are available in every case.
         context.configurationValues.put(IS_CONTROL_WORKFLOW, isControlWorkflow().toString())
         context.configurationValues.put(IS_NO_CONTROL_WORKFLOW, isNoControlWorkflow().toString())
 
         //TODO Low priority. There were thoughts to have workflows which support multi-tumor samples, this it not supported by any workflow now.
-        if (context.getConfiguration().getConfigurationValues().getBoolean(WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES, false)) {
+        if (context.configurationValues.getBoolean(WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES, false)) {
             return executeMulti(initialBamFiles)
         }
 

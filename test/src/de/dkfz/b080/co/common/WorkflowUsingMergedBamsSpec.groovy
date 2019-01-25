@@ -120,7 +120,7 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
 
         then:
         result == false
-        context.getErrors().size() == errorCount
+        context.errors.size() == errorCount
 
         where:
         controlFlag | tumorFlag   | initialFiles    | errorCount
@@ -139,7 +139,7 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
 
         then:
         result == false
-        context.getErrors().size() == errorCount
+        context.errors.size() == errorCount
 
         where:
         controlFlag | tumorFlag   | initialFiles                  | errorCount
@@ -148,22 +148,23 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         NOCONTROL   | SINGLETUMOR | CONTROL_BAM + TUMOR_BAM_ARRAY | 1
     }
 
-    void "check initial files with invalid entries for control/tumor workflows with exceptions"(boolean controlFlag, boolean tumorFlag, List<Boolean> initialFiles, Class<Throwable> expectedException) {
+    void "check initial files with invalid entries for control/tumor workflows with exceptions"(boolean controlFlag, boolean tumorFlag, List<Boolean> initialFiles, Integer errorCount) {
         when:
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
-        createMockupWorkflow(context).checkInitialFiles(_initialFiles)
+        boolean result = createMockupWorkflow(context).checkInitialFiles(_initialFiles)
 
         then:
-        thrown(expectedException)
+        !result
+        context.errors.size() == errorCount
 
         where:
-        controlFlag | tumorFlag   | initialFiles                | expectedException
-        CONTROL     | SINGLETUMOR | EMPTY_BAM                   | ConfigurationError
-        CONTROL     | SINGLETUMOR | EMPTY_BAM + TUMOR_BAM       | ConfigurationError
-        CONTROL     | SINGLETUMOR | EMPTY_BAM + TUMOR_BAM_ARRAY | ConfigurationError
-        NOCONTROL   | SINGLETUMOR | EMPTY_BAM                   | ConfigurationError
-        NOCONTROL   | SINGLETUMOR | CONTROL_BAM + EMPTY_BAM     | ConfigurationError
+        controlFlag | tumorFlag   | initialFiles                | errorCount
+        CONTROL     | SINGLETUMOR | EMPTY_BAM                   | 1
+        CONTROL     | SINGLETUMOR | EMPTY_BAM + TUMOR_BAM       | 1
+        CONTROL     | SINGLETUMOR | EMPTY_BAM + TUMOR_BAM_ARRAY | 1
+        NOCONTROL   | SINGLETUMOR | EMPTY_BAM                   | 1
+        NOCONTROL   | SINGLETUMOR | CONTROL_BAM + EMPTY_BAM     | 1
     }
 
 }
