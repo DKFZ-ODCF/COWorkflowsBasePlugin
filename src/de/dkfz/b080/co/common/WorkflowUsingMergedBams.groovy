@@ -222,8 +222,8 @@ abstract class WorkflowUsingMergedBams extends Workflow {
         List<ExecutionContextError> errors = []
         boolean controlWasFound = true
         if (initialBamFiles[0].sample.type != CONTROL) {
-            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.
-                    expand('Control BAM file is missing and workflow is not set to accept tumor only.' +
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA
+                    .expand('Control BAM file is missing and workflow is not set to accept tumor only.' +
                     '\n\t- Set the cvalue isNoControlWorkflow=true in your configuration to allow this.' +
                     '\n\t- Please note, that the workflow needs to support this option.'
             )
@@ -231,11 +231,11 @@ abstract class WorkflowUsingMergedBams extends Workflow {
         }
 
         if (controlWasFound && initialBamFiles.size() == 1)
-            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.
-                    expand('No tumor BAM file found.')
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA
+                    .expand('No tumor BAM file found.')
         else if (!initialBamFiles[(controlWasFound ? 1 : 0)..-1].every { it.sample.sampleType == TUMOR })
-            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.
-                    expand('The list of BAM files must contain one control BAM file and one or more tumor BAM files. Some of these files are neither of sample type control nor tumor.')
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA
+                    .expand('The list of BAM files must contain one control BAM file and one or more tumor BAM files. Some of these files are neither of sample type control nor tumor.')
 
         errors.each { context.addError(it) }
         return !errors
