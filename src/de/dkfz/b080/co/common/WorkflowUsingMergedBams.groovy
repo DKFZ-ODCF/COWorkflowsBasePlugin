@@ -19,6 +19,7 @@ import java.util.logging.Level
 import static de.dkfz.b080.co.files.COConstants.FLAG_EXTRACT_SAMPLES_FROM_OUTPUT_FILES
 import static de.dkfz.b080.co.files.Sample.SampleType.CONTROL
 import static de.dkfz.b080.co.files.Sample.SampleType.TUMOR
+import static de.dkfz.b080.co.files.Sample.SampleType.UNKNOWN
 
 /**
  * A basic workflow which uses merged bam files as an input and offers some check routines for those files.
@@ -84,6 +85,12 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      * @param context
      * @return
      */
+    @Deprecated // change this to private, protected or package scope in next major release
+    BasicBamFile[] loadInitialBamFilesForDataset() {
+        loadInitialBamFilesForDataset(context)
+    }
+
+    @Deprecated
     BasicBamFile[] loadInitialBamFilesForDataset(ExecutionContext context) {
         DataSet dataSet = context.getDataSet()
 
@@ -164,13 +171,15 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      * @param initialBamFiles
      * @return
      */
+    @Deprecated
     boolean checkInitialFiles(ExecutionContext context, BasicBamFile[] initialBamFiles) {
         if (!initialBamFiles) {
             context.addError(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Did not find any BAM files."))
             return false
         }
 
-        assertBamfileArrayValidity(initialBamFiles)
+        if (!checkBamfileArrayValidity(initialBamFiles))
+            return false
 
         if (isControlWorkflow())
             return checkBamfileArrayContentForControlWorkflows(context, initialBamFiles)
@@ -178,16 +187,25 @@ abstract class WorkflowUsingMergedBams extends Workflow {
         return checkBamfileArrayContentForTumorOnlyWorkflows(context, initialBamFiles)
     }
 
-    void assertBamfileArrayValidity(BasicBamFile[] initialBamFiles) {
-        if (initialBamFiles.any { it == null }) {
-            throw new RuntimeException(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("WorkflowUsingMergedBams.checkInitialFiles failed: The list of BAM files contains an empty entry.").getDescription())
-        }
-
-        if (initialBamFiles.any { BasicBamFile bam -> bam.fileStage == null }) {
-            throw new RuntimeException(ExecutionContextError.EXECUTION_NOINPUTDATA.expand("WorkflowUsingMergedBams.checkInitialFiles failed: The list of BAM files contains an entry with unset sample.").getDescription())
-        }
+    @Deprecated // change this to private, protected or package scope in next major release
+    boolean checkInitialFiles(BasicBamFile[] initialBamFiles) {
+        checkInitialFiles(context, initialBamFiles)
     }
 
+    @Deprecated // change this to private, protected or package scope in next major release
+    boolean checkBamfileArrayValidity(BasicBamFile[] initialBamFiles) {
+        List<ExecutionContextError> errors = []
+        if (initialBamFiles.any { it == null })
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of BAM files contains an empty entry.")
+
+        if (initialBamFiles.any { BasicBamFile bam -> bam.sample == Sample.SampleType.UNKNOWN })
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of BAM files contains an entry with unset sample.")
+
+        errors.each { context.addError(it) }
+        return !errors
+    }
+
+    @Deprecated // change this to private, protected or package scope in next major release
     boolean checkBamfileArrayContentForTumorOnlyWorkflows(ExecutionContext context, BasicBamFile[] initialBamFiles) {
         List<ExecutionContextError> errors = []
         if (initialBamFiles.size() == 0)
@@ -199,22 +217,26 @@ abstract class WorkflowUsingMergedBams extends Workflow {
         return !errors
     }
 
+    @Deprecated // change this to private, protected or package scope in next major release
     boolean checkBamfileArrayContentForControlWorkflows(ExecutionContext context, BasicBamFile[] initialBamFiles) {
         List<ExecutionContextError> errors = []
         boolean controlWasFound = true
         if (initialBamFiles[0].sample.type != CONTROL) {
-            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("Control BAM file is missing and workflow is not set to accept tumor only." +
-                    "\n\t- Set the cvalue isNoControlWorkflow=true in your configuration to allow this." +
-                    "\n\t- Please note, that the workflow needs to support this option."
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA
+                    .expand('Control BAM file is missing and workflow is not set to accept tumor only.' +
+                    '\n\t- Set the cvalue isNoControlWorkflow=true in your configuration to allow this.' +
+                    '\n\t- Please note, that the workflow needs to support this option.'
             )
             controlWasFound = false
         }
 
         if (controlWasFound && initialBamFiles.size() == 1)
-            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("No tumor BAM file found.")
-        else if (!initialBamFiles[(controlWasFound ? 1 : 0)..-1].every { it.sample.sampleType == TUMOR }) {
-            errors << ExecutionContextError.EXECUTION_NOINPUTDATA.expand("The list of BAM files must contain one control BAM file and one or more tumor BAM files. Some of these files are neither of sample type control nor tumor.")
-        }
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA
+                    .expand('No tumor BAM file found.')
+        else if (!initialBamFiles[(controlWasFound ? 1 : 0)..-1].every { it.sample.sampleType == TUMOR })
+            errors << ExecutionContextError.EXECUTION_NOINPUTDATA
+                    .expand('The list of BAM files must contain one control BAM file and one or more tumor BAM files. Some of these files are neither of sample type control nor tumor.')
+
         errors.each { context.addError(it) }
         return !errors
     }
@@ -227,18 +249,22 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      * @return
      */
     @Override
+    boolean execute() {
+        execute(context)
+    }
+
+    @Deprecated
+    @Override
     boolean execute(ExecutionContext context) {
         BasicBamFile[] initialBamFiles = loadInitialBamFilesForDataset(context)
-        if (!checkInitialFiles(context, initialBamFiles))
-            return false
 
         // Just put them to the context config, so they are available in every case.
         context.configurationValues.put(IS_CONTROL_WORKFLOW, isControlWorkflow().toString())
         context.configurationValues.put(IS_NO_CONTROL_WORKFLOW, isNoControlWorkflow().toString())
 
         //TODO Low priority. There were thoughts to have workflows which support multi-tumor samples, this it not supported by any workflow now.
-        if (context.getConfiguration().getConfigurationValues().getBoolean(WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES, false)) {
-            return executeMulti(context, initialBamFiles)
+        if (context.configurationValues.getBoolean(WORKFLOW_SUPPORTS_MULTI_TUMOR_SAMPLES, false)) {
+            return executeMulti(initialBamFiles)
         }
 
         if (isNoControlWorkflow())
@@ -255,7 +281,7 @@ abstract class WorkflowUsingMergedBams extends Workflow {
      * @param initialBamFiles
      * @return
      */
-    private boolean executeMulti(ExecutionContext context, BasicBamFile[] initialBamFiles) {
+    private boolean executeMulti(BasicBamFile[] initialBamFiles) {
 
         boolean result = true
         BasicBamFile bamControlMerged = initialBamFiles[0]
@@ -266,7 +292,20 @@ abstract class WorkflowUsingMergedBams extends Workflow {
     }
 
     @Override
-    boolean checkExecutability(ExecutionContext context) {
-        return checkInitialFiles(context, loadInitialBamFilesForDataset(context))
+    boolean checkExecutability() {
+        return checkInitialFiles(loadInitialBamFilesForDataset(context))
     }
+
+    List<BasicBamFile> getControlBamFiles() {
+        loadInitialBamFilesForDataset(context).findAll { it.sample.sampleType == CONTROL } as List
+    }
+
+    List<BasicBamFile> getTumorBamFiles() {
+        loadInitialBamFilesForDataset(context).findAll { it.sample.sampleType == TUMOR } as List
+    }
+
+    List<BasicBamFile> getUnkownBamFiles() {
+        loadInitialBamFilesForDataset(context).findAll { it.sample.sampleType == UNKNOWN } as List
+    }
+
 }

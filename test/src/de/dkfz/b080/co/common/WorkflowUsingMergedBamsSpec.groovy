@@ -9,6 +9,7 @@ import de.dkfz.b080.co.files.BasicBamFile
 import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
 import de.dkfz.roddy.RoddyTestSpec
+import de.dkfz.roddy.config.ConfigurationError
 import de.dkfz.roddy.config.ConfigurationValue
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.knowledge.files.BaseFile
@@ -85,7 +86,7 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         when:
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
-        boolean result = createMockupWorkflow(context).checkInitialFiles(context, _initialFiles)
+        boolean result = createMockupWorkflow(context).checkInitialFiles(_initialFiles)
 
         then:
         result == true
@@ -100,7 +101,7 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         when:
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
-        boolean result = createMockupWorkflow(context).checkInitialFiles(context, _initialFiles)
+        boolean result = createMockupWorkflow(context).checkInitialFiles(_initialFiles)
 
         then:
         result == true
@@ -115,11 +116,11 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         when:
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
-        boolean result = createMockupWorkflow(context).checkInitialFiles(context, _initialFiles)
+        boolean result = createMockupWorkflow(context).checkInitialFiles(_initialFiles)
 
         then:
         result == false
-        context.getErrors().size() == errorCount
+        context.errors.size() == errorCount
 
         where:
         controlFlag | tumorFlag   | initialFiles    | errorCount
@@ -134,11 +135,11 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         when:
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
-        boolean result = createMockupWorkflow(context).checkInitialFiles(context, _initialFiles)
+        boolean result = createMockupWorkflow(context).checkInitialFiles(_initialFiles)
 
         then:
         result == false
-        context.getErrors().size() == errorCount
+        context.errors.size() == errorCount
 
         where:
         controlFlag | tumorFlag   | initialFiles                  | errorCount
@@ -147,22 +148,23 @@ class WorkflowUsingMergedBamsSpec extends RoddyTestSpec {
         NOCONTROL   | SINGLETUMOR | CONTROL_BAM + TUMOR_BAM_ARRAY | 1
     }
 
-    void "check initial files with invalid entries for control/tumor workflows with exceptions"(boolean controlFlag, boolean tumorFlag, List<Boolean> initialFiles, Class<Throwable> expectedException) {
+    void "check initial files with invalid entries for control/tumor workflows with exceptions"(boolean controlFlag, boolean tumorFlag, List<Boolean> initialFiles, Integer errorCount) {
         when:
         ExecutionContext context = getContext(controlFlag, tumorFlag)
         def _initialFiles = bamArrayFromBooleanList(context, initialFiles)
-        createMockupWorkflow(context).checkInitialFiles(controlFlag, tumorFlag, _initialFiles)
+        boolean result = createMockupWorkflow(context).checkInitialFiles(_initialFiles)
 
         then:
-        thrown(expectedException)
+        !result
+        context.errors.size() == errorCount
 
         where:
-        controlFlag | tumorFlag   | initialFiles                | expectedException
-        CONTROL     | SINGLETUMOR | EMPTY_BAM                   | RuntimeException
-        CONTROL     | SINGLETUMOR | EMPTY_BAM + TUMOR_BAM       | RuntimeException
-        CONTROL     | SINGLETUMOR | EMPTY_BAM + TUMOR_BAM_ARRAY | RuntimeException
-        NOCONTROL   | SINGLETUMOR | EMPTY_BAM                   | RuntimeException
-        NOCONTROL   | SINGLETUMOR | CONTROL_BAM + EMPTY_BAM     | RuntimeException
+        controlFlag | tumorFlag   | initialFiles                | errorCount
+        CONTROL     | SINGLETUMOR | EMPTY_BAM                   | 1
+        CONTROL     | SINGLETUMOR | EMPTY_BAM + TUMOR_BAM       | 1
+        CONTROL     | SINGLETUMOR | EMPTY_BAM + TUMOR_BAM_ARRAY | 1
+        NOCONTROL   | SINGLETUMOR | EMPTY_BAM                   | 1
+        NOCONTROL   | SINGLETUMOR | CONTROL_BAM + EMPTY_BAM     | 1
     }
 
 }
