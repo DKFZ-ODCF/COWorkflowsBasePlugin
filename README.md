@@ -97,7 +97,7 @@ You can modify the search behaviour with several switches:
 
 |Switch                                   | Default | Description |
 |---|---|---|
-|matchExactSampleName                     |false    | If set, the sample will be extracted like they are set in the config. This is compatible with allowSampleTerminationWithIndex. |
+|matchExactSampleNames                    |false    | If set, the sample will be extracted like they are set in the config. This is compatible with allowSampleTerminationWithIndex. |
 |allowSampleTerminationWithIndex          |true     | Allow recognition of trailing integer numbers for sample names, e.g. tumor_02, if tumor is set. |
 |useLowerCaseFilenamesForSampleExtraction |true     | The switch will tell the method to work on lowercase filenames.|
 
@@ -112,6 +112,12 @@ If you want to use version_2 in a similar name way like version_1, you can do th
     useLowerCaseFilenameForSampleExtraction=true
 ```
 However, the method still works a lot more sophisticated than version_1.
+
+Also note, that you still need to set:
+```xml
+        <cvalue name='searchMergedBamWithSeparator' value='true' type="boolean"/>
+```
+in your project xml, if you use matchExactSampleNames! Otherwise, the extracted samples are correct, but you could still find more than one bam file when they share the same prefix (e.g. tumor was extracted but it will match for tumor_ tumor03_ during the bam search).
 
 #### "regex" (planned)
 Not implemented, but planned.
