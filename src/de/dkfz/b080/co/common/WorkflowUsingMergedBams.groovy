@@ -293,19 +293,19 @@ abstract class WorkflowUsingMergedBams extends Workflow {
 
     @Override
     boolean checkExecutability() {
-        return checkInitialFiles(loadInitialBamFilesForDataset(context))
+        return checkInitialFiles(loadInitialBamFilesForDataset())
     }
 
     List<BasicBamFile> getControlBamFiles() {
-        loadInitialBamFilesForDataset(context).findAll { it.sample.sampleType == CONTROL } as List
+        loadInitialBamFilesForDataset().findAll { it.sample.sampleType == CONTROL } as List
     }
 
     List<BasicBamFile> getTumorBamFiles() {
-        loadInitialBamFilesForDataset(context).findAll { it.sample.sampleType == TUMOR } as List
+        loadInitialBamFilesForDataset().findAll { it.sample.sampleType == TUMOR } as List
     }
 
     List<BasicBamFile> getUnkownBamFiles() {
-        loadInitialBamFilesForDataset(context).findAll { it.sample.sampleType == UNKNOWN } as List
+        loadInitialBamFilesForDataset().findAll { it.sample.sampleType == UNKNOWN } as List
     }
 
 }

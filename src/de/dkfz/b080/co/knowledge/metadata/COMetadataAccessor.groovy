@@ -227,7 +227,7 @@ class COMetadataAccessor {
         else if (coConfig.extractSamplesFromBamList)
             return extractBamFilesFromBamList(context)
         else {
-            context.addError(ExecutionContextError.EXECUTION_SETUP_INVALID.expand("Please set bamfile_list or extractSamplesFromOutputFiles."))
+            context.addError(ExecutionContextError.EXECUTION_SETUP_INVALID.expand("Please set bamfile_list or extractSamplesFromOutputFiles or use --usemetadatatable command-line option."))
             return null
         }
     }
