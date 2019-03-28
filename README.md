@@ -131,6 +131,11 @@ Not implemented, but planned.
 
 ## Changelist
 
+  * Version update to 1.4.0
+    - Update to Roddy 3.5
+    - Default to "version_1" sample name extraction
+    - API extensions on WorkflowUsingMergedBams (getTumorBamFiles etc.)
+
   * Version update to 1.3.0
     - Change tests to extend the RoddyTestSpec class in Roddy 3.4.0
     - Changed tests in WorkflowUsingMergedBamsSpec to use flags instead of getContext() method.
