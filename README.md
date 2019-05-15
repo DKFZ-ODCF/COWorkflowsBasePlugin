@@ -131,6 +131,10 @@ Not implemented, but planned.
 
 ## Changelist
 
+  * Version update to 1.4.1
+    - Added file readability checks to analyzeBamHeader.sh
+    - Added online IO checks to some Perl scripts (not all)
+
   * Version update to 1.4.0
     - Update to Roddy 3.5
     - Default to "version_1" sample name extraction
