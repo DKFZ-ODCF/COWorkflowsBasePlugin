@@ -13,10 +13,10 @@
 
 set -xvu
 
-[ $# -ne 2 ] && echo "Parameter count is wrong! You have to provide the parameters for the bwa binary and the bwa index." && exit -5
+[[ $# -ne 2 ]] && echo "Parameter count is wrong! You have to provide the parameters for the bwa binary and the bwa index." && exit -5
 
 # Currently we only use bwa 0.5 or 0.6, the test is reduced to the second part of the version number!
-bwaBinaryVersion=`$1 2>&1 | grep Version | cut -d " " -f 2 | cut -d "." -f 2`
+bwaBinaryVersion=$( $1 2>&1 | grep Version | cut -d " " -f 2 | cut -d "." -f 2 )
 # bwa 7 uses the index of bwa 6
 [[ "$bwaBinaryVersion" == 7 ]] && bwaBinaryVersion=6 && echo "bwa 7 uses the index of 6, so bwa 6 is taken to match the index version"
 

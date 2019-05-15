@@ -9,6 +9,7 @@
 use strict;
 use warnings;
 use v5.10;
+use Carp;
 
 use constant DEBUG => 0; # set to 1 and it will only print out duplicates
 
@@ -16,21 +17,27 @@ my @fields;
 my @pfields;
 my $i;
 
-$_ = <>;
-chomp;
-@pfields = split(/\t/);
+my $header = readline(STDIN)
+    || croak "Couldn't read header from standard input: $!";
+chomp $header;
+@pfields = split(/\t/, $header);
 
-while (<>) {
-  chomp;
-  @fields = split(/\t/);
-  if ($fields[0] eq $pfields[0] && $fields[1] eq $pfields[1]) { # duplicate line
-    for ($i=0; $i<@fields; $i++) { # join deviating fields from new line to corresponding field from old line
-      $pfields[$i] .= '&'.$fields[$i] if ("$fields[$i]" ne "$pfields[$i]");
+while (! eof(STDIN)) {
+    my $line = readline(STDIN);
+    if (! defined $line) {
+        croak "Couldn't read from standard input: $!";
     }
-    DEBUG && say "@pfields";
-    next;
-  }
-  DEBUG || say join "\t", @pfields;
-  @pfields = @fields;
+    chomp $line;
+    @fields = split(/\t/, $line);
+    if ($fields[0] eq $pfields[0] && $fields[1] eq $pfields[1]) {
+                                           # duplicate line
+        for ($i = 0; $i < @fields; $i++) { # join deviating fields from new line to corresponding field from old line
+            $pfields[$i] .= '&' . $fields[$i] if ("$fields[$i]" ne "$pfields[$i]");
+        }
+        DEBUG && say "@pfields";
+        next;
+    }
+    DEBUG || say join "\t", @pfields;
+    @pfields = @fields;
 }
 say join "\t", @pfields;
