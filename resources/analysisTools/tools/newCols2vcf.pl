@@ -58,11 +58,9 @@ BEGIN {
     if ($opts{aFileType} eq 'custom') {
         @aCPE = split(',', $opts{aChrPosEnd});
         die "Invalid specification of aChrPosEnd" if (@aCPE < 3);
-    }
-    elsif ($opts{aFileType} eq 'vcf') {
+    } elsif ($opts{aFileType} eq 'vcf') {
         @aCPE = (0, 1, 'NA');
-    }
-    else {
+    } else {
         die "Invalid a-file type";
     }
 
@@ -110,20 +108,17 @@ while ($l2 = <NC>) {
         if (AFILETYPE() eq 'vcf') {
             if ($f1_hash{INFO} =~ /END=(\d+)/) {
                 $end = $1;
-            }
-            else {
+            } else {
                 $end = $f1_hash{POS} + length($f1_hash{REF}) - 1;
             }
-        }
-        else {
+        } else {
             $end = $f1_hash{$columns[AENDCOL()]};
         }
         if (CHRPREFIX() . $f2_fields[BCHRCOL()] . CHRSUFFIX() eq $f1_hash{@columns[ACHRCOL()]} && $f2_fields[BPOSCOL()] == $f1_hash{@columns[APOSCOL()]} && $f2_fields[BENDCOL()] + ENDADD() == $end) {
             @f1_hash{@newcols} = @f2_fields[@repCols];
             say join "\t", @f1_hash{@columns};
             next NC_LOOP;
-        }
-        else {
+        } else {
             @f1_hash{@newcols} = ('.') x @newcols;
             say join "\t", @f1_hash{@columns};
             # warn "No new column line found for vcf line $l1";

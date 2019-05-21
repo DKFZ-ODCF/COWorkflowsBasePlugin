@@ -162,8 +162,7 @@ while (<$bamfh>) {
             delete($readHash->{$fields->[0]});
             $hs--;
             next;
-        }
-        else {
+        } else {
             $matenr = (!$flags->{PAIRED}) ? 1 : ($flags->{FIRST_MATE}) ? 1 : 2;
             $matenr2 = (!$flags2->{PAIRED}) ? 1 : ($flags2->{FIRST_MATE}) ? 1 : 2;
             ($matenr != $matenr2) || die "Mate number clash in input line $.";
@@ -207,8 +206,7 @@ while (<$bamfh>) {
                 delete($readHash->{$fields->[0]});
                 $hs--;
                 next;
-            }
-            elsif (MINREADLENGTH() > 0 && $seqlength2 < MINREADLENGTH() && $seqlength >= MINREADLENGTH()) {
+            } elsif (MINREADLENGTH() > 0 && $seqlength2 < MINREADLENGTH() && $seqlength >= MINREADLENGTH()) {
                 if (FASTQ) {
                     printf {$fq{u}} "\@%s/%s\n%s\n+\n%s\n", $fields->[0], $matenr, $fields->[9], $fields->[10];
                 }
@@ -219,15 +217,13 @@ while (<$bamfh>) {
                 COUNT && $count{single_read_deleted}++;
                 $hs--;
                 next;
-            }
-            elsif (MINREADLENGTH() > 0 && $seqlength < MINREADLENGTH() && $seqlength2 < MINREADLENGTH()) {
+            } elsif (MINREADLENGTH() > 0 && $seqlength < MINREADLENGTH() && $seqlength2 < MINREADLENGTH()) {
                 #both sequences too short, only delete read ID in readHash, no output
                 delete($readHash->{$fields->[0]});
                 COUNT && $count{read_pair_deleted}++;
                 $hs--;
                 next;
-            }
-            else {
+            } else {
                 #both sequences still long enough
 
 
@@ -253,8 +249,7 @@ while (<$bamfh>) {
         $selected = check_selection($fields, $flags, $noiseHash);
         if (!$selected) {
             next;
-        }
-        else {
+        } else {
             $matenr = 1;
             # write out unpaired
             if (FASTQ) {
@@ -390,8 +385,7 @@ sub check_selection {
             COUNT && $count{noise_overlap}++;
             return 1;
         }
-    }
-    else {
+    } else {
         # the alignment falls into at least two bins; test each bin separately
         DEBUG && say '$a[0] != $a[2]';
         #the leftmost bin: we have an overlap if t1 <= n2
@@ -452,8 +446,7 @@ sub initialize_noiseHash {
         $noisehash{$chr}{$a[0]}{'start'} = $a[1];
         if ($a[0] == $a[2]) { #start and end position fall into same bin
             $noisehash{$chr}{$a[0]}{'end'} = $a[3];
-        }
-        else {
+        } else {
             $noisehash{$chr}{$a[0]}{'end'} = 99;
             for ($i = 1; $i < ($a[2] - $a[0]); $i++) {
                 $noisehash{$chr}{$a[0] + $i}{'start'} = 0;
@@ -487,8 +480,7 @@ sub trim_bwa {
         if ($area < $maxArea) {
             $pos--;
             next;
-        }
-        else {
+        } else {
             $maxArea = $area;
             $maxPos = $pos;
             $pos--;

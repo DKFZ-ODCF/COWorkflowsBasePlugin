@@ -21,8 +21,7 @@ while (<>) {
         {
             print "phred\n";
             last;
-        }
-        elsif (/[\x5e-\x7e]/) # ASCII 94 - 126 can only be illumina
+        } elsif (/[\x5e-\x7e]/) # ASCII 94 - 126 can only be illumina
         {
             print "illumina\n";
             last;

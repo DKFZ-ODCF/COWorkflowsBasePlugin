@@ -62,8 +62,7 @@ foreach my $lane (@lanes) {
         $laneID = join('_', @pair[0 .. $#pair + $index]);
         if (defined($lanes{$pair})) {
             push(@lanepairs, "$lane:$pair:$laneID");
-        }
-        else {
+        } else {
             warn "Unpaired lane detected: $lane";
         }
     }

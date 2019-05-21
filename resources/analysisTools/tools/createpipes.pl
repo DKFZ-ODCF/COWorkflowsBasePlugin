@@ -55,11 +55,9 @@ while (<FL>) {
     # bed, vcf, or gff3, but some are called "gvf" and are gff3
     if ($type =~ /bed/) {
         $type = "bed";
-    }
-    elsif ($type =~ /vcf/) {
+    } elsif ($type =~ /vcf/) {
         $type = "vcf";
-    }
-    else {
+    } else {
         $type = "gff3";
     }
     $commandlist .= "$stem -b $file --bFileType=$type --columnName=$column --tabix_bin=$tabix_bin ";

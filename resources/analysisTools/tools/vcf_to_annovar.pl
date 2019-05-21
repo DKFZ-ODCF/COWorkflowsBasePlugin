@@ -47,8 +47,7 @@ while (<>) {
             $fields[3] = substr($fields[3], 1); # remove first base from ref
             $alt = substr($alt, 1);             # remove first base from alt
             $fields[1] += 1;                    # adjust pos coordinate
-        }
-        else {
+        } else {
             #      warn "Found indel where 1st ref base does not equal 1st alt base:\n$_";
         }
     }

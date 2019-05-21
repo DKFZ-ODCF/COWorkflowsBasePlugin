@@ -79,8 +79,7 @@ foreach (@columns) {
 if ($newcolidx == @columns) {
     say '#', $header, "\t", "$newcol";
     push @columns, $newcol;
-}
-else {
+} else {
     say '#', $header;
 }
 
@@ -105,8 +104,7 @@ while ($t_line = <T>) {
         $chr = $t_fields{CHROM};
         $mp_fh = open_mpileup($chr, $regionFile);
         %mpileups = ();
-    }
-    else {
+    } else {
         $t_chr_changed = 0;
     }
     $t_left = $t_fields{POS};
@@ -219,8 +217,7 @@ while ($t_line = <T>) {
 
             $stats{indel_cnt}++;
             push(@{$stats{indel}}, join(',', @{$mpileups{$mp_linenr}{i16}}[0 .. 3], $i_start, $i_end));
-        }
-        else {
+        } else {
             $stats{mm_cnt}++;
             push(@{$stats{mm}}, join(',', @{$mpileups{$mp_linenr}{i16}}[0 .. 3], $mpileups{$mp_linenr}{pos}));
         }
