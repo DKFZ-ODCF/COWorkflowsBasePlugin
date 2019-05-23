@@ -18,11 +18,14 @@ Inside this, you will need to create the alignment subfolder:
 ```bash
 /tmp/[dataset_id]/alignment
 ```
-And inside this, you will need to place or link your merged bams, e.g.:
+And inside this, you may have to to place or link your merged bams (dependent on the workflow), e.g.:
 ```bash
 /tmp/[dataset_id]/alignment/[sample_id]_[dataset_id]_merged.rmdup.bam
 /tmp/[dataset_id]/alignment/[sample_id]_[dataset_id]_merged.rmdup.bam.bai
 ```
+
+It should be possible to just link the files in there.
+
 So whenever we speak of the alignment folder, it is basically the described structure.
 You can change the alignment folder by overriding in your xml:
 ```xml
