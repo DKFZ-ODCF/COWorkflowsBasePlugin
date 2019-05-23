@@ -54,28 +54,27 @@ Valid values with their control variables are:
 
 #### "version_1"
 
-This one is very simple and just splits the filename. Afterwards, it takes the first splitted value
+This one is very (too) simple and just splits the filename on underscores '_'. Afterwards, it takes the first splitted value
 and uses it as the sample name. Further control is possible with:
 
 |Switch                                   | Default | Description |
 |-----------------------------------------|---------|-------------|
 |enforceAtomicSampleName|false|Defines whether the method shall append '_' to the search pattern. The method searches then e.g. for 'control_' or 'tumor_something_'|
 
-Please take a close look at the file SampleFromFilenameExtractorVersionOneTest (to be found [here](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionOneTest.groovy)) to 
-see a table of filenames and expected samples. 
+Please take a close look at the file [`SampleFromFilenameExtractorVersionOneTest`](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionOneTest.groovy) to see a table of filenames and expected samples. 
 
-Note that, in difference to version_2, this method does not take the configured samples in possibleControlSampleNamePrefixes 
-and possibleTumorSampleNamePrefixes into account and will return any file prefix separated by "_". 
+Note that, in contrast to version_2, this method does not take the configured samples in `possibleControlSampleNamePrefixes` 
+and `possibleTumorSampleNamePrefixes` into account and will return any file prefix separated by "_". So **you should not have underscores in your sample names**. 
 
 #### "version_2"
 
 The method is quite complex and can detect a variety of samples. The basic settings will use the samples set in 
-possibleControlSampleNamePrefixes and possibleTumorSampleNamePrefixes as prefixes for the sample search. E.g. 
+`possibleControlSampleNamePrefixes` and `possibleTumorSampleNamePrefixes` as prefixes for the sample search. E.g. 
 "con" will extract "control" from "control_some_merged.bam" and "control02" from "control02_some_merged.bam". Like in 
-version_1, "_" is used as a delimiter for the extraction. Note that, in hindsight to version_1, samples may contain "_"
+version_1, "_" is used as a delimiter for the extraction. Note that, in contrast to version_1, samples may contain "_"
 delimiters in their name! A sample prefix like "control_sample" will work.
 
-Before the sample is extracted, both possible... lists are joined and sorted in a reverse order. Let's say you have:
+Before the sample is extracted, both `possible...` lists are joined and sorted in a reverse order. Let's say you have:
 
 ```bash
     possibleControlSampleNamePrefixes=( control control02 control_sample )
@@ -93,36 +92,35 @@ you will get the following list for the extraction:
     control
 ```
 
-We do this to search for the most specific sample prefix first, otherwise in the case above, control would supercede the
-more specific control_sample or control02.
+We do this to search for the most specific sample prefix first, otherwise in the case above, control would be preferred over the more specific control_sample or control02.
 
 You can modify the search behaviour with several switches:
 
 |Switch                                   | Default | Description |
 |---|---|---|
 |matchExactSampleNames                    |false    | If set, the sample will be extracted like they are set in the config. This is compatible with allowSampleTerminationWithIndex. |
-|allowSampleTerminationWithIndex          |true     | Allow recognition of trailing integer numbers for sample names, e.g. tumor_02, if tumor is set. |
-|useLowerCaseFilenamesForSampleExtraction |true     | The switch will tell the method to work on lowercase filenames.|
+|allowSampleTerminationWithIndex          |true     | Allow recognition of trailing integer numbers (or "index") for sample names, e.g. tumor_02, if tumor is set. |
+|useLowerCaseFilenamesForSampleExtraction |true     | The switch will tell the method to work on lowercase filenames. Filenames are first converted to lower case before matching.|
 
-Please take a close look at the file SampleFromFilenameExtractorVersionTwoTest (to be found [here](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionTwoTest.groovy)). There is 
-a large test case *"Version_2: Extract sample name from BAM basename"*, which features a table with input, switches and
-expected output.
+Please take a close look at the file [`SampleFromFilenameExtractorVersionTwoTest`](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionTwoTest.groovy). There is a large test case *"Version_2: Extract sample name from BAM basename"*, which features a table with inputs, switches and expected output.
 
-If you want to use version_2 in a similar name way like version_1, you can do that by setting
+If you want to emulate with version_2 a similar strategy like version_1 implements, you can do that by setting
 ```bash
     matchExactSampleName=false
     allowSampleTerminationWithIndex=true
     useLowerCaseFilenameForSampleExtraction=true
 ```
+
 However, the method still works a lot more sophisticated than version_1.
 
 Also note, that you still need to set:
 ```xml
         <cvalue name='searchMergedBamWithSeparator' value='true' type="boolean"/>
 ```
-in your project xml, if you use matchExactSampleNames! Otherwise, the extracted samples are correct, but you could still find more than one bam file when they share the same prefix (e.g. tumor was extracted but it will match for tumor_ tumor03_ during the bam search).
+in your project xml, if you use `matchExactSampleNames`! Otherwise, the extracted samples are correct, but you could still find more than one bam file when they share the same prefix (e.g. tumor was extracted but it will match for `tumor_`, `tumor03_` during the bam search).
 
 #### "regex" (planned)
+
 Not implemented, but planned.
 
 ### For sample extraction from the alignment directory
