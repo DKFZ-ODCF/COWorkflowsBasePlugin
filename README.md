@@ -69,7 +69,7 @@ and possibleTumorSampleNamePrefixes into account and will return any file prefix
 The method is quite complex and can detect a variety of samples. The basic settings will use the samples set in 
 possibleControlSampleNamePrefixes and possibleTumorSampleNamePrefixes as prefixes for the sample search. E.g. 
 "con" will extract "control" from "control_some_merged.bam" and "control02" from "control02_some_merged.bam". Like in 
-version_1, "_" is used as a delimiter for the extraction. Note that, in hindsight to version_1, samples may contain "_"
+version_1, "\_" is used as a delimiter for the extraction. Note that, in hindsight to version_1, samples may contain "\_"
 delimiters in their name! A sample prefix like "control_sample" will work.
 
 Before the sample is extracted, both possible... lists are joined and sorted in a reverse order. Let's say you have:
