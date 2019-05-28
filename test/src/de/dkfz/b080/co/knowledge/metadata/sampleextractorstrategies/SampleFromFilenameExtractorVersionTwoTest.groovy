@@ -44,6 +44,8 @@ class SampleFromFilenameExtractorVersionTwoTest extends RoddyTestSpec {
         "Control_02_TEST012b_mdup.bam"    | ["control"]                       | []                              | true                  | true                            | true                                     | "control_02"
         "CONTROL_02_TEST013b_mdup.bam"    | ["control"]                       | []                              | true                  | true                            | true                                     | "control_02"
         "control_02_TEST011c_mdup.bam"    | ["control_02"]                    | ["tumor"]                       | true                  | true                            | false                                    | "control_02"
+        "Control_02_TEST011d_mdup.bam"    | ["control_02"]                    | ["tumor"]                       | true                  | true                            | false                                    | null
+        "control_02_TEST011d_mdup.bam"    | ["Control_02"]                    | ["tumor"]                       | true                  | false                           | false                                    | null
         "Control_02_TEST012c_mdup.bam"    | ["Control_02"]                    | []                              | true                  | true                            | false                                    | "Control_02"
         "CONTROL_02_TEST013c_mdup.bam"    | ["CONTROL_02"]                    | []                              | true                  | true                            | false                                    | "CONTROL_02"
 

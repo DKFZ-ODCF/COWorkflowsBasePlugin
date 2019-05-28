@@ -98,28 +98,41 @@ You can modify the search behaviour with several switches:
 |Switch                                   | Default | Description |
 |---|---|---|
 |matchExactSampleNames                    |false    | If set, the sample will be extracted like they are set in the config. This is compatible with allowSampleTerminationWithIndex. |
-|allowSampleTerminationWithIndex          |true     | Allow recognition of trailing integer numbers for sample names, e.g. tumor_02, if tumor is set. |
+|allowSampleTerminationWithIndex          |true     | Allow recognition of trailing integer numbers for sample names, where the index may be separated by an underscore from the prefix, e.g. both "tumor02" and "tumor_02" would be matched with "possibleTumorSampleNamePrefixes:tumor". |
 |useLowerCaseFilenamesForSampleExtraction |true     | The switch will tell the method to work on lowercase filenames.|
 
-Please take a close look at the file SampleFromFilenameExtractorVersionTwoTest (to be found [here](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionTwoTest.groovy)). There is 
-a large test case *"Version_2: Extract sample name from BAM basename"*, which features a table with input, switches and
+Please take a close look at the file SampleFromFilenameExtractorVersionTwoTest (to be found [here](https://github.com/DKFZ-ODCF/COWorkflowsBasePlugin/blob/master/test/src/de/dkfz/b080/co/knowledge/metadata/sampleextractorstrategies/SampleFromFilenameExtractorVersionTwoTest.groovy)). There is a large test case *"Version_2: Extract sample name from BAM basename"*, which features a table with input, switches and
 expected output.
 
 If you want to use version_2 in a similar name way like version_1, you can do that by setting
+
 ```bash
     matchExactSampleName=false
     allowSampleTerminationWithIndex=true
     useLowerCaseFilenameForSampleExtraction=true
 ```
-However, the method still works a lot more sophisticated than version_1.
 
-Also note, that you still need to set:
+Note that these are the default settings for the version_2 algorithm.
+
+If you want just exact matching to the names in the `possible(Tumor|Control)SampleNamePrefixes` you can use
+
+```bash
+    matchExactSampleName=true
+    allowSampleTerminationWithIndex=false
+    useLowerCaseFilenameForSampleExtraction=false
+```
+
+
+Also note that there is a variable calle `searchMergedBamWithSeparator`, which defaults to "true".
+
 ```xml
         <cvalue name='searchMergedBamWithSeparator' value='true' type="boolean"/>
 ```
-in your project xml, if you use matchExactSampleNames! Otherwise, the extracted samples are correct, but you could still find more than one bam file when they share the same prefix (e.g. tumor was extracted but it will match for tumor_ tumor03_ during the bam search).
+
+It determines whether the sample-name is separated from the patient identifier with an underscore "\_". Leave this value set to "true" also with `matchExactSampleNames`, because otherwise you could still find more than one BAM file when they share the same prefix (e.g. "tumor" was extracted but it will match for "tumor_" and "tumor03_" during the BAM file search.
 
 #### "regex" (planned)
+
 Not implemented, but planned.
 
 ### For sample extraction from the alignment directory
