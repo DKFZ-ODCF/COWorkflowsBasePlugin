@@ -1,6 +1,0 @@
-name="COWorkflows plugin"
-description="A collection of computational oncology based workflows, classes, scripts and basic configurations"
-availableWorkflows=de.dkfz.b080.co.qcworkflow.QCPipeline
-#,de.dkfz.b080.co
-configurationDirectories=/resources/configurations
-toolsDirectories=/resources/analysisTools
