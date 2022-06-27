@@ -296,7 +296,11 @@ while ($a_line = <A>) {
         @b_lines = ();
         $next_b_line = {};
         close $b_fh if (ref($b_fh));
-        open $b_fh, TABIX_BIN . " $opts{bfile} ${b_chr_prefix}${chr}${b_chr_suffix} |" or die "opening b file $opts{bfile} with tabix failed";
+        if($chr=~/^HLA/){
+            open $b_fh, TABIX_BIN . " $opts{bfile} ${chr}: |" or die "opening b file $opts{bfile} with tabix failed";
+        } else {
+            open $b_fh, TABIX_BIN . " $opts{bfile} ${b_chr_prefix}${chr}${b_chr_suffix} |" or die "opening b file $opts{bfile} with tabix failed";
+        }
         warn "Tabix returned no b-features for chromosome ${b_chr_prefix}${chr}${b_chr_suffix}" if (!ref($b_fh));
         # $b_linectr = 0;
     }
