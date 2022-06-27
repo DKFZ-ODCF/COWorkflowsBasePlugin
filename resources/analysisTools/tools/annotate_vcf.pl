@@ -257,7 +257,16 @@ while ($a_line = <A>) {
     if ($a_fields{CHROMCOL()} ne $chr_raw) {
         $chr_changed = 1;
         $chr_raw = $a_fields{CHROMCOL()};
-        $chr = $chr_raw =~ s/[^\dXY]*([\dXY]+).*/$1/r;
+
+        ## Expection for contigs from alt and HLA
+        # so contig 'chr1_KI270759v1_alt' will remain as '1_KI270759v1_alt'
+        # rather as '1'
+        if($chr_raw=~/_alt$|^HLA/) {
+            $chr = $chr_raw =~ s/$b_chr_prefix//r;
+        } else {
+            $chr = $chr_raw =~ s/[^\dXY]*([\dXY]+).*/$1/r;
+        }
+
         $chr = $chrXb if (CHROMXTR() && $chr eq $chrXa);
         $chr = $chrYb if (CHROMYTR() && $chr eq $chrYa);
     } else {
