@@ -263,7 +263,12 @@ AFILE_LOOP: while ($a_line=<A>) {
   if ($a_fields{CHROMCOL()} ne $chr_raw) {
     $chr_changed = 1;
     $chr_raw = $a_fields{CHROMCOL()};
-    $chr = $chr_raw =~ s/[^\dXY]*([\dXY]+).*/$1/r;
+    # Expection for contigs from alt and HLA
+    if($chr_raw=~/alt$|^HLA/) {
+        $chr = $chr_raw =~ s/$b_chr_prefix//r;
+    } else {
+        $chr = $chr_raw =~ s/[^\dXY]*([\dXY]+).*/$1/r;
+    }    
     $chr = $chrXb if (CHROMXTR() && $chr eq $chrXa);
     $chr = $chrYb if (CHROMYTR() && $chr eq $chrYa);
   } else {
