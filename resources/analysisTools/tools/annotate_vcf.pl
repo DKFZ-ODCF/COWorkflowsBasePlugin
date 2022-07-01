@@ -258,7 +258,7 @@ while ($a_line = <A>) {
         $chr_changed = 1;
         $chr_raw = $a_fields{CHROMCOL()};
 
-        ## Expection for contigs from alt and HLA
+        ## Exception for contigs from alt and HLA
         # so contig 'chr1_KI270759v1_alt' will remain as '1_KI270759v1_alt'
         # rather as '1'
         if($chr_raw=~/_alt$|^HLA/) {
