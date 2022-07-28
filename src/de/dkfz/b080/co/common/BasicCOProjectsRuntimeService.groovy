@@ -70,11 +70,11 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
      */
     @Deprecated
     protected File fillTemplatesInPathnameString(String dir, ExecutionContext context, Sample sample, String library = null) {
-        Configuration cfg = context.getConfiguration()
-        File path = cfg.getConfigurationValues().get(dir).toFile(context)
-        String temp = path.getAbsolutePath()
-        temp = temp.replace('${dataSet}', context.getDataSet().toString())
-        temp = temp.replace('${sample}', sample.getName())
+        Configuration cfg = context.configuration
+        File path = cfg.configurationValues.get(dir).toFile(context)
+        String temp = path.absolutePath.
+                replace('${dataSet}', context.dataSet.toString()).
+                replace('${sample}', sample.name)
         if (library)
             temp = temp.replace('${library}', library)
         else

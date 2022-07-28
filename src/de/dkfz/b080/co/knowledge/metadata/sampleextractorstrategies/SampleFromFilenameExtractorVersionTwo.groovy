@@ -56,7 +56,6 @@ class SampleFromFilenameExtractorVersionTwo extends SampleFromFilenameExtractor 
 
         if (allowSampleTerminationWithIndex)
             extractedSampleName = "check for index in filename and adjust extracted sample name if necessary"(filename, extractedSampleName)
-
         return extractedSampleName
     }
 
@@ -76,24 +75,32 @@ class SampleFromFilenameExtractorVersionTwo extends SampleFromFilenameExtractor 
         return filename
     }
 
-    String prepareSearchString() {
-        matchExactSampleNames ? "_" : ""
-    }
-
+    /** Note, that this function uses matchExactSampleNames only as guideline, but if the
+     *  filename ends with an underscore or an integer, it does not match exactly, but allows
+     *  for extension of the resulting match with an underscore.
+     *
+     * @param filename
+     * @return Some kind of possibly extended sample name prefix.
+     */
     String findFirstMatchOfSampleInPossibleSamplesList(String filename) {
         possibleSamplePrefixes.find { String sampleID ->
-            String _searchString = prepareSearchString()
-            if (sampleID.endsWith("_")) {
-                logger.always("A sample name was given with an underscore at the end. We assume this is intentional and set matchExactSampleNames for '$sampleID'")
-                _searchString = ""
+            String optionalTerminalUnderscore
+            if (matchExactSampleNames) {
+                if (sampleID.endsWith("_")) {
+                    logger.always("A sample name was given with an underscore at the end. We assume this is intentional and set matchExactSampleNames for '$sampleID'")
+                    optionalTerminalUnderscore = ""
+                } else {
+                    optionalTerminalUnderscore = "_"
+                }
+            } else {
+                optionalTerminalUnderscore = ""
+                String[] sampleSplit = sampleID.split(StringConstants.SPLIT_UNDERSCORE)
+                if (sampleSplit.last().isInteger()) {
+                    logger.always("A sample name was given with an index at the end. We assume this is intentional and set allowSampleTerminationWithIndex for '$sampleID'")
+                    sampleID = sampleID[0..-2]
+                }
             }
-            String[] sampleSplit = sampleID.split(StringConstants.SPLIT_UNDERSCORE)
-            if (sampleSplit.last().isInteger() && !matchExactSampleNames) {
-                logger.always("A sample name was given with an index at the end. We assume this is intentional and set allowSampleTerminationWithIndex for '$sampleID'")
-                sampleID = sampleID[0..-2]
-            }
-
-            filename.startsWith(sampleID + _searchString)
+            filename.startsWith(sampleID + optionalTerminalUnderscore)
         }
     }
 

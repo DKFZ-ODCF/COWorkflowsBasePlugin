@@ -141,18 +141,23 @@ Not implemented, but planned.
 |extractSampleNameOnlyFromBamFiles | false   | By default, the method will search for samples in all files in the alignment directory. With this switch, you can restrict it to BAM files.            |
 
 ## Changelist
+
+  * Version update to 1.4.3
+    - patch: Better error handling when parsing metadata from filesystem. Note that older versions may fail with an exception, if there are non-parsable files in the alignment directory.
+  
   * Version update to 1.4.2
-    - Skipping the addition of 'chr' prefix for the ALT and HLA contigs in hg38
-    - Update tabix command for ALT and HLA contigs in hg38
+    - minor: ALT/HLA support
+      - Skipping the addition of 'chr' prefix for the ALT and HLA contigs in hg38
+      - Update tabix command for ALT and HLA contigs in hg38
 
   * Version update to 1.4.1
-    - Added file readability checks to analyzeBamHeader.sh
-    - Added online IO checks to some Perl scripts (not all)
+    - patch: Added file readability checks to analyzeBamHeader.sh
+    - patch: Added online IO checks to some Perl scripts (not all)
 
   * Version update to 1.4.0
-    - Update to Roddy 3.5
-    - Default to "version_1" sample name extraction
-    - API extensions on WorkflowUsingMergedBams (getTumorBamFiles etc.)
+    - minor: Update to Roddy 3.5
+    - minor: Default to "version_1" sample name extraction
+    - patch: API extensions on WorkflowUsingMergedBams (getTumorBamFiles etc.)
 
   * Version update to 1.3.0
     - Change tests to extend the RoddyTestSpec class in Roddy 3.4.0

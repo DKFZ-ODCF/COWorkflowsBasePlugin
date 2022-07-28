@@ -9,7 +9,14 @@ import de.dkfz.roddy.RoddyTestSpec
 
 class SampleFromFilenameExtractorVersionTwoTest extends RoddyTestSpec {
 
-    def "Version_2: Extract sample name from BAM basename"(String filename, List<String> possibleControlSampleNamePrefixes, List<String> possibleTumorSampleNamePrefixes, boolean matchExactSampleNames, boolean allowSampleTerminationWithIndex, boolean useLowerCaseFilenamesForSampleExtraction, String expectedSample) {
+    def "Version_2: Extract sample name from BAM basename"(
+            String filename,
+            List<String> possibleControlSampleNamePrefixes,
+            List<String> possibleTumorSampleNamePrefixes,
+            boolean matchExactSampleNames,
+            boolean allowSampleTerminationWithIndex,
+            boolean useLowerCaseFilenamesForSampleExtraction,
+            String expectedSample) {
 
         when:
         def file = new File("/tmp/", filename)
@@ -24,11 +31,12 @@ class SampleFromFilenameExtractorVersionTwoTest extends RoddyTestSpec {
         String extractedSample = extractor.extract()
 
         then:
-        // The filename has no actual meaning. It is solely for debugging
-        "$filename:$extractedSample" == "$filename:$expectedSample"
+        extractedSample == expectedSample
 
         where:
         filename                          | possibleControlSampleNamePrefixes | possibleTumorSampleNamePrefixes | matchExactSampleNames | allowSampleTerminationWithIndex | useLowerCaseFilenamesForSampleExtraction | expectedSample
+        "tumor03_V_H000-ABCDE_merged.mdup.bam" | ["control", "blood", "buffycoat", "buffy_coat", "buffy-coat"]      | ["tumor", "metastasis", "cell"] | false | true | true | "tumor03"
+        "buffy_coat_V_H000-ABCDE_merged.mdup.bam" | ["control", "blood", "buffycoat", "buffy_coat", "buffy-coat"]      | ["tumor", "metastasis", "cell"] | false | true | true | "buffy_coat"
         "control_TEST000_mdup.bam"        | ["cont"]                          | ["tumor"]                       | false                 | true                            | true                                     | "control"
         "control_TEST001_mdup.bam"        | ["cont"]                          | ["tumor"]                       | true                  | true                            | true                                     | null
         "control_TEST002_mdup.bam"        | ["control_"]                      | ["tumor"]                       | false                 | true                            | true                                     | "control"
@@ -54,8 +62,8 @@ class SampleFromFilenameExtractorVersionTwoTest extends RoddyTestSpec {
         "control_abc_02_TEST014_mdup.bam" | ["control"]                       | []                              | false                 | true                            | true                                     | "control"
         "control_abc_02_TEST015_mdup.bam" | ["control"]                       | []                              | true                  | true                            | true                                     | "control"
 
-        // Fallback. If no sample was found ( could be matched against the list ), the first part of the filename will be used. This
-        // way, we will keep the old process.
+        // Fallback. If no sample was found (could be matched against the list), the first part of the filename will be used. This
+        // way, we will keep the legacy behaviour.
         "control_abc_01_TEST016_mdup.bam" | ["control_abc_0"]                 | []                              | true                  | true                            | true                                     | null
         "control_abc_01_TEST016_mdup.bam" | ["control_abc_0"]                 | []                              | false                 | true                            | true                                     | "control_abc_01"
 

@@ -101,7 +101,15 @@ class COMetadataAccessor {
             filesInDirectory = fileSystemAccessProvider.listFilesInDirectory(alignmentDirectory).sort()
 
         return filesInDirectory.collect { File file ->
-            extractSampleNameFromBamBasename(file, context)
+            try {
+                extractSampleNameFromBamBasename(file, context)
+            } catch (IndexOutOfBoundsException ex) {
+                logger.warning("Could not parse sample from '${file}. Ignored.")
+                null
+            } catch (NullPointerException ex) {
+                logger.warning("Could not parse sample from '${file}. Ignored.")
+                null
+            }
         }.unique().findAll { it != null }.collect {
             new Sample(context, it)
         }
@@ -152,37 +160,43 @@ class COMetadataAccessor {
         String extractedFrom
         List<String> samplesPassedInConfig = cfg.getSampleList()
 
-        if (Roddy.isMetadataCLOptionSet()) {
-            samples = extractSamplesFromMetadataTable(context)
-            extractedFrom = "input table '${getMetadataTable(context)}'"
-        } else if (samplesPassedInConfig) {
-            logger.postSometimesInfo("Samples were passed as configuration value: ${samplesPassedInConfig}")
-            samples = samplesPassedInConfig.collect { String it -> new Sample(context, it) }
-            extractedFrom = "${CVALUE_SAMPLE_LIST} configuration value"
-        } else if (cfg.fastqFileListIsSet) {
-            List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f) }
-            samples = extractSamplesFromFastqList(fastqFiles, context)
-            extractedFrom = "fastq_list configuration value"
-        } else if (cfg.getExtractSamplesFromOutputFiles()) { // Groovy won't recognize property. Keep the get()
-            samples = extractSamplesFromOutputFiles(context)
-            extractedFrom = "output files"
-        } else if (cfg.extractSamplesFromBamList) {
-            List<File> bamFiles = cfg.getBamList().collect { String f -> new File(f) }
-            samples = extractSamplesFromFilenames(bamFiles, context)
-            extractedFrom = "${CVALUE_BAMFILE_LIST} configuration value "
-        } else {
-            samples = extractSamplesFromSampleDirs(context)
-            extractedFrom = "subdirectories of input directory '${context.inputDirectory}'"
-        }
+        try {
+            if (Roddy.isMetadataCLOptionSet()) {
+                samples = extractSamplesFromMetadataTable(context)
+                extractedFrom = "input table '${getMetadataTable(context)}'"
+            } else if (samplesPassedInConfig) {
+                logger.postSometimesInfo("Samples were passed as configuration value: ${samplesPassedInConfig}")
+                samples = samplesPassedInConfig.collect { String it -> new Sample(context, it) }
+                extractedFrom = "${CVALUE_SAMPLE_LIST} configuration value"
+            } else if (cfg.fastqFileListIsSet) {
+                List<File> fastqFiles = cfg.getFastqList().collect { String f -> new File(f) }
+                samples = extractSamplesFromFastqList(fastqFiles, context)
+                extractedFrom = "fastq_list configuration value"
+            } else if (cfg.getExtractSamplesFromOutputFiles()) { // Groovy won't recognize property. Keep the get()
+                samples = extractSamplesFromOutputFiles(context)
+                extractedFrom = "output files"
+            } else if (cfg.extractSamplesFromBamList) {
+                List<File> bamFiles = cfg.getBamList().collect { String f -> new File(f) }
+                samples = extractSamplesFromFilenames(bamFiles, context)
+                extractedFrom = "${CVALUE_BAMFILE_LIST} configuration value "
+            } else {
+                samples = extractSamplesFromSampleDirs(context)
+                extractedFrom = "subdirectories of input directory '${context.inputDirectory}'"
+            }
 
-        // Remove unknown samples
-        samples.removeAll { Sample sample ->
-            sample.sampleType == Sample.SampleType.UNKNOWN
-        }
-        // Sort an remove duplicates
-        samples = samples.sort().unique()
-        if (!samples) {
-            logger.warning("No valid samples could be extracted from ${extractedFrom} for dataset ${context.getDataSet().getId()}.")
+            // Remove unknown samples
+            samples.removeAll { Sample sample ->
+                sample.sampleType == Sample.SampleType.UNKNOWN
+            }
+            // Sort an remove duplicates
+            samples = samples.sort().unique()
+            if (!samples) {
+                logger.warning("No valid samples could be extracted from ${extractedFrom} for dataset ${context.getDataSet().getId()}.")
+            }
+        } catch (IndexOutOfBoundsException ex) {
+            throw new MetadataRetrievalException(Roddy.isMetadataCLOptionSet(), cfg, ex)
+        } catch (NullPointerException ex) {
+            throw new MetadataRetrievalException(Roddy.isMetadataCLOptionSet(), cfg, ex)
         }
         return samples
     }
