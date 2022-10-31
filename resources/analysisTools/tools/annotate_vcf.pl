@@ -298,10 +298,11 @@ while ($a_line = <A>) {
         close $b_fh if (ref($b_fh));
 
         ## Exception for the HLA contig
+        my $chr_mod;
         if ($chr=~/^HLA/) {
-            chr_mod=$chr;
+            $chr_mod=$chr;
         } else {
-            chr_mod="${b_chr_prefix}${chr}${b_chr_suffix}";
+            $chr_mod="${b_chr_prefix}${chr}${b_chr_suffix}";
         }
 
         open $b_fh, TABIX_BIN . " $opts{bfile} ${chr_mod}: |" or die "opening b file $opts{bfile} with tabix failed";
