@@ -214,3 +214,5 @@ Not implemented, but planned.
     - Changed COProjectsRuntimeService so, that a library name can be set when getting the sample or sequence directory.
     - Function added to get the read groups of a bam file from the bam header. Small fix in the SQ count
     - Add readme file.
+    
+ The original code came from the [COWorkflows](https://github.com/DKFZ-ODCF/COWorkflows) plugin.
