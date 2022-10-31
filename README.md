@@ -141,6 +141,9 @@ Not implemented, but planned.
 |extractSampleNameOnlyFromBamFiles | false   | By default, the method will search for samples in all files in the alignment directory. With this switch, you can restrict it to BAM files.            |
 
 ## Changelist
+  * Version update to 1.4.2
+    - Skipping the addition of 'chr' prefix for the ALT and HLA contigs in hg38
+    - Update tabix command for ALT and HLA contigs in hg38
 
   * Version update to 1.4.1
     - Added file readability checks to analyzeBamHeader.sh
