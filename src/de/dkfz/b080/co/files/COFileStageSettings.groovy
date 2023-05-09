@@ -15,9 +15,9 @@ import de.dkfz.roddy.knowledge.files.FileStageSettings
 import groovy.transform.CompileStatic;
 
 @CompileStatic
-public class COFileStageSettings extends FileStageSettings<COFileStageSettings> {
+class COFileStageSettings extends FileStageSettings<COFileStageSettings> {
 
-    final LaneID laneId;
+    final LaneID laneID;
     final IndexID index;
     final int numericIndex;
     final RunID runID;
@@ -25,8 +25,8 @@ public class COFileStageSettings extends FileStageSettings<COFileStageSettings> 
     final LibraryID libraryID;
 
     // Convenience constructor
-    public COFileStageSettings(String laneId, String index, int numericIndex, String runID, String libraryID, Sample sample, DataSet dataSet, FileStage stage) {
-        this(laneId == null ? (LaneID) null : new LaneID(laneId),
+    COFileStageSettings(String laneID, String index, int numericIndex, String runID, String libraryID, Sample sample, DataSet dataSet, FileStage stage) {
+        this(laneID == null ? (LaneID) null : new LaneID(laneID),
                 index == null ? (IndexID) null : new IndexID(index),
                 numericIndex,
                 runID == null ? (RunID) null : new RunID(runID),
@@ -36,9 +36,9 @@ public class COFileStageSettings extends FileStageSettings<COFileStageSettings> 
                 stage)
     }
 
-    public COFileStageSettings(LaneID laneId, IndexID index, int numericIndex, RunID runID, LibraryID libraryID, Sample sample, DataSet dataSet, FileStage stage) {
+    COFileStageSettings(LaneID laneID, IndexID index, int numericIndex, RunID runID, LibraryID libraryID, Sample sample, DataSet dataSet, FileStage stage) {
         super(dataSet, stage)
-        this.laneId = laneId
+        this.laneID = laneID
         this.index = index
         this.numericIndex = numericIndex
         this.runID = runID
@@ -46,35 +46,35 @@ public class COFileStageSettings extends FileStageSettings<COFileStageSettings> 
         this.sample = sample
     }
 
-    public COFileStageSettings(LaneID laneId, RunID runID, LibraryID libraryID, Sample sample, DataSet dataSet) {
-        this(laneId, null, -1, runID, libraryID, sample, dataSet, COFileStage.LANE);
+    COFileStageSettings(LaneID laneID, RunID runID, LibraryID libraryID, Sample sample, DataSet dataSet) {
+        this(laneID, null, -1, runID, libraryID, sample, dataSet, COFileStage.LANE);
     }
 
-    public COFileStageSettings(RunID runID, LibraryID libraryID, Sample sample, DataSet dataSet) {
+    COFileStageSettings(RunID runID, LibraryID libraryID, Sample sample, DataSet dataSet) {
         this(null, null, -1, runID, libraryID, sample, dataSet, COFileStage.LANE);
     }
 
-    public COFileStageSettings(LibraryID libraryID, Sample sample, DataSet dataSet) {
+    COFileStageSettings(LibraryID libraryID, Sample sample, DataSet dataSet) {
         this(null, null, -1, null, libraryID, sample, dataSet, COFileStage.LIBRARY);
     }
 
-    public COFileStageSettings(Sample sample, DataSet dataSet) {
+    COFileStageSettings(Sample sample, DataSet dataSet) {
         this(null, null, -1, null, (LibraryID) null, sample, dataSet, COFileStage.SAMPLE);
     }
 
-    public COFileStageSettings(DataSet dataSet) {
+    COFileStageSettings(DataSet dataSet) {
         this(null, null, -1, null, (LibraryID) null, null, dataSet, COFileStage.PID);
     }
 
     @Override
-    public COFileStageSettings copy() {
-        return new COFileStageSettings(laneId, index, numericIndex, runID, libraryID, sample, dataSet, stage);
+    COFileStageSettings copy() {
+        return new COFileStageSettings(laneID, index, numericIndex, runID, libraryID, sample, dataSet, stage);
     }
 
     @Override
-    public COFileStageSettings decreaseLevel() {
+    COFileStageSettings decreaseLevel() {
         if (stage == COFileStage.INDEXEDLANE)
-            return new COFileStageSettings(laneId, runID, libraryID, sample, dataSet);
+            return new COFileStageSettings(laneID, runID, libraryID, sample, dataSet);
         if (stage == COFileStage.LANE)
             return new COFileStageSettings(runID, libraryID, sample, dataSet);
         if (stage == COFileStage.RUN)
@@ -89,37 +89,43 @@ public class COFileStageSettings extends FileStageSettings<COFileStageSettings> 
     }
 
     @Override
-    public String getIDString() {
+    String getIDString() {
         if (stage == COFileStage.INDEXEDLANE)
-            return String.format("%s_%s_%s_%s_%s_%s", dataSet, sample.getName(), libraryID, runID, laneId, index);
+            return String.format("%s_%s_%s_%s_%s_%s",
+                    dataSet.id, sample.name, libraryID.toString(), runID.toString(), laneID.toString(), index);
         if (stage == COFileStage.LANE)
-            return String.format("%s_%s_%s_%s_%s", dataSet, sample.getName(), libraryID, runID, laneId);
+            return String.format("%s_%s_%s_%s_%s",
+                    dataSet.id, sample.name, libraryID.toString(), runID.toString(), laneID.toString());
         if (stage == COFileStage.RUN)
-            return String.format("%s_%s_%s_%s", dataSet, sample.getName(), libraryID, runID);
+            return String.format("%s_%s_%s_%s",
+                    dataSet.id, sample.name, libraryID.toString(), runID.toString());
         if (stage == COFileStage.LIBRARY)
-            return String.format("%s_%s_%s", dataSet, sample.getName(), libraryID);
+            return String.format("%s_%s_%s",
+                    dataSet.id, sample.name, libraryID.toString());
         if (stage == COFileStage.SAMPLE)
-            return String.format("%s_%s", dataSet, sample.getName(), dataSet);
-        return String.format("%s", dataSet);
+            return String.format("%s_%s",
+                    dataSet.id, sample.name);
+        return String.format("%s",
+                dataSet.id);
     }
 
     @Override
-    public String fillStringContent(String temp) {
-        if (sample != null) temp = temp.replace("\${sample}", getSample().getName().toString());
-        if (libraryID != null) temp = temp.replace("\${library}", getLibraryID().toString());
-        if (runID != null) temp = temp.replace("\${run}", getRunID().toString());
-        if (laneId != null) temp = temp.replace("\${lane}", getLaneId().toString());
-        if (index != null) temp = temp.replace("\${laneindex}", getIndex().toString());
+    String fillStringContent(String temp) {
+        if (sample != null) temp = temp.replace("\${sample}", sample.name.toString());
+        if (libraryID != null) temp = temp.replace("\${library}", libraryID.toString());
+        if (runID != null) temp = temp.replace("\${run}", runID.toString());
+        if (laneID != null) temp = temp.replace("\${lane}", laneID.toString());
+        if (index != null) temp = temp.replace("\${laneindex}", index.toString());
         return temp;
     }
 
     @Override
-    public String fillStringContentWithArrayValues(int index, String temp) {
-        if (sample != null) temp = temp.replace("\${sample[${index}]}", getSample().getName())
-        if (libraryID != null) temp = temp.replace("\${library[${index}]}", getLibraryID().toString())
-        if (runID != null) temp = temp.replace("\${run[${index}]}", getRunID().toString())
-        if (laneId != null) temp = temp.replace("\${lane[${index}]}", getLaneId().toString())
-        if (this.index != null) temp = temp.replace("\${laneindex[${index}]}", getIndex().toString())
+    String fillStringContentWithArrayValues(int index, String temp) {
+        if (sample != null) temp = temp.replace("\${sample[${index}]}", sample.name)
+        if (libraryID != null) temp = temp.replace("\${library[${index}]}", libraryID.toString())
+        if (runID != null) temp = temp.replace("\${run[${index}]}", runID.toString())
+        if (laneID != null) temp = temp.replace("\${lane[${index}]}", laneID.toString())
+        if (this.index != null) temp = temp.replace("\${laneindex[${index}]}", index.toString())
         return temp;
     }
 }

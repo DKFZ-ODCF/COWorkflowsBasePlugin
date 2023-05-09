@@ -182,7 +182,7 @@ Not implemented, but planned.
     - Roddy 3.1 has changed unit test framework classes. COWFBP unit tests require Roddy 3.1.
     - contributors
     - changed internal column names for metadata table
-    - refactoring: moved a lot of code to new MetadataAccessor class (will be facade for more elaborate metadata backend), no effect on client code (that we know of) is expected)
+    - refactoring: moved a lot of code to new MetadataAccessor class (will be facade for more elaborate metadata backend), no effect on client code (that we know of) is expected.
   * Version update to 1.0.3
     - bugfixes
     - improved error detection and reporting
