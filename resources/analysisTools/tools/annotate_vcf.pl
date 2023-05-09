@@ -258,12 +258,14 @@ while ($a_line = <A>) {
         $chr_changed = 1;
         $chr_raw = $a_fields{CHROMCOL()};
 
-        ## Exception for contigs from alt and HLA
-        # so contig 'chr1_KI270759v1_alt' will remain as '1_KI270759v1_alt'
-        # rather as '1'
-        if($chr_raw=~/_alt$|^HLA/) {
+        ## Exception for ALT and HLA contigs
+        # so contig 'chr1_KI270759v1_alt' will remain as '1_KI270759v1_alt' rather as '1'
+        # so contig 'HLA-DRB1*01:01:01:01' will remain as 'HLA-DRB1*01:01:01:01' rather as '-DRB1*01:01:01:01'
+        if($chr_raw=~/_alt$/) {
             $chr = $chr_raw =~ s/$b_chr_prefix//r;
-        } else {
+        } elsif($chr_raw=~/^HLA/) {
+            $chr = $chr_raw;
+        }else {
             $chr = $chr_raw =~ s/[^\dXY]*([\dXY]+).*/$1/r;
         }
 
