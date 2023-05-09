@@ -121,7 +121,7 @@ If you want just exact matching to the names in the `possible(Tumor|Control)Samp
 ```
 
 
-Also note that there is a variable calle `searchMergedBamWithSeparator`, which defaults to "true".
+Also note that there is a variable called `searchMergedBamWithSeparator`, which defaults to "true".
 
 ```xml
         <cvalue name='searchMergedBamWithSeparator' value='true' type="boolean"/>
@@ -144,6 +144,9 @@ Not implemented, but planned.
 
   * Version update to 1.4.3
     - patch: Better error handling when parsing metadata from filesystem. Note that older versions may fail with an exception, if there are non-parsable files in the alignment directory.
+    - patch: Bugfix `COFileStageSettings.laneId` to `laneID` following the pattern of the other "ID" methods. Added deprecated backwards compatibility accessor.
+    - patch: Added `COConfig.getAlignmentInputFolderName()` and `BasicCOProjectsRuntimeService.getAlignmentInputDirectory(Context, Sample)` to replace call to deprecated method `BAsicCOProjectRuntimeService.fillTemplatesInPathnameString`
+    - patch: Fixed some type errors that occur with newer Groovy versions (2.5+)
   
   * Version update to 1.4.2
     - minor: ALT/HLA support
@@ -219,5 +222,5 @@ Not implemented, but planned.
     - Changed COProjectsRuntimeService so, that a library name can be set when getting the sample or sequence directory.
     - Function added to get the read groups of a bam file from the bam header. Small fix in the SQ count
     - Add readme file.
-    
- The original code came from the [COWorkflows](https://github.com/DKFZ-ODCF/COWorkflows) plugin.
+
+The original code came from the [COWorkflows](https://github.com/DKFZ-ODCF/COWorkflows) plugin.

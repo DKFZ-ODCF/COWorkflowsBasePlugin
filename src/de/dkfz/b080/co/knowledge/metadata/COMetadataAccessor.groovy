@@ -304,7 +304,7 @@ class COMetadataAccessor {
 
         File searchDirectory = runtimeService.getAlignmentDirectory(context);
         if (cfg.useMergedBamsFromInputDirectory)
-            searchDirectory = runtimeService.fillTemplatesInPathnameString(CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME, context, sample)
+            searchDirectory = runtimeService.getAlignmentInputDirectory(context, sample)
 
         synchronized (_alreadySearchedMergedBamFolders) {
             if (!_alreadySearchedMergedBamFolders.contains(searchDirectory)) {

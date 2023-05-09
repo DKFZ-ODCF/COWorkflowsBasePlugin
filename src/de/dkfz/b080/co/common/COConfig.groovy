@@ -80,6 +80,10 @@ class COConfig {
         return configValues.getString(CVALUE_ALIGNMENT_DIRECTORY_NAME, "alignment")
     }
 
+    String getAlignmentInputFolderName() {
+        return configValues.getString(CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME, "alignment")
+    }
+
     String[] getMergedBamSuffixList() {
         return configValues.get("mergedBamSuffixList", "merged.bam.dupmarked.bam,merged.mdup.bam,merged.bam.rmdup.bam").toString().split(StringConstants.COMMA)
     }

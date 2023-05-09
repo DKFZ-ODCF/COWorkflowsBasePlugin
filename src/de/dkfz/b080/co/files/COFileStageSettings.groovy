@@ -10,7 +10,7 @@ import de.dkfz.b080.co.common.LaneID;
 import de.dkfz.b080.co.common.LibraryID;
 import de.dkfz.b080.co.common.RunID;
 import de.dkfz.roddy.core.DataSet;
-import de.dkfz.roddy.knowledge.files.FileStage;
+import de.dkfz.roddy.knowledge.files.FileStage
 import de.dkfz.roddy.knowledge.files.FileStageSettings
 import groovy.transform.CompileStatic;
 
@@ -127,5 +127,10 @@ class COFileStageSettings extends FileStageSettings<COFileStageSettings> {
         if (laneID != null) temp = temp.replace("\${lane[${index}]}", laneID.toString())
         if (this.index != null) temp = temp.replace("\${laneindex[${index}]}", index.toString())
         return temp;
+    }
+
+    @Deprecated
+    LaneID getLaneId() {
+        return laneID
     }
 }

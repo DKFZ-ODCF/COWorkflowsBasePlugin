@@ -8,18 +8,17 @@ package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.Sample
 import de.dkfz.b080.co.knowledge.metadata.COMetadataAccessor
-import de.dkfz.roddy.Roddy
 import de.dkfz.roddy.config.Configuration
 import de.dkfz.roddy.core.ExecutionContext
 import de.dkfz.roddy.core.RuntimeService
-import de.dkfz.roddy.execution.jobs.BatchEuphoriaJobManager
-import de.dkfz.roddy.execution.jobs.JobManager
 import de.dkfz.roddy.knowledge.files.BaseFile
+import groovy.transform.CompileStatic
 
 import static COConstants.CVALUE_SAMPLE_DIRECTORY
 import static COConstants.CVALUE_SEQUENCE_DIRECTORY
+import static de.dkfz.b080.co.common.COConstants.CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME
 
-@groovy.transform.CompileStatic
+@CompileStatic
 class BasicCOProjectsRuntimeService extends RuntimeService {
 
     public COMetadataAccessor metadataAccessor
@@ -45,6 +44,10 @@ class BasicCOProjectsRuntimeService extends RuntimeService {
     File getAlignmentDirectory(ExecutionContext context) {
         COConfig cfg = new COConfig(context)
         return getDirectory(cfg.alignmentFolderName, context)
+    }
+
+    File getAlignmentInputDirectory(ExecutionContext context, Sample sample) {
+        return fillTemplatesInPathnameString(CVALUE_ALIGNMENT_INPUT_DIRECTORY_NAME, context, sample)
     }
 
     File getSampleDirectory(ExecutionContext process, Sample sample, String library = null) {

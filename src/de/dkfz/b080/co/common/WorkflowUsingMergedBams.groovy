@@ -6,6 +6,7 @@
 package de.dkfz.b080.co.common
 
 import de.dkfz.b080.co.files.BasicBamFile
+import de.dkfz.b080.co.files.COFileStageSettings
 import de.dkfz.b080.co.files.Sample
 import de.dkfz.roddy.core.DataSet
 import de.dkfz.roddy.core.ExecutionContext
@@ -147,7 +148,11 @@ abstract class WorkflowUsingMergedBams extends Workflow {
                 BasicBamFile[] copy = new BasicBamFile[bamFilesForDataset.length]
                 for (int i = 0; i < bamFilesForDataset.length; i++) {
                     if (bamFilesForDataset[i] == null) continue
-                    copy[i] = new BasicBamFile(new BaseFile.ConstructionHelperForSourceFiles(bamFilesForDataset[i].getPath(), context, bamFilesForDataset[i].getFileStage().copy(), null))
+                    copy[i] = new BasicBamFile(
+                            new BaseFile.ConstructionHelperForSourceFiles(bamFilesForDataset[i].path,
+                                    context,
+                                    (bamFilesForDataset[i].fileStage as COFileStageSettings).copy(),
+                                    null))
                     copy[i].setAsSourceFile()
                 }
                 bamFilesForDataset = copy
