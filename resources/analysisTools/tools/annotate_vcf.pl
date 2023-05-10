@@ -257,7 +257,18 @@ while ($a_line = <A>) {
     if ($a_fields{CHROMCOL()} ne $chr_raw) {
         $chr_changed = 1;
         $chr_raw = $a_fields{CHROMCOL()};
-        $chr = $chr_raw =~ s/[^\dXY]*([\dXY]+).*/$1/r;
+
+        ## Exception for ALT and HLA contigs
+        # so contig 'chr1_KI270759v1_alt' will remain as '1_KI270759v1_alt' rather as '1'
+        # so contig 'HLA-DRB1*01:01:01:01' will remain as 'HLA-DRB1*01:01:01:01' rather as '-DRB1*01:01:01:01'
+        if($chr_raw=~/_alt$/) {
+            $chr = $chr_raw =~ s/$b_chr_prefix//r;
+        } elsif($chr_raw=~/^HLA/) {
+            $chr = $chr_raw;
+        }else {
+            $chr = $chr_raw =~ s/[^\dXY]*([\dXY]+).*/$1/r;
+        }
+
         $chr = $chrXb if (CHROMXTR() && $chr eq $chrXa);
         $chr = $chrYb if (CHROMYTR() && $chr eq $chrYa);
     } else {
@@ -287,7 +298,17 @@ while ($a_line = <A>) {
         @b_lines = ();
         $next_b_line = {};
         close $b_fh if (ref($b_fh));
-        open $b_fh, TABIX_BIN . " $opts{bfile} ${b_chr_prefix}${chr}${b_chr_suffix} |" or die "opening b file $opts{bfile} with tabix failed";
+
+        ## Exception for the HLA contig
+        my $chr_mod;
+        if ($chr=~/^HLA/) {
+            $chr_mod=$chr;
+        } else {
+            $chr_mod="${b_chr_prefix}${chr}${b_chr_suffix}";
+        }
+
+        open $b_fh, TABIX_BIN . " $opts{bfile} ${chr_mod}: |" or die "opening b file $opts{bfile} with tabix failed";
+
         warn "Tabix returned no b-features for chromosome ${b_chr_prefix}${chr}${b_chr_suffix}" if (!ref($b_fh));
         # $b_linectr = 0;
     }
